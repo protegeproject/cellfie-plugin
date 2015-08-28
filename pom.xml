@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>org.mm</groupId>
+   <artifactId>cellfie-plugin</artifactId>
+   <version>1.0.0</version>
+   <name>Cellfie Protege 5.0+ Plugin</name>
+   <description>MappingMaster plugin for Desktop Protege 5.0+</description>
+
+   <properties>
+      <java.version>1.8</java.version>
+      <protege.version>5.0.0-beta-15</protege.version>
+      <mappingmaster.version>1.1.0</mappingmaster.version>
+      <log4j.version>1.2.17</log4j.version>
+      <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
+      <maven.bundle.plugin.version>2.5.3</maven.bundle.plugin.version>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   </properties>
+
+
+   <dependencies>
+      <dependency>
+         <groupId>edu.stanford.protege</groupId>
+         <artifactId>org.protege.editor.owl</artifactId>
+         <version>${protege.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.mm</groupId>
+         <artifactId>mapping-master</artifactId>
+         <version>${mapping-master.version}</version>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>${maven.compiler.plugin.version}</version>
+            <configuration>
+               <source>${java.version}</source>
+               <target>${java.version}</target>
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <version>${maven.bundle.plugin.version}</version>
+            <extensions>true</extensions>
+            <configuration>
+
+               <instructions>
+                  <Bundle-Activator>org.protege.editor.owl.ProtegeOWL</Bundle-Activator>
+                  <Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
+                  <Include-Resource>plugin.xml, {maven-resources}</Include-Resource>
+                  <Bundle-ClassPath>.</Bundle-ClassPath>
+                  <Import-Package>
+                     org.apache.log4j.*;version="[1.2,2)",
+                     org.protege.editor.owl.*;version="[5.0, 6.0)",
+                     org.mm.*;version="${mappingmaster.version}",
+                     *
+                  </Import-Package>
+               </instructions>
+
+               <executions>
+                  <execution>
+                     <id>bundle-manifest</id>
+                     <phase>install</phase>
+                     <goals>
+                        <goal>manifest</goal>
+                     </goals>
+                  </execution>
+               </executions>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+</project>
