@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.0"?>
+
+<plugin name="Cellfie Plugin" version="1.0.0">
+   <extension id="cellfie" point="org.protege.editor.core.application.EditorKitMenuAction">
+      <name value="Import Spreadsheet..." />
+      <toolTip value="Generate OWL axioms from Excel spreadsheet" />
+      <class value="org.mm.cellfie.action.CellfieAction" />
+      <path value="org.protege.editor.owl.menu.tools/SlotF-B"></path>
+      <editorKitId value="OWLEditorKit" />
+   </extension>
+</plugin>
