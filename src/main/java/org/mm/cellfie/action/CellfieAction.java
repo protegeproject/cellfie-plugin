@@ -47,7 +47,7 @@ public class CellfieAction extends ProtegeOWLAction
 	@Override
 	public void dispose() throws Exception
 	{
-		cellfieDialog.dispose();
+		//	NO-OP
 	}
 
 	class ProtegeDialogManager implements MMDialogManager
