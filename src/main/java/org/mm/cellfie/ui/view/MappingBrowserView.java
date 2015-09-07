@@ -29,16 +29,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import org.mm.app.MappingExpressionModel;
 import org.mm.cellfie.ui.action.MapExpressionsAction;
 import org.mm.cellfie.ui.dialog.CreateMappingExpressionDialog;
 import org.mm.core.MappingExpression;
-import org.mm.core.MappingExpressionSet;
 import org.mm.core.MappingExpressionSetFactory;
-import org.mm.ui.MMDialogManager;
-import org.mm.ui.MMView;
+import org.mm.ui.DialogManager;
+import org.mm.ui.ModelView;
 
-public class MappingBrowserView extends JPanel implements MMView
+public class MappingBrowserView extends JPanel implements ModelView
 {
 	private static final long serialVersionUID = 1L;
 
@@ -128,7 +126,7 @@ public class MappingBrowserView extends JPanel implements MMView
 	{
 		cmdRunMapping.setEnabled(true);
 		
-		tableModel = new MappingExpressionTableModel(getMappingExpressionsModel());
+		tableModel = new MappingExpressionTableModel(container.getLoadedMappingExpressions());
 		tblMappingExpression.setModel(tableModel);
 		setPreferredColumnSize();
 		resizeColumnWidth();
@@ -204,12 +202,7 @@ public class MappingBrowserView extends JPanel implements MMView
 		return tableModel.getMappingExpressions();
 	}
 
-	private MappingExpressionModel getMappingExpressionsModel()
-	{
-		return container.getApplicationModel().getMappingExpressionsModel();
-	}
-
-	private MMDialogManager getApplicationDialogManager()
+	private DialogManager getApplicationDialogManager()
 	{
 		return container.getApplicationDialogManager();
 	}
@@ -223,10 +216,10 @@ public class MappingBrowserView extends JPanel implements MMView
 			"Mapping Expression", "Comment"
 		};
 
-		public MappingExpressionTableModel(final MappingExpressionModel model)
+		public MappingExpressionTableModel(final List<MappingExpression> mappings)
 		{
 			super();
-			for (MappingExpression mapping : model.getExpressions()) {
+			for (MappingExpression mapping : mappings) {
 				Vector<Object> row = new Vector<Object>();
 				row.add(mapping.getSheetName());
 				row.add(mapping.getStartColumn());
@@ -280,15 +273,6 @@ public class MappingBrowserView extends JPanel implements MMView
 			}
 			return mappings;
 		}
-
-		public MappingExpressionSet getMappingExpressionSet()
-		{
-			MappingExpressionSet mappings = new MappingExpressionSet();
-			for (MappingExpression mapping : getMappingExpressions()) {
-				mappings.add(mapping);
-			}
-			return mappings;
-		}
 	}
 
 	class MultiLineCellRenderer extends JTextArea implements TableCellRenderer
@@ -328,7 +312,8 @@ public class MappingBrowserView extends JPanel implements MMView
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			CreateMappingExpressionDialog dialog = new CreateMappingExpressionDialog(container);
+			CreateMappingExpressionDialog dialog =
+					new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		}
@@ -344,7 +329,8 @@ public class MappingBrowserView extends JPanel implements MMView
 				getApplicationDialogManager().showMessageDialog(container, "No mapping expression was selected");
 				return;
 			}
-			CreateMappingExpressionDialog dialog = new CreateMappingExpressionDialog(container);
+			CreateMappingExpressionDialog dialog =
+					new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
 			dialog.fillDialogFields(selectedRow,
 					getValueAt(selectedRow, 0),
 					getValueAt(selectedRow, 1),
@@ -408,9 +394,8 @@ public class MappingBrowserView extends JPanel implements MMView
 		{
 			try {
 				MappingExpressionSetFactory.saveMappingExpressionSetToDocument(
-						txtMappingPath.getText(),
-						tableModel.getMappingExpressionSet());
-				container.updateMappingExpressionModel(tableModel.getMappingExpressionSet());
+						txtMappingPath.getText(), tableModel.getMappingExpressions());
+				container.updateMappingExpressionModel(tableModel.getMappingExpressions());
 			}
 			catch (IOException ex) {
 				getApplicationDialogManager().showErrorMessageDialog(container,
@@ -434,9 +419,8 @@ public class MappingBrowserView extends JPanel implements MMView
 						filePath = filePath + ext;
 					}
 					MappingExpressionSetFactory.saveMappingExpressionSetToDocument(
-							filePath,
-							tableModel.getMappingExpressionSet());
-					container.updateMappingExpressionModel(tableModel.getMappingExpressionSet());
+							filePath, tableModel.getMappingExpressions());
+					container.updateMappingExpressionModel(tableModel.getMappingExpressions());
 					txtMappingPath.setText(filePath);
 				}
 			} catch (Exception ex) {

@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.mm.app.DataSourceModel;
 import org.mm.cellfie.ui.view.ApplicationView;
 import org.mm.cellfie.ui.view.PreviewAxiomsPanel;
 import org.mm.core.MappingExpression;
@@ -23,7 +22,7 @@ import org.mm.rendering.owlapi.OWLAPIRendering;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
-import org.mm.ui.MMDialogManager;
+import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -51,7 +50,7 @@ public class MapExpressionsAction implements ActionListener
 			// TODO: Move this business logic inside the renderer
 			Set<Rendering> results = new HashSet<Rendering>();
 			List<MappingExpression> mappings = getMappingExpressions();
-			SpreadSheetDataSource dataSource = getDataSourceModel().getDataSource();
+			SpreadSheetDataSource dataSource = container.getLoadedSpreadSheet();
 			Workbook workbook = dataSource.getWorkbook();
 			for (MappingExpression mapping : mappings) {
 				if (mapping.isActive()) {
@@ -155,9 +154,6 @@ public class MapExpressionsAction implements ActionListener
 		if (getMappingExpressions().isEmpty()) {
 			throw new MappingMasterException("No mappings defined");
 		}
-		if (getDataSourceModel().isEmpty()) {
-			throw new MappingMasterException("No workbook loaded");
-		}
 	}
 
 	private void evaluate(MappingExpression mapping, Set<Rendering> results) throws ParseException
@@ -184,12 +180,7 @@ public class MapExpressionsAction implements ActionListener
 		return container.getMappingBrowserView().getMappingExpressions();
 	}
 
-	private DataSourceModel getDataSourceModel()
-	{
-		return container.getApplicationModel().getDataSourceModel();
-	}
-
-	private MMDialogManager getApplicationDialogManager()
+	private DialogManager getApplicationDialogManager()
 	{
 		return container.getApplicationDialogManager();
 	}

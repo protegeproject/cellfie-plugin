@@ -1,13 +1,14 @@
 package org.mm.cellfie.ui.view;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JSplitPane;
 
-import org.mm.app.ApplicationModel;
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
+import org.mm.app.MMApplicationModel;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
 import org.mm.core.settings.ReferenceSettings;
@@ -18,8 +19,9 @@ import org.mm.parser.SimpleNode;
 import org.mm.parser.node.ExpressionNode;
 import org.mm.renderer.Renderer;
 import org.mm.rendering.Rendering;
-import org.mm.ui.MMDialogManager;
-import org.mm.ui.MMView;
+import org.mm.ss.SpreadSheetDataSource;
+import org.mm.ui.DialogManager;
+import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -29,13 +31,13 @@ import org.semanticweb.owlapi.model.OWLOntology;
  * spreadsheet and a control area to edit and execute Mapping Master
  * expressions.
  */
-public class ApplicationView extends ViewSplitPane implements MMView
+public class ApplicationView extends ViewSplitPane implements ModelView
 {
 	private static final long serialVersionUID = 1L;
 
 	private OWLEditorKit editorKit;
 
-	private MMDialogManager applicationDialogManager;
+	private DialogManager applicationDialogManager;
 	private DataSourceView dataSourceView;
 	private MappingBrowserView mappingExpressionView;
 
@@ -44,7 +46,7 @@ public class ApplicationView extends ViewSplitPane implements MMView
 
 	private ReferenceSettings referenceSettings = new ReferenceSettings();
 
-	public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, MMDialogManager applicationDialogManager)
+	public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, DialogManager applicationDialogManager)
 	{
 		super(JSplitPane.VERTICAL_SPLIT);
 		
@@ -125,7 +127,7 @@ public class ApplicationView extends ViewSplitPane implements MMView
 		}
 	}
 
-	public ApplicationModel getApplicationModel()
+	private MMApplicationModel getApplicationModel()
 	{
 		return application.getApplicationModel();
 	}
@@ -150,8 +152,19 @@ public class ApplicationView extends ViewSplitPane implements MMView
 		// NO-OP
 	}
 
-	public void updateMappingExpressionModel(MappingExpressionSet mappings)
+	public SpreadSheetDataSource getLoadedSpreadSheet()
 	{
+		return getApplicationModel().getDataSourceModel().getDataSource();
+	}
+
+	public List<MappingExpression> getLoadedMappingExpressions()
+	{
+		return getApplicationModel().getMappingExpressionsModel().getExpressions();
+	}
+
+	public void updateMappingExpressionModel(List<MappingExpression> mappingList)
+	{
+		MappingExpressionSet mappings = MappingExpressionSet.create(mappingList);
 		getApplicationModel().getMappingExpressionsModel().changeMappingExpressionSet(mappings);
 	}
 
@@ -165,7 +178,7 @@ public class ApplicationView extends ViewSplitPane implements MMView
 		return editorKit;
 	}
 
-	public MMDialogManager getApplicationDialogManager()
+	public DialogManager getApplicationDialogManager()
 	{
 		return applicationDialogManager;
 	}

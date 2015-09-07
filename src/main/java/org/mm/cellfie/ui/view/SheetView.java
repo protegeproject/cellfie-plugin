@@ -8,9 +8,9 @@ import javax.swing.JTable;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.cellfie.ui.model.SheetModel;
-import org.mm.ui.MMView;
+import org.mm.ui.ModelView;
 
-public class SheetView extends JPanel implements MMView
+public class SheetView extends JPanel implements ModelView
 {
 	private static final long serialVersionUID = 1L;
 

@@ -19,12 +19,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.mm.app.DataSourceModel;
 import org.mm.cellfie.ui.view.ApplicationView;
 import org.mm.cellfie.ui.view.MappingBrowserView;
 import org.mm.exceptions.MappingMasterException;
+import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
-import org.mm.ui.MMDialogManager;
+import org.mm.ui.DialogManager;
 
 public class CreateMappingExpressionDialog extends JDialog
 {
@@ -44,7 +44,7 @@ public class CreateMappingExpressionDialog extends JDialog
 
 	private JTextArea txtExpression;
 
-	public CreateMappingExpressionDialog(ApplicationView container)
+	public CreateMappingExpressionDialog(ApplicationView container, SpreadSheetDataSource spreadSheet)
 	{
 		this.container = container;
 
@@ -59,26 +59,26 @@ public class CreateMappingExpressionDialog extends JDialog
 		
 		contentPane.add(pnlMain, BorderLayout.CENTER);
 
-		JLabel lblSheetName = new JLabel("Sheet name*:");
+		JLabel lblSheetName = new JLabel("Sheet name:");
 		cbbSheetName = new JComboBox<>();
-		cbbSheetName.setModel(new DefaultComboBoxModel<>(new Vector<>(getDataSourceModel().getSheetNames())));
+		cbbSheetName.setModel(new DefaultComboBoxModel<>(new Vector<>(spreadSheet.getSheetNames())));
 
-		JLabel lblStartColumn = new JLabel("Start column*:");
+		JLabel lblStartColumn = new JLabel("Start column:");
 		txtStartColumn = new JTextField("");
 
-		JLabel lblEndColumn = new JLabel("End column*:");
+		JLabel lblEndColumn = new JLabel("End column:");
 		txtEndColumn = new JTextField("");
 
-		JLabel lblStartRow = new JLabel("Start row*:");
+		JLabel lblStartRow = new JLabel("Start row:");
 		txtStartRow = new JTextField("");
 
-		JLabel lblEndRow = new JLabel("End row*:");
+		JLabel lblEndRow = new JLabel("End row:");
 		txtEndRow = new JTextField("");
 
 		JLabel lblComment = new JLabel("Comment:");
 		txtComment = new JTextField("");
 
-		JLabel lblExpression = new JLabel("DSL mapping expression*:");
+		JLabel lblExpression = new JLabel("DSL mapping expression:");
 
 		JPanel pnlFields = new JPanel(new GridLayout(7, 2));
 		pnlFields.add(lblSheetName);
@@ -174,12 +174,7 @@ public class CreateMappingExpressionDialog extends JDialog
 		return container.getMappingBrowserView();
 	}
 
-	private DataSourceModel getDataSourceModel()
-	{
-		return container.getApplicationModel().getDataSourceModel();
-	}
-
-	private MMDialogManager getApplicationDialogManager()
+	private DialogManager getApplicationDialogManager()
 	{
 		return container.getApplicationDialogManager();
 	}

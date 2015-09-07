@@ -10,7 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.mm.cellfie.ui.view.ApplicationView;
-import org.mm.ui.MMDialogManager;
+import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -50,7 +50,7 @@ public class CellfieAction extends ProtegeOWLAction
 		//	NO-OP
 	}
 
-	class ProtegeDialogManager implements MMDialogManager
+	class ProtegeDialogManager implements DialogManager
 	{
 		@Override
 		public int showConfirmDialog(Component parent, String title, String message)

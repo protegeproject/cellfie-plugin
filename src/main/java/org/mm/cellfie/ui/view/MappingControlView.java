@@ -20,9 +20,9 @@ import org.mm.app.Environment;
 import org.mm.cellfie.ui.action.MapExpressionsAction;
 import org.mm.core.settings.ReferenceSettings;
 import org.mm.core.settings.ValueEncodingSetting;
-import org.mm.ui.MMView;
+import org.mm.ui.ModelView;
 
-public class MappingControlView extends JPanel implements MMView
+public class MappingControlView extends JPanel implements ModelView
 {
 	private static final long serialVersionUID = 1L;
 

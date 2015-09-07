@@ -12,11 +12,11 @@ import javax.swing.JTextField;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.ss.SpreadSheetDataSource;
-import org.mm.ui.MMDialogManager;
-import org.mm.ui.MMView;
+import org.mm.ui.DialogManager;
+import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 
-public class DataSourceView extends JPanel implements MMView
+public class DataSourceView extends JPanel implements ModelView
 {
 	private static final long serialVersionUID = 1L;
 
@@ -68,7 +68,7 @@ public class DataSourceView extends JPanel implements MMView
 		}
 	}
 
-	private MMDialogManager getApplicationDialogManager()
+	private DialogManager getApplicationDialogManager()
 	{
 		return container.getApplicationDialogManager();
 	}
@@ -77,7 +77,7 @@ public class DataSourceView extends JPanel implements MMView
 	public void update()
 	{
 		tabSheetContainer.removeAll(); // reset the tab panel first
-		SpreadSheetDataSource spreadsheet = container.getApplicationModel().getDataSourceModel().getDataSource();
+		SpreadSheetDataSource spreadsheet = container.getLoadedSpreadSheet();
 		for (Sheet sheet : spreadsheet.getSheets()) {
 			SheetView sheetView = new SheetView(sheet);
 			tabSheetContainer.addTab(sheet.getSheetName(), null, sheetView);
