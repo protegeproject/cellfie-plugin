@@ -8,12 +8,12 @@ import java.io.File;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.cellfie.ui.dialog.MMDialogManager;
 import org.mm.ss.SpreadSheetDataSource;
+import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 
 public class DataSourceView extends JPanel implements MMView
 {
@@ -22,7 +22,7 @@ public class DataSourceView extends JPanel implements MMView
 	private ApplicationView container;
 
 	private JTextField txtWorkbookPath;
-	private JTabbedPane tabSheetContainer;
+	private ViewTabbedPane tabSheetContainer;
 
 	public DataSourceView(ApplicationView container)
 	{
@@ -30,7 +30,7 @@ public class DataSourceView extends JPanel implements MMView
 
 		setLayout(new BorderLayout());
 
-		tabSheetContainer = new JTabbedPane();
+		tabSheetContainer = new ViewTabbedPane();
 		tabSheetContainer.addTab("NONE", new JPanel());
 		add(tabSheetContainer, BorderLayout.CENTER);
 
