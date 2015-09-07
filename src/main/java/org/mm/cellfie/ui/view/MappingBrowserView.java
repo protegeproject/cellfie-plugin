@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,42 +69,17 @@ public class MappingBrowserView extends JPanel implements ModelView
 		setLayout(new BorderLayout());
 		
 		JPanel pnlTop = new JPanel(new BorderLayout());
+		pnlTop.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mapping File"));
+
 		add(pnlTop, BorderLayout.NORTH);
-		
-		cmdRunMapping = new JButton("Run Mapping");
-		cmdRunMapping.setEnabled(false);
-		cmdRunMapping.setPreferredSize(new Dimension(125, 32));
-		cmdRunMapping.addActionListener(new MapExpressionsAction(container));
-		pnlTop.add(cmdRunMapping, BorderLayout.WEST);
-		
-		JPanel pnlCommandButton = new JPanel(new BorderLayout());
-		pnlTop.add(pnlCommandButton, BorderLayout.EAST);
-		
-		cmdAdd = new JButton("Add");
-		cmdAdd.addActionListener(new AddButtonActionListener());
-		pnlCommandButton.add(cmdAdd, BorderLayout.WEST);
-		
-		cmdEdit = new JButton("Edit");
-		cmdEdit.addActionListener(new EditButtonActionListener());
-		pnlCommandButton.add(cmdEdit, BorderLayout.CENTER);
-		
-		cmdDelete = new JButton("Delete");
-		cmdDelete.addActionListener(new DeleteButtonActionListener());
-		pnlCommandButton.add(cmdDelete, BorderLayout.EAST);
-		
-		add(scrMappingExpression, BorderLayout.CENTER);
-		
-		JPanel pnlBottom = new JPanel(new BorderLayout());
-		pnlBottom.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mapping File"));
-		add(pnlBottom, BorderLayout.SOUTH);
 
 		txtMappingPath = new JTextField();
 		txtMappingPath.setPreferredSize(new Dimension(80, 30));
 		txtMappingPath.setEnabled(true);
-		pnlBottom.add(txtMappingPath, BorderLayout.CENTER);
+		pnlTop.add(txtMappingPath, BorderLayout.CENTER);
 
 		JPanel pnlMappingOpenSave = new JPanel(new GridLayout(1, 4));
-		pnlBottom.add(pnlMappingOpenSave, BorderLayout.EAST);
+		pnlTop.add(pnlMappingOpenSave, BorderLayout.EAST);
 
 		JButton cmdOpen = new JButton("Browse...");
 		cmdOpen.addActionListener(new OpenMappingAction());
@@ -117,6 +93,35 @@ public class MappingBrowserView extends JPanel implements ModelView
 		JButton cmdSaveAs = new JButton("Save As...");
 		cmdSaveAs.addActionListener(new SaveAsMappingAction());
 		pnlMappingOpenSave.add(cmdSaveAs);
+		
+		JPanel pnlCenter = new JPanel(new BorderLayout());
+		add(pnlCenter, BorderLayout.CENTER);
+		
+		pnlCenter.add(scrMappingExpression, BorderLayout.CENTER);
+		
+		JPanel pnlBottom = new JPanel(new BorderLayout());
+		add(pnlBottom, BorderLayout.SOUTH);
+		
+		JPanel pnlCommandButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		pnlBottom.add(pnlCommandButton, BorderLayout.WEST);
+		
+		cmdAdd = new JButton("Add");
+		cmdAdd.addActionListener(new AddButtonActionListener());
+		pnlCommandButton.add(cmdAdd);
+		
+		cmdEdit = new JButton("Edit");
+		cmdEdit.addActionListener(new EditButtonActionListener());
+		pnlCommandButton.add(cmdEdit);
+		
+		cmdDelete = new JButton("Delete");
+		cmdDelete.addActionListener(new DeleteButtonActionListener());
+		pnlCommandButton.add(cmdDelete);
+		
+		cmdRunMapping = new JButton("Run Mapping");
+		cmdRunMapping.setEnabled(false);
+		cmdRunMapping.setPreferredSize(new Dimension(125, 32));
+		cmdRunMapping.addActionListener(new MapExpressionsAction(container));
+		pnlBottom.add(cmdRunMapping, BorderLayout.EAST);
 		
 		validate();
 	}
