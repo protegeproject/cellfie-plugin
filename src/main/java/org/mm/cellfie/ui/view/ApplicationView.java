@@ -32,6 +32,8 @@ public class ApplicationView extends ViewSplitPane implements MMView
 {
 	private static final long serialVersionUID = 1L;
 
+	private OWLEditorKit editorKit;
+
 	private MMDialogManager applicationDialogManager;
 	private DataSourceView dataSourceView;
 	private MappingBrowserView mappingExpressionView;
@@ -46,6 +48,8 @@ public class ApplicationView extends ViewSplitPane implements MMView
 		super(JSplitPane.VERTICAL_SPLIT);
 		
 		setUserOntology(ontology);
+		
+		this.editorKit = editorKit;
 		this.applicationDialogManager = applicationDialogManager;
 
 		setDividerLocation(500);
@@ -153,6 +157,11 @@ public class ApplicationView extends ViewSplitPane implements MMView
 	public Renderer getDefaultRenderer()
 	{
 		return getApplicationModel().getDefaultRenderer();
+	}
+
+	public OWLEditorKit getEditorKit()
+	{
+		return editorKit;
 	}
 
 	public MMDialogManager getApplicationDialogManager()

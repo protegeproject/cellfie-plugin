@@ -9,8 +9,8 @@ import java.util.Set;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import org.mm.ui.dialog.MMDialogManager;
-import org.mm.ui.view.ApplicationView;
+import org.mm.cellfie.ui.dialog.MMDialogManager;
+import org.mm.cellfie.ui.view.ApplicationView;
 import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -32,12 +32,12 @@ public class CellfieAction extends ProtegeOWLAction
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		ApplicationView appView = new ApplicationView(currentOntology, new ProtegeDialogManager());
+		ApplicationView appView = new ApplicationView(currentOntology, getOWLEditorKit(), new ProtegeDialogManager());
 		appView.setDividerLocation(500);
 		appView.setResizeWeight(0.8);
 		
 		cellfieDialog = new JDialog();
-		cellfieDialog.setTitle("Cellfie Spreadsheet Importer");
+		cellfieDialog.setTitle("Cellfie");
 		cellfieDialog.setContentPane(appView);
 		cellfieDialog.setSize(1100, 1000);
 		cellfieDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
