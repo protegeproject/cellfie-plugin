@@ -19,6 +19,8 @@ import org.mm.parser.SimpleNode;
 import org.mm.parser.node.ExpressionNode;
 import org.mm.renderer.Renderer;
 import org.mm.rendering.Rendering;
+import org.protege.editor.core.ui.split.ViewSplitPane;
+import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
@@ -26,7 +28,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
  * spreadsheet and a control area to edit and execute Mapping Master
  * expressions.
  */
-public class ApplicationView extends JSplitPane implements MMView
+public class ApplicationView extends ViewSplitPane implements MMView
 {
 	private static final long serialVersionUID = 1L;
 
@@ -39,17 +41,13 @@ public class ApplicationView extends JSplitPane implements MMView
 
 	private ReferenceSettings referenceSettings = new ReferenceSettings();
 
-	public ApplicationView(MMDialogManager applicationDialogManager)
+	public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, MMDialogManager applicationDialogManager)
 	{
-		this(null, applicationDialogManager);
-	}
-
-	public ApplicationView(OWLOntology ontology, MMDialogManager applicationDialogManager)
-	{
+		super(JSplitPane.VERTICAL_SPLIT);
+		
 		setUserOntology(ontology);
 		this.applicationDialogManager = applicationDialogManager;
 
-		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setDividerLocation(500);
 		setResizeWeight(0.8);
 
