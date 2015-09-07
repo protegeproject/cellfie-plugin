@@ -20,6 +20,7 @@ import org.mm.cellfie.ui.Environment;
 import org.mm.cellfie.ui.action.MapExpressionsAction;
 import org.mm.core.settings.ReferenceSettings;
 import org.mm.core.settings.ValueEncodingSetting;
+import org.mm.ui.MMView;
 
 public class MappingControlView extends JPanel implements MMView
 {

@@ -31,11 +31,12 @@ import javax.swing.table.TableColumnModel;
 
 import org.mm.cellfie.ui.action.MapExpressionsAction;
 import org.mm.cellfie.ui.dialog.CreateMappingExpressionDialog;
-import org.mm.cellfie.ui.dialog.MMDialogManager;
 import org.mm.cellfie.ui.model.MappingExpressionModel;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
 import org.mm.core.MappingExpressionSetFactory;
+import org.mm.ui.MMDialogManager;
+import org.mm.ui.MMView;
 
 public class MappingBrowserView extends JPanel implements MMView
 {

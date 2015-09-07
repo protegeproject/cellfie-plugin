@@ -9,8 +9,8 @@ import java.util.Set;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import org.mm.cellfie.ui.dialog.MMDialogManager;
 import org.mm.cellfie.ui.view.ApplicationView;
+import org.mm.ui.MMDialogManager;
 import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.semanticweb.owlapi.model.OWLOntology;

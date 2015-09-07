@@ -8,6 +8,7 @@ import javax.swing.JTable;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.cellfie.ui.model.SheetModel;
+import org.mm.ui.MMView;
 
 public class SheetView extends JPanel implements MMView
 {

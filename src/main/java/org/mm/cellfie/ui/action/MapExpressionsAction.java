@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.mm.cellfie.ui.dialog.MMDialogManager;
 import org.mm.cellfie.ui.model.DataSourceModel;
 import org.mm.cellfie.ui.view.ApplicationView;
 import org.mm.cellfie.ui.view.PreviewAxiomsPanel;
@@ -24,6 +23,7 @@ import org.mm.rendering.owlapi.OWLAPIRendering;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
+import org.mm.ui.MMDialogManager;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.semanticweb.owlapi.model.OWLAxiom;
 

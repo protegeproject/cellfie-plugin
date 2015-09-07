@@ -5,6 +5,7 @@ import org.mm.renderer.Renderer;
 import org.mm.renderer.owlapi.OWLAPIRenderer;
 import org.mm.renderer.text.TextRenderer;
 import org.mm.ss.SpreadSheetDataSource;
+import org.mm.ui.MMModel;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 public class ApplicationModel implements MMModel

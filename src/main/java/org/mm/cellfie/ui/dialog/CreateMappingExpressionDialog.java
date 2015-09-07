@@ -24,6 +24,7 @@ import org.mm.cellfie.ui.view.ApplicationView;
 import org.mm.cellfie.ui.view.MappingBrowserView;
 import org.mm.exceptions.MappingMasterException;
 import org.mm.ss.SpreadSheetUtil;
+import org.mm.ui.MMDialogManager;
 
 public class CreateMappingExpressionDialog extends JDialog
 {

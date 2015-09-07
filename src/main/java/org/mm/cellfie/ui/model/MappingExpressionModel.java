@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
+import org.mm.ui.MMModel;
 
 public class MappingExpressionModel implements MMModel
 {

@@ -7,7 +7,6 @@ import javax.swing.JSplitPane;
 
 import org.mm.cellfie.ui.MMApplication;
 import org.mm.cellfie.ui.MMApplicationFactory;
-import org.mm.cellfie.ui.dialog.MMDialogManager;
 import org.mm.cellfie.ui.model.ApplicationModel;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
@@ -19,6 +18,8 @@ import org.mm.parser.SimpleNode;
 import org.mm.parser.node.ExpressionNode;
 import org.mm.renderer.Renderer;
 import org.mm.rendering.Rendering;
+import org.mm.ui.MMDialogManager;
+import org.mm.ui.MMView;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.OWLOntology;

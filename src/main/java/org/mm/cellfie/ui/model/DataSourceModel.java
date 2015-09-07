@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mm.ss.SpreadSheetDataSource;
+import org.mm.ui.MMModel;
 
 public class DataSourceModel implements MMModel
 {

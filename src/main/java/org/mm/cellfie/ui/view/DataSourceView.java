@@ -11,8 +11,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.apache.poi.ss.usermodel.Sheet;
-import org.mm.cellfie.ui.dialog.MMDialogManager;
 import org.mm.ss.SpreadSheetDataSource;
+import org.mm.ui.MMDialogManager;
+import org.mm.ui.MMView;
 import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 
 public class DataSourceView extends JPanel implements MMView
