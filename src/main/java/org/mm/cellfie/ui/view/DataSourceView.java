@@ -79,8 +79,8 @@ public class DataSourceView extends JPanel implements ModelView
 		tabSheetContainer.removeAll(); // reset the tab panel first
 		SpreadSheetDataSource spreadsheet = container.getLoadedSpreadSheet();
 		for (Sheet sheet : spreadsheet.getSheets()) {
-			SheetView sheetView = new SheetView(sheet);
-			tabSheetContainer.addTab(sheet.getSheetName(), null, sheetView);
+			SheetPanel sheetPanel = new SheetPanel(sheet);
+			tabSheetContainer.addTab(sheetPanel.getSheetName(), null, sheetPanel);
 		}
 	}
 }

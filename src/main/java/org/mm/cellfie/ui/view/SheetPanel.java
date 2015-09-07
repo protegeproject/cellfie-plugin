@@ -10,16 +10,15 @@ import javax.swing.table.AbstractTableModel;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.ss.SpreadSheetUtil;
-import org.mm.ui.ModelView;
 
-public class SheetView extends JPanel implements ModelView
+public class SheetPanel extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 
 	private final Sheet sheet;
 	private final SheetTableModel sheetModel;
 
-	public SheetView(Sheet sheet)
+	public SheetPanel(Sheet sheet)
 	{
 		this.sheet = sheet;
 		sheetModel = new SheetTableModel(sheet);
@@ -41,12 +40,6 @@ public class SheetView extends JPanel implements ModelView
 	public String getSheetName()
 	{
 		return sheet.getSheetName();
-	}
-
-	@Override
-	public void update()
-	{
-		// NO-OP
 	}
 	
 	class SheetTableModel extends AbstractTableModel
