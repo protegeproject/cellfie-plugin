@@ -5,9 +5,9 @@ import java.util.Set;
 
 import javax.swing.JSplitPane;
 
-import org.mm.cellfie.ui.MMApplication;
-import org.mm.cellfie.ui.MMApplicationFactory;
-import org.mm.cellfie.ui.model.ApplicationModel;
+import org.mm.app.ApplicationModel;
+import org.mm.app.MMApplication;
+import org.mm.app.MMApplicationFactory;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
 import org.mm.core.settings.ReferenceSettings;

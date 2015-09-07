@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.mm.cellfie.ui.Environment;
+import org.mm.app.Environment;
 import org.mm.cellfie.ui.action.MapExpressionsAction;
 import org.mm.core.settings.ReferenceSettings;
 import org.mm.core.settings.ValueEncodingSetting;

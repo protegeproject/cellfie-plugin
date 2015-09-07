@@ -29,9 +29,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import org.mm.app.MappingExpressionModel;
 import org.mm.cellfie.ui.action.MapExpressionsAction;
 import org.mm.cellfie.ui.dialog.CreateMappingExpressionDialog;
-import org.mm.cellfie.ui.model.MappingExpressionModel;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
 import org.mm.core.MappingExpressionSetFactory;

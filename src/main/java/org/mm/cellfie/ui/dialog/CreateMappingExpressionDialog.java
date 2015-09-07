@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.mm.cellfie.ui.model.DataSourceModel;
+import org.mm.app.DataSourceModel;
 import org.mm.cellfie.ui.view.ApplicationView;
 import org.mm.cellfie.ui.view.MappingBrowserView;
 import org.mm.exceptions.MappingMasterException;
