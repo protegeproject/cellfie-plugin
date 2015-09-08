@@ -59,6 +59,12 @@ public class CellfieAction extends ProtegeOWLAction
 		}
 
 		@Override
+		public String showInputDialog(Component parent, String message)
+		{
+			return JOptionPane.showInputDialog(parent, message, "Input", JOptionPane.OK_CANCEL_OPTION);
+		}
+
+		@Override
 		public void showMessageDialog(Component parent, String message)
 		{
 			JOptionPane.showMessageDialog(parent, message, "Message", JOptionPane.INFORMATION_MESSAGE);
