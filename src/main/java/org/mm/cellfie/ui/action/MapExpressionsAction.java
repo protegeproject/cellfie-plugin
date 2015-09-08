@@ -2,6 +2,7 @@ package org.mm.cellfie.ui.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,12 +25,19 @@ import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
 import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 public class MapExpressionsAction implements ActionListener
 {
 	private ApplicationView container;
 
+	private static final int CANCEL_IMPORT = 0;
 	private static final int IMPORT_TO_CURRENT_ONTOLOGY = 1;
 	private static final int IMPORT_TO_NEW_ONTOLOGY = 2;
 
@@ -105,33 +113,36 @@ public class MapExpressionsAction implements ActionListener
 		return axiomSet;
 	}
 
-	private void showAxiomPreviewDialog(Set<OWLAxiom> axioms)
+	private void showAxiomPreviewDialog(Set<OWLAxiom> axioms) throws MappingMasterException
 	{
+		OWLModelManager modelManager = container.getEditorKit().getOWLModelManager();
+		
 		int answer = showConfirmImportDialog(axioms);
-//		try {
-//			switch (answer) {
-//				case IMPORT_TO_CURRENT_ONTOLOGY:
-//					OWLOntology currentOntology = container.getApplicationModel().getOntology();
-////					importResult(currentOntology, results);
-//					break;
-//				case IMPORT_TO_NEW_ONTOLOGY:
-//					File file = container.getApplicationDialogManager().showSaveFileChooser(container, "Save", "owl", "OWL ontology file", true);
-//					if (file != null) {
-//						OWLOntology newOntology = OWLManager.createOWLOntologyManager().createOntology(IRI.create(file.toURI()));
-////						importResult(newOntology, results);
-//					}
-//					break;
-//				default:
-//					// NO-OP
-//			}
-//		} catch (OWLOntologyCreationException e) {
-//			throw new MappingMasterException("Error while creating a new ontology file: " + e.getMessage());
-//		} catch (OWLOntologyStorageException e) {
-//			if (e.getCause() instanceof ProtocolException) {
-//				throw new MappingMasterException("Unable to import the axioms to remote location. Please make sure your ontology was loaded from a local directory.");
-//			}
-//			throw new MappingMasterException("Error while importing the axioms to target ontology: " + e.getMessage());
-//		}
+		try {
+			switch (answer) {
+				case IMPORT_TO_CURRENT_ONTOLOGY:
+					OWLOntology currentOntology = modelManager.getActiveOntology();
+					modelManager.applyChanges(addAxioms(currentOntology, axioms));
+					break;
+				case IMPORT_TO_NEW_ONTOLOGY:
+					OWLOntology newOntology = modelManager.createNewOntology(new OWLOntologyID(), null);
+					modelManager.applyChanges(addAxioms(newOntology, axioms));
+					break;
+				default:
+					// NO-OP
+			}
+		} catch (OWLOntologyCreationException e) {
+			throw new MappingMasterException("Error while creating a new ontology: " + e.getMessage());
+		}
+	}
+
+	private List<OWLOntologyChange> addAxioms(OWLOntology ontology, Set<OWLAxiom> axioms)
+	{
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+		for (OWLAxiom ax : axioms) {
+			changes.add(new AddAxiom(ontology, ax));
+		}
+		return changes;
 	}
 
 	private JPanel createPreviewAxiomsPanel(Set<OWLAxiom> axioms)
@@ -142,6 +153,7 @@ public class MapExpressionsAction implements ActionListener
 	private int showConfirmImportDialog(Set<OWLAxiom> axioms)
 	{
 		ImportOption[] options = {
+				new ImportOption(CANCEL_IMPORT, "Don't Import"),
 				new ImportOption(IMPORT_TO_CURRENT_ONTOLOGY, "Import axioms to the current ontology"),
 				new ImportOption(IMPORT_TO_NEW_ONTOLOGY, "Import axioms to new ontology")
 		};
@@ -185,7 +197,7 @@ public class MapExpressionsAction implements ActionListener
 		return container.getApplicationDialogManager();
 	}
 
-	class ImportOption
+	class ImportOption implements Comparable<ImportOption>
 	{
 		private int option;
 		private String title;
@@ -205,6 +217,12 @@ public class MapExpressionsAction implements ActionListener
 		public String toString()
 		{
 			return title;
+		}
+
+		@Override
+		public int compareTo(ImportOption o)
+		{
+			return option-o.option;
 		}
 	}
 }
