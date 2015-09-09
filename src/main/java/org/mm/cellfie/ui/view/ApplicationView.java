@@ -13,6 +13,7 @@ import javax.swing.JSplitPane;
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
 import org.mm.app.MMApplicationModel;
+import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
 import org.mm.core.settings.ReferenceSettings;
@@ -89,30 +90,37 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 	public void updateOntologyDocument(String path)
 	{
 		applicationFactory.setOntologyLocation(path);
-		fireApplicationResourceChanged();
+		fireOntologyDocumentChanged();
 	}
 
 	public void loadWorkbookDocument(String path)
 	{
 		applicationFactory.setWorkbookLocation(path);
-		fireApplicationResourceChanged();
-
-		updateDataSourceView();
-		updateMappingBrowserView();
+		fireWorkbookDocumentChanged();
 	}
 
 	public void loadMappingDocument(String path)
 	{
 		applicationFactory.setMappingLocation(path);
-		fireApplicationResourceChanged();
-		
-		updateMappingBrowserView();
+		fireMappingDocumentChanged();
 	}
 
-	private void fireApplicationResourceChanged()
+	private void fireOntologyDocumentChanged()
+	{
+		setupApplication();
+	}
+
+	private void fireWorkbookDocumentChanged()
+	{
+		setupApplication();
+		updateDataSourceView();
+	}
+
+	private void fireMappingDocumentChanged()
 	{
 		setupApplication();
 		prepareLogFileLocation();
+		updateMappingBrowserView();
 	}
 
 	private void updateDataSourceView()
@@ -179,14 +187,24 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 		// NO-OP
 	}
 
-	public SpreadSheetDataSource getLoadedSpreadSheet()
+	public SpreadSheetDataSource getLoadedSpreadSheet() throws CellfieException
 	{
-		return getApplicationModel().getDataSourceModel().getDataSource();
+		try {
+			SpreadSheetDataSource spreadsheet = getApplicationModel().getDataSourceModel().getDataSource();
+			spreadsheet.getSheets(); // just to check NullPointerException
+			return spreadsheet;
+		} catch (NullPointerException ex) {
+			throw new CellfieException("Unable to find the spreadsheet. Please load the source spreadsheet first and try again.", ex);
+		}
 	}
 
-	public List<MappingExpression> getLoadedMappingExpressions()
+	public List<MappingExpression> getLoadedMappingExpressions() throws CellfieException
 	{
-		return getApplicationModel().getMappingExpressionsModel().getExpressions();
+		try {
+			return getApplicationModel().getMappingExpressionsModel().getExpressions();
+		} catch (NullPointerException ex) {
+			throw new CellfieException("Unable to find the mapping expressions. Please load the expressions first and try again.", ex);
+		}
 	}
 
 	public void updateMappingExpressionModel(List<MappingExpression> mappingList)

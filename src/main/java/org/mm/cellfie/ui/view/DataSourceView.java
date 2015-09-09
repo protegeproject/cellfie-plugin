@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.apache.poi.ss.usermodel.Sheet;
+import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ui.DialogManager;
 import org.mm.ui.ModelView;
@@ -54,16 +55,15 @@ public class DataSourceView extends JPanel implements ModelView
 		public void actionPerformed(ActionEvent e)
 		{
 			try {
-				File file = getApplicationDialogManager().showOpenFileChooser(
-						container, "Open Excel Workbook", "xlsx", "Excel Workbook (.xlsx)");
+				File file = getApplicationDialogManager().showOpenFileChooser(container, "Open Excel Workbook", "xlsx", "Excel Workbook (.xlsx)");
 				if (file != null) {
 					String filename = file.getAbsolutePath();
 					container.loadWorkbookDocument(filename);
 					txtWorkbookPath.setText(filename);
 				}
 			} catch (Exception ex) {
-				getApplicationDialogManager().showErrorMessageDialog(container,
-						"Error opening file: " + ex.getMessage());
+				getApplicationDialogManager().showErrorMessageDialog(container, "Error opening file: " + ex.getMessage());
+				txtWorkbookPath.setText("");
 			}
 		}
 	}
@@ -76,11 +76,15 @@ public class DataSourceView extends JPanel implements ModelView
 	@Override
 	public void update()
 	{
-		tabSheetContainer.removeAll(); // reset the tab panel first
-		SpreadSheetDataSource spreadsheet = container.getLoadedSpreadSheet();
-		for (Sheet sheet : spreadsheet.getSheets()) {
-			SheetPanel sheetPanel = new SheetPanel(sheet);
-			tabSheetContainer.addTab(sheetPanel.getSheetName(), null, sheetPanel);
+		try {
+			tabSheetContainer.removeAll(); // reset the tab panel first
+			SpreadSheetDataSource spreadsheet = container.getLoadedSpreadSheet();
+			for (Sheet sheet : spreadsheet.getSheets()) {
+				SheetPanel sheetPanel = new SheetPanel(sheet);
+				tabSheetContainer.addTab(sheetPanel.getSheetName(), null, sheetPanel);
+			}
+		} catch (CellfieException ex) {
+			getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
 		}
 	}
 }

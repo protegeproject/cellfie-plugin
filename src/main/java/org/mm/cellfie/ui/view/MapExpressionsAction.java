@@ -15,8 +15,8 @@ import javax.swing.JPanel;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.core.MappingExpression;
-import org.mm.exceptions.MappingMasterException;
 import org.mm.parser.ParseException;
 import org.mm.renderer.RendererException;
 import org.mm.rendering.Rendering;
@@ -55,17 +55,17 @@ public class MapExpressionsAction implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		try {
-			/*
-			 * Verify the input resources first
-			 */
-			verify();
+			SpreadSheetDataSource dataSource = container.getLoadedSpreadSheet();
+			Workbook workbook = dataSource.getWorkbook();
+			
+			List<MappingExpression> mappings = getUserExpressions();
+			if (mappings.isEmpty()) {
+				throw new CellfieException("No mappings defined");
+			}
 			
 			// TODO: Move this business logic inside the renderer
 			Set<Rendering> results = new HashSet<Rendering>();
 			StringBuffer logMessage = new StringBuffer();
-			List<MappingExpression> mappings = getMappingExpressions();
-			SpreadSheetDataSource dataSource = container.getLoadedSpreadSheet();
-			Workbook workbook = dataSource.getWorkbook();
 			for (MappingExpression mapping : mappings) {
 				if (mapping.isActive()) {
 					String sheetName = mapping.getSheetName();
@@ -80,10 +80,10 @@ public class MapExpressionsAction implements ActionListener
 							: SpreadSheetUtil.row2Number(mapping.getEndRow());
 
 					if (startColumn > endColumn) {
-						throw new RendererException("start column after finish column in expression " + mapping);
+						throw new CellfieException("start column after finish column in expression " + mapping);
 					}
 					if (startRow > endRow) {
-						throw new RendererException("start row after finish row in expression " + mapping);
+						throw new CellfieException("start row after finish row in expression " + mapping);
 					}
 					SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumn, endRow);
 					SpreadsheetLocation startLocation = new SpreadsheetLocation(sheetName, startColumn, startRow);
@@ -128,7 +128,7 @@ public class MapExpressionsAction implements ActionListener
 		return axiomSet;
 	}
 
-	private void showAxiomPreviewDialog(Set<OWLAxiom> axioms) throws MappingMasterException
+	private void showAxiomPreviewDialog(Set<OWLAxiom> axioms) throws CellfieException
 	{
 		OWLModelManager modelManager = container.getEditorKit().getOWLModelManager();
 		OWLOntology currentOntology = modelManager.getActiveOntology();
@@ -149,7 +149,7 @@ public class MapExpressionsAction implements ActionListener
 					// NO-OP
 			}
 		} catch (OWLOntologyCreationException e) {
-			throw new MappingMasterException("Error while creating a new ontology: " + e.getMessage());
+			throw new CellfieException("Error while creating a new ontology: " + e.getMessage());
 		}
 	}
 
@@ -195,13 +195,6 @@ public class MapExpressionsAction implements ActionListener
 				JOptionPane.DEFAULT_OPTION, null, options, null);
 	}
 
-	private void verify() throws MappingMasterException
-	{
-		if (getMappingExpressions().isEmpty()) {
-			throw new MappingMasterException("No mappings defined");
-		}
-	}
-
 	private void evaluate(MappingExpression mapping, Set<Rendering> results, StringBuffer logMessage) throws ParseException
 	{
 		container.evaluate(mapping, container.getDefaultRenderer(), results, logMessage);
@@ -221,7 +214,7 @@ public class MapExpressionsAction implements ActionListener
 		throw new RendererException("incrementLocation called redundantly");
 	}
 
-	private List<MappingExpression> getMappingExpressions()
+	private List<MappingExpression> getUserExpressions()
 	{
 		return container.getMappingBrowserView().getMappingExpressions();
 	}

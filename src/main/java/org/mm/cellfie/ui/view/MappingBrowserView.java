@@ -31,6 +31,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import org.mm.cellfie.ui.dialog.CreateMappingExpressionDialog;
+import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSetFactory;
 import org.mm.ui.DialogManager;
@@ -119,7 +120,6 @@ public class MappingBrowserView extends JPanel implements ModelView
 		pnlBottom.add(pnlRunMappingButton, BorderLayout.EAST);
 		
 		cmdRunMapping = new JButton("Run Mapping");
-		cmdRunMapping.setEnabled(false);
 		cmdRunMapping.addActionListener(new MapExpressionsAction(container));
 		pnlRunMappingButton.add(cmdRunMapping);
 		
@@ -141,12 +141,14 @@ public class MappingBrowserView extends JPanel implements ModelView
 	@Override
 	public void update()
 	{
-		cmdRunMapping.setEnabled(true);
-		
-		tableModel = new MappingExpressionTableModel(container.getLoadedMappingExpressions());
-		tblMappingExpression.setModel(tableModel);
-		setPreferredColumnSize();
-		resizeColumnHeight();
+		try {
+			tableModel = new MappingExpressionTableModel(container.getLoadedMappingExpressions());
+			tblMappingExpression.setModel(tableModel);
+			setPreferredColumnSize();
+			resizeColumnHeight();
+		} catch (CellfieException ex) {
+			container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+		}
 	}
 
 	public void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn, String startRow, String endRow, String expression, String comment)
@@ -310,10 +312,13 @@ public class MappingBrowserView extends JPanel implements ModelView
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			CreateMappingExpressionDialog dialog =
-					new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
+			try {
+				CreateMappingExpressionDialog dialog = new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setVisible(true);
+			} catch (CellfieException ex) {
+				container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+			}
 		}
 	}
 
@@ -327,18 +332,21 @@ public class MappingBrowserView extends JPanel implements ModelView
 				getApplicationDialogManager().showMessageDialog(container, "No mapping expression was selected");
 				return;
 			}
-			CreateMappingExpressionDialog dialog =
-					new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
-			dialog.fillDialogFields(selectedRow,
-					getValueAt(selectedRow, 0),
-					getValueAt(selectedRow, 1),
-					getValueAt(selectedRow, 2),
-					getValueAt(selectedRow, 3),
-					getValueAt(selectedRow, 4),
-					getValueAt(selectedRow, 5),
-					getValueAt(selectedRow, 6));
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
+			try {
+				CreateMappingExpressionDialog dialog = new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
+				dialog.fillDialogFields(selectedRow,
+						getValueAt(selectedRow, 0),
+						getValueAt(selectedRow, 1),
+						getValueAt(selectedRow, 2),
+						getValueAt(selectedRow, 3),
+						getValueAt(selectedRow, 4),
+						getValueAt(selectedRow, 5),
+						getValueAt(selectedRow, 6));
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setVisible(true);
+			} catch (CellfieException ex) {
+				container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+			}
 		}
 
 		private String getValueAt(int row, int column)
@@ -356,8 +364,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 				getApplicationDialogManager().showMessageDialog(container, "No mapping expression was selected");
 				return;
 			}
-			int answer = getApplicationDialogManager().showConfirmDialog(
-					container, "Delete", "Do you really want to delete the selected expression?");
+			int answer = getApplicationDialogManager().showConfirmDialog(container, "Delete", "Do you really want to delete the selected expression?");
 			if (answer == JOptionPane.YES_OPTION) {
 				tableModel.removeRow(selectedRow);
 			}
@@ -379,8 +386,8 @@ public class MappingBrowserView extends JPanel implements ModelView
 					cmdSave.setEnabled(true);
 				}
 			} catch (Exception ex) {
-				getApplicationDialogManager().showErrorMessageDialog(container,
-						"Error opening file: " + ex.getMessage());
+				getApplicationDialogManager().showErrorMessageDialog(container, "Error opening file: " + ex.getMessage());
+				txtMappingPath.setText("");
 			}
 		}
 	}
@@ -396,8 +403,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 				container.updateMappingExpressionModel(tableModel.getMappingExpressions());
 			}
 			catch (IOException ex) {
-				getApplicationDialogManager().showErrorMessageDialog(container,
-						"Error saving file: " + ex.getMessage());
+				getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
 			}
 		}
 	}
@@ -422,8 +428,8 @@ public class MappingBrowserView extends JPanel implements ModelView
 					txtMappingPath.setText(filePath);
 				}
 			} catch (Exception ex) {
-				getApplicationDialogManager().showErrorMessageDialog(container,
-						"Error saving file: " + ex.getMessage());
+				getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
+				txtMappingPath.setText("");
 			}
 		}
 	}

@@ -21,7 +21,6 @@ import javax.swing.JTextField;
 
 import org.mm.cellfie.ui.view.ApplicationView;
 import org.mm.cellfie.ui.view.MappingBrowserView;
-import org.mm.exceptions.MappingMasterException;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
 import org.mm.ui.DialogManager;
@@ -163,7 +162,7 @@ public class CreateMappingExpressionDialog extends JDialog
 				
 				setVisible(false);
 			}
-			catch (MappingMasterException ex) {
+			catch (Exception ex) {
 				getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
 			}
 		}
