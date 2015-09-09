@@ -29,8 +29,10 @@ import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -129,16 +131,17 @@ public class MapExpressionsAction implements ActionListener
 	private void showAxiomPreviewDialog(Set<OWLAxiom> axioms) throws MappingMasterException
 	{
 		OWLModelManager modelManager = container.getEditorKit().getOWLModelManager();
+		OWLOntology currentOntology = modelManager.getActiveOntology();
 		
 		int answer = showConfirmImportDialog(axioms);
 		try {
 			switch (answer) {
 				case IMPORT_TO_CURRENT_ONTOLOGY:
-					OWLOntology currentOntology = modelManager.getActiveOntology();
 					modelManager.applyChanges(addAxioms(currentOntology, axioms));
 					break;
 				case IMPORT_TO_NEW_ONTOLOGY:
 					OWLOntology newOntology = modelManager.createNewOntology(createOntologyID(), null);
+					modelManager.applyChanges(addImport(newOntology, currentOntology));
 					modelManager.applyChanges(addAxioms(newOntology, axioms));
 					break;
 				default:
@@ -147,6 +150,16 @@ public class MapExpressionsAction implements ActionListener
 		} catch (OWLOntologyCreationException e) {
 			throw new MappingMasterException("Error while creating a new ontology: " + e.getMessage());
 		}
+	}
+
+	private List<? extends OWLOntologyChange> addImport(OWLOntology newOntology, OWLOntology currentOntology)
+	{
+		OWLModelManager modelManager = container.getEditorKit().getOWLModelManager();
+		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+		IRI currentOntologyIRI = currentOntology.getOntologyID().getOntologyIRI();
+		OWLImportsDeclaration importDeclaration = modelManager.getOWLDataFactory().getOWLImportsDeclaration(currentOntologyIRI);
+		changes.add(new AddImport(newOntology, importDeclaration));
+		return changes;
 	}
 
 	private OWLOntologyID createOntologyID()
