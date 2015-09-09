@@ -59,7 +59,6 @@ public class MappingBrowserView extends JPanel implements ModelView
 		
 		tblMappingExpression = new JTable();
 		tblMappingExpression.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tblMappingExpression.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tblMappingExpression.setGridColor(Color.LIGHT_GRAY);
 		tblMappingExpression.setDefaultRenderer(String.class, new MultiLineCellRenderer());
 
@@ -147,7 +146,6 @@ public class MappingBrowserView extends JPanel implements ModelView
 		tableModel = new MappingExpressionTableModel(container.getLoadedMappingExpressions());
 		tblMappingExpression.setModel(tableModel);
 		setPreferredColumnSize();
-		resizeColumnWidth();
 		resizeColumnHeight();
 	}
 
@@ -166,7 +164,6 @@ public class MappingBrowserView extends JPanel implements ModelView
 			tableModel.removeRow(selectedRow);
 		}
 		tableModel.addRow(row);
-		resizeColumnWidth();
 		resizeColumnHeight();
 	}
 
@@ -180,23 +177,6 @@ public class MappingBrowserView extends JPanel implements ModelView
 		columnModel.getColumn(4).setPreferredWidth(80);
 		columnModel.getColumn(5).setPreferredWidth(400);
 		columnModel.getColumn(6).setPreferredWidth(280);
-	}
-
-	private void resizeColumnWidth()
-	{
-		final TableColumnModel columnModel = tblMappingExpression.getColumnModel();
-		for (int column = 0; column < tblMappingExpression.getColumnCount(); column++) {
-			if (column == 1 || column == 2 || column == 3 || column == 4) { // skip for certain columns
-				continue;
-			}
-			int width = columnModel.getColumn(column).getPreferredWidth(); // min width
-			for (int row = 0; row < tblMappingExpression.getRowCount(); row++) {
-				TableCellRenderer renderer = tblMappingExpression.getCellRenderer(row, column);
-				Component comp = tblMappingExpression.prepareRenderer(renderer, row, column);
-				width = Math.max(comp.getPreferredSize().width + 5, width);
-			}
-			columnModel.getColumn(column).setPreferredWidth(width);
-		}
 	}
 
 	private void resizeColumnHeight()
