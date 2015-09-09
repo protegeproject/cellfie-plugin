@@ -140,7 +140,8 @@ public class MapExpressionsAction implements ActionListener
 					modelManager.applyChanges(addAxioms(currentOntology, axioms));
 					break;
 				case IMPORT_TO_NEW_ONTOLOGY:
-					OWLOntology newOntology = modelManager.createNewOntology(createOntologyID(), null);
+					OWLOntologyID id = createOntologyID();
+					OWLOntology newOntology = modelManager.createNewOntology(id, id.getDefaultDocumentIRI().toURI());
 					modelManager.applyChanges(addImport(newOntology, currentOntology));
 					modelManager.applyChanges(addAxioms(newOntology, axioms));
 					break;
