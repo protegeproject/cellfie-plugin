@@ -41,6 +41,7 @@ public class CellfieAction extends ProtegeOWLAction
 		cellfieDialog.setContentPane(appView);
 		cellfieDialog.setSize(1100, 1000);
 		cellfieDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		cellfieDialog.setLocationRelativeTo(null);
 		cellfieDialog.setVisible(true);
 	}
 
