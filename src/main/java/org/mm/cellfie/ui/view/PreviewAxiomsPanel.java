@@ -65,7 +65,7 @@ public class PreviewAxiomsPanel extends JPanel
 		@Override
 		public void mouseClicked(MouseEvent e)
 		{
-			JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewer(), JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_OPTION, null);
+			JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewer(), JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null);
 		}
 	}
 
