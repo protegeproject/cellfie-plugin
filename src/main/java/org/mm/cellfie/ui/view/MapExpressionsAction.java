@@ -27,7 +27,9 @@ import org.mm.ss.SpreadsheetLocation;
 import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.ui.ontology.OntologyPreferences;
 import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -37,8 +39,6 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 public class MapExpressionsAction implements ActionListener
 {
 	private ApplicationView container;
-
-	private File logFile;
 
 	private static final int CANCEL_IMPORT = 0;
 	private static final int IMPORT_TO_NEW_ONTOLOGY = 1;
@@ -138,7 +138,7 @@ public class MapExpressionsAction implements ActionListener
 					modelManager.applyChanges(addAxioms(currentOntology, axioms));
 					break;
 				case IMPORT_TO_NEW_ONTOLOGY:
-					OWLOntology newOntology = modelManager.createNewOntology(new OWLOntologyID(), null);
+					OWLOntology newOntology = modelManager.createNewOntology(createOntologyID(), null);
 					modelManager.applyChanges(addAxioms(newOntology, axioms));
 					break;
 				default:
@@ -147,6 +147,13 @@ public class MapExpressionsAction implements ActionListener
 		} catch (OWLOntologyCreationException e) {
 			throw new MappingMasterException("Error while creating a new ontology: " + e.getMessage());
 		}
+	}
+
+	private OWLOntologyID createOntologyID()
+	{
+		OntologyPreferences ontologyPreferences = OntologyPreferences.getInstance();
+		IRI freshIRI = IRI.create(ontologyPreferences.generateNextURI());
+		return new OWLOntologyID(freshIRI);
 	}
 
 	private List<OWLOntologyChange> addAxioms(OWLOntology ontology, Set<OWLAxiom> axioms)
