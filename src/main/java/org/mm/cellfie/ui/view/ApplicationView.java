@@ -1,6 +1,10 @@
 package org.mm.cellfie.ui.view;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +22,8 @@ import org.mm.parser.ParseException;
 import org.mm.parser.SimpleNode;
 import org.mm.parser.node.ExpressionNode;
 import org.mm.renderer.Renderer;
+import org.mm.renderer.RendererException;
+import org.mm.renderer.text.TextRendererEx;
 import org.mm.rendering.Rendering;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ui.DialogManager;
@@ -106,6 +112,7 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 	private void fireApplicationResourceChanged()
 	{
 		setupApplication();
+		prepareLogFileLocation();
 	}
 
 	private void updateDataSourceView()
@@ -137,6 +144,26 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 		String expression = mapping.getExpressionString();
 		ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
 		results.add(renderer.renderExpression(expressionNode).get());
+	}
+
+	public void evaluate(MappingExpression mapping, Renderer renderer, Set<Rendering> results, StringBuffer logMessage) throws ParseException
+	{
+		String expression = mapping.getExpressionString();
+		ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
+		results.add(renderer.renderExpression(expressionNode).get());
+		log(expressionNode, logMessage);
+	}
+
+	private void log(ExpressionNode expressionNode, StringBuffer logMessage)
+	{
+		try {
+			TextRendererEx renderer = getApplicationModel().getLogRenderer();
+			String output = renderer.renderExpression(expressionNode).get().getRendering();
+			logMessage.append(output);
+		}
+		catch (RendererException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
@@ -196,5 +223,49 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 	public MappingBrowserView getMappingBrowserView()
 	{
 		return mappingExpressionView;
+	}
+	
+	private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+	
+	private String logFileLocation;
+	private File logFile;
+	
+	/* protected */File getLogFile()
+	{
+		return logFile;
+	}
+
+	/* protected */File createLogFile()
+	{
+		if (logFileLocation == null) {
+			logFileLocation = getDefaultLogFileLocation();
+		}
+		String timestamp = dateFormat.format(new Date());
+		String fileName = String.format("%s%s.log", logFileLocation, timestamp);
+		logFile = new File(fileName);
+		return logFile;
+	}
+
+	private void prepareLogFileLocation()
+	{
+		String mappingFilePath = applicationFactory.getMappingLocation();
+		if (mappingFilePath == null) {
+			logFileLocation = getDefaultLogFileLocation();
+		} else {
+			logFileLocation = getLogFileLocation(new File(mappingFilePath));
+		}
+	}
+
+	private String getLogFileLocation(File mappingFile)
+	{
+		String mappingPath = mappingFile.getParent();
+		String mappingFileName = mappingFile.getName().substring(0, mappingFile.getName().lastIndexOf("."));
+		return mappingPath + System.getProperty("file.separator") + mappingFileName + "_mmexec";
+	}
+
+	private String getDefaultLogFileLocation()
+	{
+		String tmpPath = System.getProperty("java.io.tmpdir");
+		return tmpPath + System.getProperty("file.separator") + "mmexec";
 	}
 }

@@ -30,7 +30,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import org.mm.cellfie.ui.action.MapExpressionsAction;
 import org.mm.cellfie.ui.dialog.CreateMappingExpressionDialog;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSetFactory;
@@ -117,13 +116,27 @@ public class MappingBrowserView extends JPanel implements ModelView
 		cmdDelete.addActionListener(new DeleteButtonActionListener());
 		pnlCommandButton.add(cmdDelete);
 		
+		JPanel pnlRunMappingButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		pnlBottom.add(pnlRunMappingButton, BorderLayout.EAST);
+		
 		cmdRunMapping = new JButton("Run Mapping");
 		cmdRunMapping.setEnabled(false);
-		cmdRunMapping.setPreferredSize(new Dimension(125, 32));
 		cmdRunMapping.addActionListener(new MapExpressionsAction(container));
-		pnlBottom.add(cmdRunMapping, BorderLayout.EAST);
+		pnlRunMappingButton.add(cmdRunMapping);
 		
 		validate();
+	}
+
+	public String getMappingFilename()
+	{
+		File file = new File(txtMappingPath.getText());
+		return file.getName();
+	}
+
+	public String getResourcePath()
+	{
+		File file = new File(txtMappingPath.getText());
+		return file.getPath();
 	}
 
 	@Override
