@@ -114,6 +114,7 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 	{
 		setupApplication();
 		updateDataSourceView();
+		updateMappingBrowserView();
 	}
 
 	private void fireMappingDocumentChanged()
