@@ -33,8 +33,6 @@ public class CellfieAction extends ProtegeOWLAction
 		OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
 		
 		ApplicationView appView = new ApplicationView(currentOntology, getOWLEditorKit(), new ProtegeDialogManager());
-		appView.setDividerLocation(500);
-		appView.setResizeWeight(0.8);
 		
 		cellfieDialog = new JDialog();
 		cellfieDialog.setTitle("Cellfie");

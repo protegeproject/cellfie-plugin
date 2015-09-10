@@ -1,5 +1,8 @@
 package org.mm.cellfie.ui.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.text.DateFormat;
@@ -8,7 +11,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.border.EmptyBorder;
 
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
@@ -30,6 +36,7 @@ import org.mm.ui.DialogManager;
 import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
@@ -37,7 +44,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
  * spreadsheet and a control area to edit and execute Mapping Master
  * expressions.
  */
-public class ApplicationView extends ViewSplitPane implements ModelView
+public class ApplicationView extends JPanel implements ModelView
 {
 	private static final long serialVersionUID = 1L;
 
@@ -52,29 +59,49 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 
 	public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, DialogManager applicationDialogManager)
 	{
-		super(JSplitPane.VERTICAL_SPLIT);
-		
 		setUserOntology(ontology);
 		
 		this.editorKit = editorKit;
 		this.applicationDialogManager = applicationDialogManager;
 
-		setDividerLocation(500);
-		setResizeWeight(0.8);
+		setLayout(new BorderLayout());
+		
+		JPanel pnlTargetOntology = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		pnlTargetOntology.setBorder(new EmptyBorder(2, 5, 2, 5));
+		add(pnlTargetOntology, BorderLayout.NORTH);
+
+		JLabel lblTargetOntology = new JLabel("Target Ontology: ");
+		lblTargetOntology.setForeground(Color.DARK_GRAY);
+		pnlTargetOntology.add(lblTargetOntology);
+		
+		JLabel lblOntologyID = new JLabel(createName(ontology));
+		lblOntologyID.setForeground(Color.DARK_GRAY);
+		pnlTargetOntology.add(lblOntologyID);
+
+		ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setDividerLocation(500);
+		splitPane.setResizeWeight(0.8);
+		add(splitPane, BorderLayout.CENTER);
 
 		/*
 		 * Workbook sheet GUI presentation
 		 */
 		dataSourceView = new DataSourceView(this);
-		setTopComponent(dataSourceView);
+		splitPane.setTopComponent(dataSourceView);
 
 		/*
 		 * Mapping browser, create, edit, remove panel
 		 */
 		mappingExpressionView = new MappingBrowserView(this);
-		setBottomComponent(mappingExpressionView);
+		splitPane.setBottomComponent(mappingExpressionView);
 		
 		validate();
+	}
+
+	private String createName(OWLOntology ontology)
+	{
+		IRI ontologyID = ontology.getOntologyID().getOntologyIRI();
+		return String.format("%s (%s)", ontologyID.getFragment(), ontologyID);
 	}
 
 	protected void setUserOntology(OWLOntology ontology)
