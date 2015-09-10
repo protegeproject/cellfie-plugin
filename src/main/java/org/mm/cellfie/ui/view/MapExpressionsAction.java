@@ -26,6 +26,7 @@ import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
 import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
+import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
 import org.semanticweb.owlapi.model.AddAxiom;
@@ -42,6 +43,9 @@ public class MapExpressionsAction implements ActionListener
 {
 	private ApplicationView container;
 
+	private OWLEditorKit editorKit;
+	private OWLModelManager modelManager;
+
 	private static final int CANCEL_IMPORT = 0;
 	private static final int IMPORT_TO_NEW_ONTOLOGY = 1;
 	private static final int IMPORT_TO_CURRENT_ONTOLOGY = 2;
@@ -49,6 +53,8 @@ public class MapExpressionsAction implements ActionListener
 	public MapExpressionsAction(ApplicationView container)
 	{
 		this.container = container;
+		editorKit = container.getEditorKit();
+		modelManager = container.getEditorKit().getModelManager();
 	}
 
 	@Override
@@ -130,11 +136,15 @@ public class MapExpressionsAction implements ActionListener
 
 	private void showAxiomPreviewDialog(Set<OWLAxiom> axioms) throws CellfieException
 	{
-		OWLModelManager modelManager = container.getEditorKit().getOWLModelManager();
-		OWLOntology currentOntology = modelManager.getActiveOntology();
-		
-		int answer = showConfirmImportDialog(axioms);
+		final ImportOption[] options = {
+				new ImportOption(CANCEL_IMPORT, "Cancel"),
+				new ImportOption(IMPORT_TO_NEW_ONTOLOGY, "Import to new ontology"),
+				new ImportOption(IMPORT_TO_CURRENT_ONTOLOGY, "Import to the current ontology")
+		};
 		try {
+			OWLOntology currentOntology = modelManager.getActiveOntology();
+			int answer = JOptionPaneEx.showConfirmDialog(container, "Import Axioms", createPreviewAxiomsPanel(axioms), JOptionPane.PLAIN_MESSAGE,
+					JOptionPane.DEFAULT_OPTION, null, options, null);
 			switch (answer) {
 				case IMPORT_TO_CURRENT_ONTOLOGY:
 					modelManager.applyChanges(addAxioms(currentOntology, axioms));
@@ -145,9 +155,9 @@ public class MapExpressionsAction implements ActionListener
 					modelManager.applyChanges(addImport(newOntology, currentOntology));
 					modelManager.applyChanges(addAxioms(newOntology, axioms));
 					break;
-				default:
-					// NO-OP
 			}
+		} catch (ClassCastException e) {
+			// NO-OP: Fix should be to Protege API
 		} catch (OWLOntologyCreationException e) {
 			throw new CellfieException("Error while creating a new ontology: " + e.getMessage());
 		}
@@ -155,7 +165,6 @@ public class MapExpressionsAction implements ActionListener
 
 	private List<? extends OWLOntologyChange> addImport(OWLOntology newOntology, OWLOntology currentOntology)
 	{
-		OWLModelManager modelManager = container.getEditorKit().getOWLModelManager();
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 		IRI currentOntologyIRI = currentOntology.getOntologyID().getOntologyIRI();
 		OWLImportsDeclaration importDeclaration = modelManager.getOWLDataFactory().getOWLImportsDeclaration(currentOntologyIRI);
@@ -181,18 +190,7 @@ public class MapExpressionsAction implements ActionListener
 
 	private JPanel createPreviewAxiomsPanel(Set<OWLAxiom> axioms)
 	{
-		return new PreviewAxiomsPanel(container, container.getEditorKit(), axioms);
-	}
-
-	private int showConfirmImportDialog(Set<OWLAxiom> axioms)
-	{
-		ImportOption[] options = {
-				new ImportOption(CANCEL_IMPORT, "Cancel"),
-				new ImportOption(IMPORT_TO_NEW_ONTOLOGY, "Import to new ontology"),
-				new ImportOption(IMPORT_TO_CURRENT_ONTOLOGY, "Import to the current ontology")
-		};
-		return JOptionPaneEx.showConfirmDialog(container, "Import Axioms", createPreviewAxiomsPanel(axioms), JOptionPane.PLAIN_MESSAGE,
-				JOptionPane.DEFAULT_OPTION, null, options, null);
+		return new PreviewAxiomsPanel(container, editorKit, axioms);
 	}
 
 	private void evaluate(MappingExpression mapping, Set<Rendering> results, StringBuffer logMessage) throws ParseException
@@ -224,6 +222,9 @@ public class MapExpressionsAction implements ActionListener
 		return container.getApplicationDialogManager();
 	}
 
+	/**
+	 * A helper class for creating import axioms command buttons.
+	 */
 	class ImportOption implements Comparable<ImportOption>
 	{
 		private int option;
