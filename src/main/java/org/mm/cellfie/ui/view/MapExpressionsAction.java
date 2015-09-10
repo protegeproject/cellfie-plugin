@@ -138,7 +138,7 @@ public class MapExpressionsAction implements ActionListener
 	{
 		final ImportOption[] options = {
 				new ImportOption(CANCEL_IMPORT, "Cancel"),
-				new ImportOption(IMPORT_TO_NEW_ONTOLOGY, "Import to new ontology"),
+				new ImportOption(IMPORT_TO_NEW_ONTOLOGY, "Import to a new ontology"),
 				new ImportOption(IMPORT_TO_CURRENT_ONTOLOGY, "Import to the current ontology")
 		};
 		try {
