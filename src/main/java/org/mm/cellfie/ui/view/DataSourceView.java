@@ -7,8 +7,10 @@ import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.cellfie.ui.exception.CellfieException;
@@ -30,15 +32,19 @@ public class DataSourceView extends JPanel implements ModelView
 	{
 		this.container = container;
 
-		setLayout(new BorderLayout());
+		setLayout(new BorderLayout(4, 1));
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Spreadsheet"));
 
 		tabSheetContainer = new ViewTabbedPane();
 		tabSheetContainer.addTab("NONE", new JPanel());
 		add(tabSheetContainer, BorderLayout.CENTER);
 
 		JPanel pnlWorkbookFile = new JPanel(new BorderLayout());
-		pnlWorkbookFile.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Spreadsheet File"));
 		add(pnlWorkbookFile, BorderLayout.NORTH);
+
+		JLabel lblDataSource = new JLabel("Data Source: ");
+		lblDataSource.setBorder(new EmptyBorder(2, 5, 2, 5));
+		pnlWorkbookFile.add(lblDataSource, BorderLayout.WEST);
 
 		txtWorkbookPath = new JTextField("");
 		pnlWorkbookFile.add(txtWorkbookPath, BorderLayout.CENTER);

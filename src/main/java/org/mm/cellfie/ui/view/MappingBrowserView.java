@@ -16,6 +16,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -62,6 +63,9 @@ public class MappingBrowserView extends JPanel implements ModelView
 	{
 		this.container = container;
 		
+		setLayout(new BorderLayout());
+		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mapping"));
+
 		tblMappingExpression = new JTable();
 		tblMappingExpression.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tblMappingExpression.setGridColor(Color.LIGHT_GRAY);
@@ -69,12 +73,12 @@ public class MappingBrowserView extends JPanel implements ModelView
 
 		JScrollPane scrMappingExpression = new JScrollPane(tblMappingExpression);
 		
-		setLayout(new BorderLayout());
-		
 		JPanel pnlTop = new JPanel(new BorderLayout());
-		pnlTop.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mapping File"));
-
 		add(pnlTop, BorderLayout.NORTH);
+
+		JLabel lblMappingFile = new JLabel("Mapping File: ");
+		lblMappingFile.setBorder(new EmptyBorder(2, 5, 2, 5));
+		pnlTop.add(lblMappingFile, BorderLayout.WEST);
 
 		txtMappingPath = new JTextField();
 		txtMappingPath.setPreferredSize(new Dimension(80, 30));
