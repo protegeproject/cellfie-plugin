@@ -17,14 +17,13 @@ import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
 import org.mm.core.settings.ReferenceSettings;
+import org.mm.core.settings.ValueEncodingSetting;
 import org.mm.parser.ASTExpression;
 import org.mm.parser.MappingMasterParser;
 import org.mm.parser.ParseException;
 import org.mm.parser.SimpleNode;
 import org.mm.parser.node.ExpressionNode;
 import org.mm.renderer.Renderer;
-import org.mm.renderer.RendererException;
-import org.mm.renderer.text.TextRendererEx;
 import org.mm.rendering.Rendering;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ui.DialogManager;
@@ -50,8 +49,6 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 
 	private MMApplication application;
 	private MMApplicationFactory applicationFactory = new MMApplicationFactory();
-
-	private ReferenceSettings referenceSettings = new ReferenceSettings();
 
 	public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, DialogManager applicationDialogManager)
 	{
@@ -150,29 +147,21 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 
 	public void evaluate(MappingExpression mapping, Renderer renderer, Set<Rendering> results) throws ParseException
 	{
+		final ReferenceSettings referenceSettings = new ReferenceSettings();
+		
 		String expression = mapping.getExpressionString();
 		ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
 		results.add(renderer.renderExpression(expressionNode).get());
 	}
 
-	public void evaluate(MappingExpression mapping, Renderer renderer, Set<Rendering> results, StringBuffer logMessage) throws ParseException
+	public void log(MappingExpression mapping, Renderer renderer, StringBuffer logMessage) throws ParseException
 	{
+		final ReferenceSettings referenceSettings = new ReferenceSettings();
+		referenceSettings.setValueEncodingSetting(ValueEncodingSetting.RDFS_LABEL);
+		
 		String expression = mapping.getExpressionString();
 		ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
-		results.add(renderer.renderExpression(expressionNode).get());
-		log(expressionNode, logMessage);
-	}
-
-	private void log(ExpressionNode expressionNode, StringBuffer logMessage)
-	{
-		try {
-			TextRendererEx renderer = getApplicationModel().getLogRenderer();
-			String output = renderer.renderExpression(expressionNode).get().getRendering();
-			logMessage.append(output);
-		}
-		catch (RendererException e) {
-			e.printStackTrace();
-		}
+		logMessage.append(renderer.renderExpression(expressionNode).get());
 	}
 
 	private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
@@ -219,6 +208,11 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 		return getApplicationModel().getDefaultRenderer();
 	}
 
+	public Renderer getLogRenderer()
+	{
+		return getApplicationModel().getLogRenderer();
+	}
+
 	public OWLEditorKit getEditorKit()
 	{
 		return editorKit;
@@ -227,11 +221,6 @@ public class ApplicationView extends ViewSplitPane implements ModelView
 	public DialogManager getApplicationDialogManager()
 	{
 		return applicationDialogManager;
-	}
-
-	public ReferenceSettings getReferenceSettings()
-	{
-		return referenceSettings;
 	}
 
 	public DataSourceView getDataSourceView()

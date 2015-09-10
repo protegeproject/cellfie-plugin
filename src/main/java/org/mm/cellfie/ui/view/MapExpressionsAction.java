@@ -195,7 +195,8 @@ public class MapExpressionsAction implements ActionListener
 
 	private void evaluate(MappingExpression mapping, Set<Rendering> results, StringBuffer logMessage) throws ParseException
 	{
-		container.evaluate(mapping, container.getDefaultRenderer(), results, logMessage);
+		container.evaluate(mapping, container.getDefaultRenderer(), results);
+		container.log(mapping, container.getLogRenderer(), logMessage);
 	}
 
 	private SpreadsheetLocation incrementLocation(SpreadsheetLocation current, SpreadsheetLocation start, SpreadsheetLocation end)
