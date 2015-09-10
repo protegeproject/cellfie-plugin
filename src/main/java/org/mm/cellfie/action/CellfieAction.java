@@ -19,19 +19,19 @@ public class CellfieAction extends ProtegeOWLAction
 {
 	private static final long serialVersionUID = 1L;
 
-	private OWLOntology currentOntology;
-
 	private JDialog cellfieDialog;
 
 	@Override
 	public void initialise() throws Exception
 	{
-		currentOntology = getOWLModelManager().getActiveOntology();
+		// NO-OP
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
+		OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
+		
 		ApplicationView appView = new ApplicationView(currentOntology, getOWLEditorKit(), new ProtegeDialogManager());
 		appView.setDividerLocation(500);
 		appView.setResizeWeight(0.8);
