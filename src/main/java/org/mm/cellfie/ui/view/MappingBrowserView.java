@@ -68,7 +68,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 
 		tblMappingExpression = new JTable();
 		tblMappingExpression.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tblMappingExpression.setGridColor(Color.LIGHT_GRAY);
+		tblMappingExpression.setGridColor(new Color(220, 220, 220));
 		tblMappingExpression.setDefaultRenderer(String.class, new MultiLineCellRenderer());
 
 		JScrollPane scrMappingExpression = new JScrollPane(tblMappingExpression);

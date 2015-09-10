@@ -2,6 +2,7 @@ package org.mm.cellfie.ui.view;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -27,8 +28,9 @@ public class SheetTable extends JTable
 
 		resizeColumnWidth();
 		setCellSelectionEnabled(true);
+		setIntercellSpacing(new Dimension(4,4));
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		setGridColor(Color.LIGHT_GRAY);
+		setGridColor(new Color(220, 220, 220));
 	}
 
 	private void resizeColumnWidth()
