@@ -16,7 +16,6 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,12 +29,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import org.mm.cellfie.ui.dialog.CreateMappingExpressionDialog;
 import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSetFactory;
 import org.mm.ui.DialogManager;
 import org.mm.ui.ModelView;
+import org.protege.editor.core.ui.util.JOptionPaneEx;
 
 public class MappingBrowserView extends JPanel implements ModelView
 {
@@ -53,6 +52,11 @@ public class MappingBrowserView extends JPanel implements ModelView
 	private JTable tblMappingExpression;
 
 	private MappingExpressionTableModel tableModel;
+
+	private int selectedRow = -1; // -1 means no row selection
+
+	private static final int CANCEL_OPTION = 0;
+	private static final int SAVE_CHANGES_OPTION = 1;
 
 	public MappingBrowserView(ApplicationView container)
 	{
@@ -151,7 +155,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 		}
 	}
 
-	public void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn, String startRow, String endRow, String expression, String comment)
+	public void updateTableModel(String sheetName, String startColumn, String endColumn, String startRow, String endRow, String expression, String comment)
 	{
 		Vector<String> row = new Vector<>();
 		row.add(0, sheetName);
@@ -162,7 +166,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 		row.add(5, expression);
 		row.add(6, comment);
 		
-		if (selectedRow != -1) { // there was row selected
+		if (selectedRow != -1) { // user selected a row
 			tableModel.removeRow(selectedRow);
 		}
 		tableModel.addRow(row);
@@ -212,8 +216,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 		private static final long serialVersionUID = 1L;
 
 		private final String[] COLUMN_NAMES = {
-			"Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
-			"Mapping Expression", "Comment"
+			"Sheet Name", "Start Column", "End Column", "Start Row", "End Row", "Mapping Expression", "Comment"
 		};
 
 		public MappingExpressionTableModel(final List<MappingExpression> mappings)
@@ -275,6 +278,9 @@ public class MappingBrowserView extends JPanel implements ModelView
 		}
 	}
 
+	/**
+	 * To allow cells in the mapping browser table to have multilines.
+	 */
 	class MultiLineCellRenderer extends JTextArea implements TableCellRenderer
 	{
 		private static final long serialVersionUID = 1L;
@@ -313,9 +319,10 @@ public class MappingBrowserView extends JPanel implements ModelView
 		public void actionPerformed(ActionEvent e)
 		{
 			try {
-				CreateMappingExpressionDialog dialog = new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				dialog.setVisible(true);
+				selectedRow = -1;
+				MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
+				editorPanel.setSheetNames(container.getLoadedSpreadSheet().getSheetNames());
+				showMappingEditorDialog(editorPanel);
 			} catch (CellfieException ex) {
 				container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
 			}
@@ -327,14 +334,15 @@ public class MappingBrowserView extends JPanel implements ModelView
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			int selectedRow = tblMappingExpression.getSelectedRow();
+			selectedRow = tblMappingExpression.getSelectedRow();
 			if (selectedRow == -1) {
 				getApplicationDialogManager().showMessageDialog(container, "No mapping expression was selected");
 				return;
 			}
 			try {
-				CreateMappingExpressionDialog dialog = new CreateMappingExpressionDialog(container, container.getLoadedSpreadSheet());
-				dialog.fillDialogFields(selectedRow,
+				MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
+				editorPanel.setSheetNames(container.getLoadedSpreadSheet().getSheetNames());
+				editorPanel.fillFormFields(
 						getValueAt(selectedRow, 0),
 						getValueAt(selectedRow, 1),
 						getValueAt(selectedRow, 2),
@@ -342,8 +350,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 						getValueAt(selectedRow, 4),
 						getValueAt(selectedRow, 5),
 						getValueAt(selectedRow, 6));
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				dialog.setVisible(true);
+				showMappingEditorDialog(editorPanel);
 			} catch (CellfieException ex) {
 				container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
 			}
@@ -355,11 +362,37 @@ public class MappingBrowserView extends JPanel implements ModelView
 		}
 	}
 
+	private void showMappingEditorDialog(MappingExpressionEditorPanel editorPanel)
+	{
+		final SaveOption[] options = { 
+				new SaveOption(CANCEL_OPTION, "Cancel"),
+				new SaveOption(SAVE_CHANGES_OPTION, "Save Changes")
+		};
+		try {
+			int answer = JOptionPaneEx.showConfirmDialog(container, "Mapping Editor", editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, null);
+			switch (answer) {
+				case SAVE_CHANGES_OPTION:
+					MappingExpression userInput = editorPanel.getUserInput();
+					updateTableModel(
+							userInput.getSheetName(),
+							userInput.getStartColumn(),
+							userInput.getEndColumn(),
+							userInput.getStartRow(),
+							userInput.getEndRow(),
+							userInput.getExpressionString(),
+							userInput.getComment());
+					break;
+			}
+		} catch (ClassCastException ex) {
+			// NO-OP: Fix should be to Protege API
+		}
+	}
+
 	class DeleteButtonActionListener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			int selectedRow = tblMappingExpression.getSelectedRow();
+			selectedRow = tblMappingExpression.getSelectedRow();
 			if (selectedRow == -1) {
 				getApplicationDialogManager().showMessageDialog(container, "No mapping expression was selected");
 				return;
@@ -398,8 +431,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 		public void actionPerformed(ActionEvent e)
 		{
 			try {
-				MappingExpressionSetFactory.saveMappingExpressionSetToDocument(
-						txtMappingPath.getText(), tableModel.getMappingExpressions());
+				MappingExpressionSetFactory.saveMappingExpressionSetToDocument(txtMappingPath.getText(), tableModel.getMappingExpressions());
 				container.updateMappingExpressionModel(tableModel.getMappingExpressions());
 			}
 			catch (IOException ex) {
@@ -422,8 +454,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 					if (!filePath.endsWith(ext)) {
 						filePath = filePath + ext;
 					}
-					MappingExpressionSetFactory.saveMappingExpressionSetToDocument(
-							filePath, tableModel.getMappingExpressions());
+					MappingExpressionSetFactory.saveMappingExpressionSetToDocument(filePath, tableModel.getMappingExpressions());
 					container.updateMappingExpressionModel(tableModel.getMappingExpressions());
 					txtMappingPath.setText(filePath);
 				}
@@ -431,6 +462,38 @@ public class MappingBrowserView extends JPanel implements ModelView
 				getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
 				txtMappingPath.setText("");
 			}
+		}
+	}
+
+	/**
+	 * A helper class for creating mapping editor command buttons.
+	 */
+	class SaveOption implements Comparable<SaveOption>
+	{
+		private int option;
+		private String title;
+		
+		public SaveOption(int option, String title)
+		{
+			this.option = option;
+			this.title = title;
+		}
+		
+		public int get()
+		{
+			return option;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return title;
+		}
+
+		@Override
+		public int compareTo(SaveOption o)
+		{
+			return option-o.option;
 		}
 	}
 }
