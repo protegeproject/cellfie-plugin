@@ -74,10 +74,10 @@ public class MappingBrowserView extends JPanel implements ModelView
 		JScrollPane scrMappingExpression = new JScrollPane(tblMappingExpression);
 		
 		JPanel pnlTop = new JPanel(new BorderLayout());
+		pnlTop.setBorder(new EmptyBorder(2, 5, 7, 5));
 		add(pnlTop, BorderLayout.NORTH);
 
 		JLabel lblMappingFile = new JLabel("Mapping File: ");
-		lblMappingFile.setBorder(new EmptyBorder(2, 5, 2, 5));
 		pnlTop.add(lblMappingFile, BorderLayout.WEST);
 
 		txtMappingPath = new JTextField();
