@@ -40,7 +40,7 @@ public class DataSourceView extends JPanel implements ModelView
 		add(tabSheetContainer, BorderLayout.CENTER);
 
 		JPanel pnlWorkbookFile = new JPanel(new BorderLayout());
-		pnlWorkbookFile.setBorder(new EmptyBorder(2, 5, 2, 5));
+		pnlWorkbookFile.setBorder(new EmptyBorder(2, 5, 7, 5));
 		add(pnlWorkbookFile, BorderLayout.NORTH);
 
 		JLabel lblDataSource = new JLabel("Data Source: ");
