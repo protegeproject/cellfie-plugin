@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 
 import org.mm.cellfie.ui.list.OWLAxiomList;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
@@ -50,6 +51,7 @@ public class PreviewAxiomsPanel extends JPanel
 		add(pnlViewLog, BorderLayout.SOUTH);
 		
 		lblViewLog = new JLabel("View Log");
+		lblViewLog.setBorder(new EmptyBorder(0, 7, 0, 0));
 		Font font = lblViewLog.getFont();
 		Map attributes = font.getAttributes();
 		attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_TWO_PIXEL);
