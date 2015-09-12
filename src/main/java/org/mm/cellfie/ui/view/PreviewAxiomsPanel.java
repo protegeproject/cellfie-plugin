@@ -3,6 +3,7 @@ package org.mm.cellfie.ui.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
@@ -79,7 +80,25 @@ public class PreviewAxiomsPanel extends JPanel
 		{
 			setLayout(new BorderLayout());
 			try {
-				JTextPane txtLogMessage = new JTextPane();
+				JTextPane txtLogMessage = new JTextPane() // To force the horizontal scrolling
+				{
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public boolean getScrollableTracksViewportWidth()
+					{
+						return (getSize().width < getParent().getSize().width);
+					}
+
+					@Override
+					public void setSize(Dimension d)
+					{
+						if (d.width < getParent().getSize().width) {
+							d.width = getParent().getSize().width;
+						}
+						super.setSize(d);
+					}
+				};
 				txtLogMessage.read(new FileReader(container.getLogFile()), container.getLogFile());
 				add(new JScrollPane(txtLogMessage), BorderLayout.CENTER);
 			}
