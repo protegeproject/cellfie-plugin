@@ -21,76 +21,77 @@ import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 
 public class DataSourceView extends JPanel implements ModelView
 {
-	private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-	private ApplicationView container;
+   private ApplicationView container;
 
-	private JTextField txtWorkbookPath;
-	private ViewTabbedPane tabSheetContainer;
+   private JTextField txtWorkbookPath;
+   private ViewTabbedPane tabSheetContainer;
 
-	public DataSourceView(ApplicationView container)
-	{
-		this.container = container;
+   public DataSourceView(ApplicationView container)
+   {
+      this.container = container;
 
-		setLayout(new BorderLayout(4, 1));
-		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Spreadsheet"));
+      setLayout(new BorderLayout(4, 1));
+      setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Spreadsheet"));
 
-		tabSheetContainer = new ViewTabbedPane();
-		tabSheetContainer.addTab("NONE", new JPanel());
-		add(tabSheetContainer, BorderLayout.CENTER);
+      tabSheetContainer = new ViewTabbedPane();
+      tabSheetContainer.addTab("NONE", new JPanel());
+      add(tabSheetContainer, BorderLayout.CENTER);
 
-		JPanel pnlWorkbookFile = new JPanel(new BorderLayout());
-		pnlWorkbookFile.setBorder(new EmptyBorder(2, 5, 7, 5));
-		add(pnlWorkbookFile, BorderLayout.NORTH);
+      JPanel pnlWorkbookFile = new JPanel(new BorderLayout());
+      pnlWorkbookFile.setBorder(new EmptyBorder(2, 5, 7, 5));
+      add(pnlWorkbookFile, BorderLayout.NORTH);
 
-		JLabel lblDataSource = new JLabel("Data Source: ");
-		pnlWorkbookFile.add(lblDataSource, BorderLayout.WEST);
+      JLabel lblDataSource = new JLabel("Data Source: ");
+      pnlWorkbookFile.add(lblDataSource, BorderLayout.WEST);
 
-		txtWorkbookPath = new JTextField("");
-		pnlWorkbookFile.add(txtWorkbookPath, BorderLayout.CENTER);
+      txtWorkbookPath = new JTextField("");
+      pnlWorkbookFile.add(txtWorkbookPath, BorderLayout.CENTER);
 
-		JButton cmdOpen = new JButton("Browse...");
-		cmdOpen.addActionListener(new OpenWorkbookAction());
-		pnlWorkbookFile.add(cmdOpen, BorderLayout.EAST);
+      JButton cmdOpen = new JButton("Browse...");
+      cmdOpen.addActionListener(new OpenWorkbookAction());
+      pnlWorkbookFile.add(cmdOpen, BorderLayout.EAST);
 
-		validate();
-	}
+      validate();
+   }
 
-	private class OpenWorkbookAction implements ActionListener
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			try {
-				File file = getApplicationDialogManager().showOpenFileChooser(container, "Open Excel Workbook", "xlsx", "Excel Workbook (.xlsx)");
-				if (file != null) {
-					String filename = file.getAbsolutePath();
-					container.loadWorkbookDocument(filename);
-					txtWorkbookPath.setText(filename);
-				}
-			} catch (Exception ex) {
-				getApplicationDialogManager().showErrorMessageDialog(container, "Error opening file: " + ex.getMessage());
-				txtWorkbookPath.setText("");
-			}
-		}
-	}
+   private class OpenWorkbookAction implements ActionListener
+   {
+      public void actionPerformed(ActionEvent e)
+      {
+         try {
+            File file = getApplicationDialogManager().showOpenFileChooser(container, "Open Excel Workbook", "xlsx",
+                  "Excel Workbook (.xlsx)");
+            if (file != null) {
+               String filename = file.getAbsolutePath();
+               container.loadWorkbookDocument(filename);
+               txtWorkbookPath.setText(filename);
+            }
+         } catch (Exception ex) {
+            getApplicationDialogManager().showErrorMessageDialog(container, "Error opening file: " + ex.getMessage());
+            txtWorkbookPath.setText("");
+         }
+      }
+   }
 
-	private DialogManager getApplicationDialogManager()
-	{
-		return container.getApplicationDialogManager();
-	}
+   private DialogManager getApplicationDialogManager()
+   {
+      return container.getApplicationDialogManager();
+   }
 
-	@Override
-	public void update()
-	{
-		try {
-			tabSheetContainer.removeAll(); // reset the tab panel first
-			SpreadSheetDataSource spreadsheet = container.getLoadedSpreadSheet();
-			for (Sheet sheet : spreadsheet.getSheets()) {
-				SheetPanel sheetPanel = new SheetPanel(sheet);
-				tabSheetContainer.addTab(sheetPanel.getSheetName(), null, sheetPanel);
-			}
-		} catch (CellfieException ex) {
-			getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
-		}
-	}
+   @Override
+   public void update()
+   {
+      try {
+         tabSheetContainer.removeAll(); // reset the tab panel first
+         SpreadSheetDataSource spreadsheet = container.getLoadedSpreadSheet();
+         for (Sheet sheet : spreadsheet.getSheets()) {
+            SheetPanel sheetPanel = new SheetPanel(sheet);
+            tabSheetContainer.addTab(sheetPanel.getSheetName(), null, sheetPanel);
+         }
+      } catch (CellfieException ex) {
+         getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+      }
+   }
 }

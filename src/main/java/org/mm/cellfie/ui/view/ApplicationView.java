@@ -46,261 +46,263 @@ import org.semanticweb.owlapi.model.OWLOntology;
  */
 public class ApplicationView extends JPanel implements ModelView
 {
-	private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-	private OWLEditorKit editorKit;
+   private OWLEditorKit editorKit;
 
-	private DialogManager applicationDialogManager;
-	private DataSourceView dataSourceView;
-	private MappingBrowserView mappingExpressionView;
+   private DialogManager applicationDialogManager;
+   private DataSourceView dataSourceView;
+   private MappingBrowserView mappingExpressionView;
 
-	private MMApplication application;
-	private MMApplicationFactory applicationFactory = new MMApplicationFactory();
+   private MMApplication application;
+   private MMApplicationFactory applicationFactory = new MMApplicationFactory();
 
-	public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, DialogManager applicationDialogManager)
-	{
-		setUserOntology(ontology);
-		
-		this.editorKit = editorKit;
-		this.applicationDialogManager = applicationDialogManager;
+   public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, DialogManager applicationDialogManager)
+   {
+      setUserOntology(ontology);
 
-		setLayout(new BorderLayout());
-		
-		JPanel pnlTargetOntology = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		pnlTargetOntology.setBorder(new EmptyBorder(2, 5, 2, 5));
-		add(pnlTargetOntology, BorderLayout.NORTH);
+      this.editorKit = editorKit;
+      this.applicationDialogManager = applicationDialogManager;
 
-		JLabel lblTargetOntology = new JLabel("Target Ontology: ");
-		lblTargetOntology.setForeground(Color.DARK_GRAY);
-		pnlTargetOntology.add(lblTargetOntology);
-		
-		JLabel lblOntologyID = new JLabel(createName(ontology));
-		lblOntologyID.setForeground(Color.DARK_GRAY);
-		pnlTargetOntology.add(lblOntologyID);
+      setLayout(new BorderLayout());
 
-		ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.VERTICAL_SPLIT);
-		splitPane.setDividerLocation(500);
-		splitPane.setResizeWeight(0.8);
-		add(splitPane, BorderLayout.CENTER);
+      JPanel pnlTargetOntology = new JPanel(new FlowLayout(FlowLayout.LEFT));
+      pnlTargetOntology.setBorder(new EmptyBorder(2, 5, 2, 5));
+      add(pnlTargetOntology, BorderLayout.NORTH);
 
-		/*
-		 * Workbook sheet GUI presentation
-		 */
-		dataSourceView = new DataSourceView(this);
-		splitPane.setTopComponent(dataSourceView);
+      JLabel lblTargetOntology = new JLabel("Target Ontology: ");
+      lblTargetOntology.setForeground(Color.DARK_GRAY);
+      pnlTargetOntology.add(lblTargetOntology);
 
-		/*
-		 * Mapping browser, create, edit, remove panel
-		 */
-		mappingExpressionView = new MappingBrowserView(this);
-		splitPane.setBottomComponent(mappingExpressionView);
-		
-		validate();
-	}
+      JLabel lblOntologyID = new JLabel(createName(ontology));
+      lblOntologyID.setForeground(Color.DARK_GRAY);
+      pnlTargetOntology.add(lblOntologyID);
 
-	private String createName(OWLOntology ontology)
-	{
-		IRI ontologyID = ontology.getOntologyID().getOntologyIRI();
-		return String.format("%s (%s)", ontologyID.getFragment(), ontologyID);
-	}
+      ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.VERTICAL_SPLIT);
+      splitPane.setDividerLocation(500);
+      splitPane.setResizeWeight(0.8);
+      add(splitPane, BorderLayout.CENTER);
 
-	protected void setUserOntology(OWLOntology ontology)
-	{
-		if (ontology != null) {
-			applicationFactory.setUserOntology(ontology);
-		}
-	}
+      /*
+       * Workbook sheet GUI presentation
+       */
+      dataSourceView = new DataSourceView(this);
+      splitPane.setTopComponent(dataSourceView);
 
-	public void updateOntologyDocument(String path)
-	{
-		applicationFactory.setOntologyLocation(path);
-		fireOntologyDocumentChanged();
-	}
+      /*
+       * Mapping browser, create, edit, remove panel
+       */
+      mappingExpressionView = new MappingBrowserView(this);
+      splitPane.setBottomComponent(mappingExpressionView);
 
-	public void loadWorkbookDocument(String path)
-	{
-		applicationFactory.setWorkbookLocation(path);
-		fireWorkbookDocumentChanged();
-	}
+      validate();
+   }
 
-	public void loadMappingDocument(String path)
-	{
-		applicationFactory.setMappingLocation(path);
-		fireMappingDocumentChanged();
-	}
+   private String createName(OWLOntology ontology)
+   {
+      IRI ontologyID = ontology.getOntologyID().getOntologyIRI();
+      return String.format("%s (%s)", ontologyID.getFragment(), ontologyID);
+   }
 
-	private void fireOntologyDocumentChanged()
-	{
-		setupApplication();
-	}
+   protected void setUserOntology(OWLOntology ontology)
+   {
+      if (ontology != null) {
+         applicationFactory.setUserOntology(ontology);
+      }
+   }
 
-	private void fireWorkbookDocumentChanged()
-	{
-		setupApplication();
-		updateDataSourceView();
-		updateMappingBrowserView();
-	}
+   public void updateOntologyDocument(String path)
+   {
+      applicationFactory.setOntologyLocation(path);
+      fireOntologyDocumentChanged();
+   }
 
-	private void fireMappingDocumentChanged()
-	{
-		setupApplication();
-		prepareLogFileLocation();
-		updateMappingBrowserView();
-	}
+   public void loadWorkbookDocument(String path)
+   {
+      applicationFactory.setWorkbookLocation(path);
+      fireWorkbookDocumentChanged();
+   }
 
-	private void updateDataSourceView()
-	{
-		dataSourceView.update();
-	}
+   public void loadMappingDocument(String path)
+   {
+      applicationFactory.setMappingLocation(path);
+      fireMappingDocumentChanged();
+   }
 
-	private void updateMappingBrowserView()
-	{
-		mappingExpressionView.update();
-	}
+   private void fireOntologyDocumentChanged()
+   {
+      setupApplication();
+   }
 
-	private void setupApplication()
-	{
-		try {
-			application = applicationFactory.createApplication();
-		} catch (Exception e) {
-			applicationDialogManager.showErrorMessageDialog(this, "Initialization error: " + e.getMessage());
-		}
-	}
+   private void fireWorkbookDocumentChanged()
+   {
+      setupApplication();
+      updateDataSourceView();
+      updateMappingBrowserView();
+   }
 
-	private MMApplicationModel getApplicationModel()
-	{
-		return application.getApplicationModel();
-	}
+   private void fireMappingDocumentChanged()
+   {
+      setupApplication();
+      prepareLogFileLocation();
+      updateMappingBrowserView();
+   }
 
-	public void evaluate(MappingExpression mapping, Renderer renderer, Set<Rendering> results) throws ParseException
-	{
-		final ReferenceSettings referenceSettings = new ReferenceSettings();
-		
-		String expression = mapping.getExpressionString();
-		ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
-		results.add(renderer.renderExpression(expressionNode).get());
-	}
+   private void updateDataSourceView()
+   {
+      dataSourceView.update();
+   }
 
-	public void log(MappingExpression mapping, Renderer renderer, StringBuffer logMessage) throws ParseException
-	{
-		final ReferenceSettings referenceSettings = new ReferenceSettings();
-		referenceSettings.setValueEncodingSetting(ValueEncodingSetting.RDFS_LABEL);
-		
-		String expression = mapping.getExpressionString();
-		ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
-		logMessage.append(renderer.renderExpression(expressionNode).get());
-	}
+   private void updateMappingBrowserView()
+   {
+      mappingExpressionView.update();
+   }
 
-	private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
-	{
-		MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(expression.getBytes()), settings, -1);
-		SimpleNode simpleNode = parser.expression();
-		return new ExpressionNode((ASTExpression) simpleNode);
-	}
+   private void setupApplication()
+   {
+      try {
+         application = applicationFactory.createApplication();
+      } catch (Exception e) {
+         applicationDialogManager.showErrorMessageDialog(this, "Initialization error: " + e.getMessage());
+      }
+   }
 
-	@Override
-	public void update()
-	{
-		// NO-OP
-	}
+   private MMApplicationModel getApplicationModel()
+   {
+      return application.getApplicationModel();
+   }
 
-	public SpreadSheetDataSource getLoadedSpreadSheet() throws CellfieException
-	{
-		try {
-			SpreadSheetDataSource spreadsheet = getApplicationModel().getDataSourceModel().getDataSource();
-			spreadsheet.getSheets(); // just to check NullPointerException
-			return spreadsheet;
-		} catch (NullPointerException ex) {
-			throw new CellfieException("Unable to find the spreadsheet. Please load the source spreadsheet first and try again.", ex);
-		}
-	}
+   public void evaluate(MappingExpression mapping, Renderer renderer, Set<Rendering> results) throws ParseException
+   {
+      final ReferenceSettings referenceSettings = new ReferenceSettings();
 
-	public List<MappingExpression> getLoadedMappingExpressions() throws CellfieException
-	{
-		try {
-			return getApplicationModel().getMappingExpressionsModel().getExpressions();
-		} catch (NullPointerException ex) {
-			throw new CellfieException("Unable to find the mapping expressions. Please load the expressions first and try again.", ex);
-		}
-	}
+      String expression = mapping.getExpressionString();
+      ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
+      results.add(renderer.renderExpression(expressionNode).get());
+   }
 
-	public void updateMappingExpressionModel(List<MappingExpression> mappingList)
-	{
-		MappingExpressionSet mappings = MappingExpressionSet.create(mappingList);
-		getApplicationModel().getMappingExpressionsModel().changeMappingExpressionSet(mappings);
-	}
+   public void log(MappingExpression mapping, Renderer renderer, StringBuffer logMessage) throws ParseException
+   {
+      final ReferenceSettings referenceSettings = new ReferenceSettings();
+      referenceSettings.setValueEncodingSetting(ValueEncodingSetting.RDFS_LABEL);
 
-	public Renderer getDefaultRenderer()
-	{
-		return getApplicationModel().getDefaultRenderer();
-	}
+      String expression = mapping.getExpressionString();
+      ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
+      logMessage.append(renderer.renderExpression(expressionNode).get());
+   }
 
-	public Renderer getLogRenderer()
-	{
-		return getApplicationModel().getLogRenderer();
-	}
+   private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
+   {
+      MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(expression.getBytes()), settings, -1);
+      SimpleNode simpleNode = parser.expression();
+      return new ExpressionNode((ASTExpression) simpleNode);
+   }
 
-	public OWLEditorKit getEditorKit()
-	{
-		return editorKit;
-	}
+   @Override
+   public void update()
+   {
+      // NO-OP
+   }
 
-	public DialogManager getApplicationDialogManager()
-	{
-		return applicationDialogManager;
-	}
+   public SpreadSheetDataSource getLoadedSpreadSheet() throws CellfieException
+   {
+      try {
+         SpreadSheetDataSource spreadsheet = getApplicationModel().getDataSourceModel().getDataSource();
+         spreadsheet.getSheets(); // just to check NullPointerException
+         return spreadsheet;
+      } catch (NullPointerException ex) {
+         throw new CellfieException(
+               "Unable to find the spreadsheet. Please load the source spreadsheet first and try again.", ex);
+      }
+   }
 
-	public DataSourceView getDataSourceView()
-	{
-		return dataSourceView;
-	}
+   public List<MappingExpression> getLoadedMappingExpressions() throws CellfieException
+   {
+      try {
+         return getApplicationModel().getMappingExpressionsModel().getExpressions();
+      } catch (NullPointerException ex) {
+         throw new CellfieException(
+               "Unable to find the mapping expressions. Please load the expressions first and try again.", ex);
+      }
+   }
 
-	public MappingBrowserView getMappingBrowserView()
-	{
-		return mappingExpressionView;
-	}
-	
-	private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
-	
-	private String logFileLocation;
-	private File logFile;
-	
-	/* protected */File getLogFile()
-	{
-		return logFile;
-	}
+   public void updateMappingExpressionModel(List<MappingExpression> mappingList)
+   {
+      MappingExpressionSet mappings = MappingExpressionSet.create(mappingList);
+      getApplicationModel().getMappingExpressionsModel().changeMappingExpressionSet(mappings);
+   }
 
-	/* protected */File createLogFile()
-	{
-		if (logFileLocation == null) {
-			logFileLocation = getDefaultLogFileLocation();
-		}
-		String timestamp = dateFormat.format(new Date());
-		String fileName = String.format("%s%s.log", logFileLocation, timestamp);
-		logFile = new File(fileName);
-		return logFile;
-	}
+   public Renderer getDefaultRenderer()
+   {
+      return getApplicationModel().getDefaultRenderer();
+   }
 
-	private void prepareLogFileLocation()
-	{
-		String mappingFilePath = applicationFactory.getMappingLocation();
-		if (mappingFilePath == null) {
-			logFileLocation = getDefaultLogFileLocation();
-		} else {
-			logFileLocation = getLogFileLocation(new File(mappingFilePath));
-		}
-	}
+   public Renderer getLogRenderer()
+   {
+      return getApplicationModel().getLogRenderer();
+   }
 
-	private String getLogFileLocation(File mappingFile)
-	{
-		String mappingPath = mappingFile.getParent();
-		String mappingFileName = mappingFile.getName().substring(0, mappingFile.getName().lastIndexOf("."));
-		return mappingPath + System.getProperty("file.separator") + mappingFileName + "_mmexec";
-	}
+   public OWLEditorKit getEditorKit()
+   {
+      return editorKit;
+   }
 
-	private String getDefaultLogFileLocation()
-	{
-		String tmpPath = System.getProperty("java.io.tmpdir");
-		return tmpPath + System.getProperty("file.separator") + "mmexec";
-	}
+   public DialogManager getApplicationDialogManager()
+   {
+      return applicationDialogManager;
+   }
+
+   public DataSourceView getDataSourceView()
+   {
+      return dataSourceView;
+   }
+
+   public MappingBrowserView getMappingBrowserView()
+   {
+      return mappingExpressionView;
+   }
+
+   private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
+
+   private String logFileLocation;
+   private File logFile;
+
+   /* protected */File getLogFile()
+   {
+      return logFile;
+   }
+
+   /* protected */File createLogFile()
+   {
+      if (logFileLocation == null) {
+         logFileLocation = getDefaultLogFileLocation();
+      }
+      String timestamp = dateFormat.format(new Date());
+      String fileName = String.format("%s%s.log", logFileLocation, timestamp);
+      logFile = new File(fileName);
+      return logFile;
+   }
+
+   private void prepareLogFileLocation()
+   {
+      String mappingFilePath = applicationFactory.getMappingLocation();
+      if (mappingFilePath == null) {
+         logFileLocation = getDefaultLogFileLocation();
+      } else {
+         logFileLocation = getLogFileLocation(new File(mappingFilePath));
+      }
+   }
+
+   private String getLogFileLocation(File mappingFile)
+   {
+      String mappingPath = mappingFile.getParent();
+      String mappingFileName = mappingFile.getName().substring(0, mappingFile.getName().lastIndexOf("."));
+      return mappingPath + System.getProperty("file.separator") + mappingFileName + "_mmexec";
+   }
+
+   private String getDefaultLogFileLocation()
+   {
+      String tmpPath = System.getProperty("java.io.tmpdir");
+      return tmpPath + System.getProperty("file.separator") + "mmexec";
+   }
 }

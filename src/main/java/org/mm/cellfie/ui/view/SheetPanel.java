@@ -13,94 +13,100 @@ import org.mm.ss.SpreadSheetUtil;
 
 public class SheetPanel extends JPanel
 {
-	private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-	private final Sheet sheet;
-	private final SheetTableModel sheetModel;
+   private final Sheet sheet;
+   private final SheetTableModel sheetModel;
 
-	public SheetPanel(Sheet sheet)
-	{
-		this.sheet = sheet;
-		sheetModel = new SheetTableModel(sheet);
+   public SheetPanel(Sheet sheet)
+   {
+      this.sheet = sheet;
+      sheetModel = new SheetTableModel(sheet);
 
-		setLayout(new BorderLayout());
+      setLayout(new BorderLayout());
 
-		SheetTable tblBaseSheet = new SheetTable(sheetModel);
-		JScrollPane scrBaseSheet = new JScrollPane(tblBaseSheet);
+      SheetTable tblBaseSheet = new SheetTable(sheetModel);
+      JScrollPane scrBaseSheet = new JScrollPane(tblBaseSheet);
 
-		JTable tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
-		scrBaseSheet.setRowHeaderView(tblRowNumberSheet);
-		scrBaseSheet.setCorner(JScrollPane.UPPER_LEFT_CORNER, tblRowNumberSheet.getTableHeader());
+      JTable tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
+      scrBaseSheet.setRowHeaderView(tblRowNumberSheet);
+      scrBaseSheet.setCorner(JScrollPane.UPPER_LEFT_CORNER, tblRowNumberSheet.getTableHeader());
 
-		add(BorderLayout.CENTER, scrBaseSheet);
-		
-		validate();
-	}
+      add(BorderLayout.CENTER, scrBaseSheet);
 
-	public String getSheetName()
-	{
-		return sheet.getSheetName();
-	}
-	
-	class SheetTableModel extends AbstractTableModel
-	{
-		private static final long serialVersionUID = 1L;
+      validate();
+   }
 
-		private final Sheet sheet;
+   public String getSheetName()
+   {
+      return sheet.getSheetName();
+   }
 
-		public SheetTableModel(Sheet sheet)
-		{
-			this.sheet = sheet;
-		}
+   class SheetTableModel extends AbstractTableModel
+   {
+      private static final long serialVersionUID = 1L;
 
-		public int getRowCount()
-		{
-			return sheet.getLastRowNum() + 1;
-		}
+      private final Sheet sheet;
 
-		public int getColumnCount()
-		{
-			int maxCount = 0;
-			for (int i = 0; i < getRowCount(); i++) {
-				int currentCount = sheet.getRow(i).getLastCellNum();
-				if (currentCount > maxCount) {
-					maxCount = currentCount;
-				}
-			}
-			return maxCount;
-		}
+      public SheetTableModel(Sheet sheet)
+      {
+         this.sheet = sheet;
+      }
 
-		public String getColumnName(int column)
-		{
-			return SpreadSheetUtil.columnNumber2Name(column+1);
-		}
+      public int getRowCount()
+      {
+         return sheet.getLastRowNum() + 1;
+      }
 
-		public Object getValueAt(int row, int column)
-		{
-			try {
-				Cell cell = sheet.getRow(row).getCell(column);
-				switch (cell.getCellType()) {
-					case Cell.CELL_TYPE_BLANK: return "";
-					case Cell.CELL_TYPE_STRING: return cell.getStringCellValue();
-					case Cell.CELL_TYPE_NUMERIC: 
-						if (isInteger(cell.getNumericCellValue())) { // check if the numeric is an integer or double
-							return (int) cell.getNumericCellValue();
-						} else {
-							return cell.getNumericCellValue();
-						}
-					case Cell.CELL_TYPE_BOOLEAN: return cell.getBooleanCellValue();
-					case Cell.CELL_TYPE_FORMULA: return cell.getNumericCellValue();
-					default: return "";
-				}
-			} catch (NullPointerException e) {
-				// TODO Log this strange error
-				return "";
-			}
-		}
+      public int getColumnCount()
+      {
+         int maxCount = 0;
+         for (int i = 0; i < getRowCount(); i++) {
+            int currentCount = sheet.getRow(i).getLastCellNum();
+            if (currentCount > maxCount) {
+               maxCount = currentCount;
+            }
+         }
+         return maxCount;
+      }
 
-		private boolean isInteger(double number)
-		{
-			return (number == Math.floor(number) && !Double.isInfinite(number));
-		}
-	}
+      public String getColumnName(int column)
+      {
+         return SpreadSheetUtil.columnNumber2Name(column + 1);
+      }
+
+      public Object getValueAt(int row, int column)
+      {
+         try {
+            Cell cell = sheet.getRow(row).getCell(column);
+            switch (cell.getCellType()) {
+               case Cell.CELL_TYPE_BLANK :
+                  return "";
+               case Cell.CELL_TYPE_STRING :
+                  return cell.getStringCellValue();
+               case Cell.CELL_TYPE_NUMERIC :
+                  // Check if the numeric is double or integer
+                  if (isInteger(cell.getNumericCellValue())) {
+                     return (int) cell.getNumericCellValue();
+                  } else {
+                     return cell.getNumericCellValue();
+                  }
+               case Cell.CELL_TYPE_BOOLEAN :
+                  return cell.getBooleanCellValue();
+               case Cell.CELL_TYPE_FORMULA :
+                  return cell.getNumericCellValue();
+               default :
+                  return "";
+            }
+         } catch (NullPointerException e) {
+            // TODO Log this strange error
+            return "";
+         }
+      }
+
+      private boolean isInteger(double number)
+      {
+         return (number == Math.floor(number) && !Double.isInfinite(number));
+      }
+   }
 }

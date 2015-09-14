@@ -25,161 +25,155 @@ import javax.swing.table.TableColumn;
  */
 public class RowNumberWrapper extends JTable implements ChangeListener, PropertyChangeListener, TableModelListener
 {
-	private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-	private JTable main;
+   private JTable main;
 
-	public RowNumberWrapper(JTable table)
-	{
-		main = table;
-		main.addPropertyChangeListener(this);
-		main.getModel().addTableModelListener(this);
+   public RowNumberWrapper(JTable table)
+   {
+      main = table;
+      main.addPropertyChangeListener(this);
+      main.getModel().addTableModelListener(this);
 
-		setFocusable(false);
-		setAutoCreateColumnsFromModel(false);
-		setSelectionModel(main.getSelectionModel());
-		setCellSelectionEnabled(true);
+      setFocusable(false);
+      setAutoCreateColumnsFromModel(false);
+      setSelectionModel(main.getSelectionModel());
+      setCellSelectionEnabled(true);
 
-		TableColumn column = new TableColumn();
-		column.setHeaderValue(" ");
-		addColumn(column);
-		column.setCellRenderer(new RowNumberRenderer());
+      TableColumn column = new TableColumn();
+      column.setHeaderValue(" ");
+      addColumn(column);
+      column.setCellRenderer(new RowNumberRenderer());
 
-		getColumnModel().getColumn(0).setPreferredWidth(50);
-		setPreferredScrollableViewportSize(getPreferredSize());
-	}
+      getColumnModel().getColumn(0).setPreferredWidth(50);
+      setPreferredScrollableViewportSize(getPreferredSize());
+   }
 
-	@Override
-	public void addNotify()
-	{
-		super.addNotify();
+   @Override
+   public void addNotify()
+   {
+      super.addNotify();
 
-		Component c = getParent();
+      Component c = getParent();
 
-		// Keep scrolling of the row table in sync with the main table.
+      // Keep scrolling of the row table in sync with the main table.
 
-		if (c instanceof JViewport) {
-			JViewport viewport = (JViewport) c;
-			viewport.addChangeListener(this);
-		}
-	}
+      if (c instanceof JViewport) {
+         JViewport viewport = (JViewport) c;
+         viewport.addChangeListener(this);
+      }
+   }
 
-	/*
-	 * Delegate method to main table
-	 */
-	@Override
-	public int getRowCount()
-	{
-		return main.getRowCount();
-	}
+   /*
+    * Delegate method to main table
+    */
+   @Override
+   public int getRowCount()
+   {
+      return main.getRowCount();
+   }
 
-	@Override
-	public int getRowHeight(int row)
-	{
-		int rowHeight = main.getRowHeight(row);
+   @Override
+   public int getRowHeight(int row)
+   {
+      int rowHeight = main.getRowHeight(row);
 
-		if (rowHeight != super.getRowHeight(row)) {
-			super.setRowHeight(row, rowHeight);
-		}
+      if (rowHeight != super.getRowHeight(row)) {
+         super.setRowHeight(row, rowHeight);
+      }
 
-		return rowHeight;
-	}
+      return rowHeight;
+   }
 
-	/*
-	 * No model is being used for this table so just use the row number as the
-	 * value of the cell.
-	 */
-	@Override
-	public Object getValueAt(int row, int column)
-	{
-		return Integer.toString(row + 1);
-	}
+   /*
+    * No model is being used for this table so just use the row number as the
+    * value of the cell.
+    */
+   @Override
+   public Object getValueAt(int row, int column)
+   {
+      return Integer.toString(row + 1);
+   }
 
-	/*
-	 * Don't edit data in the main TableModel by mistake
-	 */
-	@Override
-	public boolean isCellEditable(int row, int column)
-	{
-		return false;
-	}
+   /*
+    * Don't edit data in the main TableModel by mistake
+    */
+   @Override
+   public boolean isCellEditable(int row, int column)
+   {
+      return false;
+   }
 
-	/*
-	 * Do nothing since the table ignores the model
-	 */
-	@Override
-	public void setValueAt(Object value, int row, int column)
-	{
-	}
+   /*
+    * Do nothing since the table ignores the model
+    */
+   @Override
+   public void setValueAt(Object value, int row, int column)
+   {
+      // NO-OP
+   }
 
-	//
-	// Implement the ChangeListener
-	//
-	public void stateChanged(ChangeEvent e)
-	{
-		// Keep the scrolling of the row table in sync with main table
+   @Override
+   public void stateChanged(ChangeEvent e)
+   {
+      // Keep the scrolling of the row table in sync with main table
 
-		JViewport viewport = (JViewport) e.getSource();
-		JScrollPane scrollPane = (JScrollPane) viewport.getParent();
-		scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
-	}
+      JViewport viewport = (JViewport) e.getSource();
+      JScrollPane scrollPane = (JScrollPane) viewport.getParent();
+      scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
+   }
 
-	//
-	// Implement the PropertyChangeListener
-	//
-	public void propertyChange(PropertyChangeEvent e)
-	{
-		// Keep the row table in sync with the main table
+   public void propertyChange(PropertyChangeEvent e)
+   {
+      // Keep the row table in sync with the main table
 
-		if ("selectionModel".equals(e.getPropertyName())) {
-			setSelectionModel(main.getSelectionModel());
-		}
+      if ("selectionModel".equals(e.getPropertyName())) {
+         setSelectionModel(main.getSelectionModel());
+      }
 
-		if ("rowHeight".equals(e.getPropertyName())) {
-			repaint();
-		}
+      if ("rowHeight".equals(e.getPropertyName())) {
+         repaint();
+      }
 
-		if ("model".equals(e.getPropertyName())) {
-			main.getModel().addTableModelListener(this);
-			revalidate();
-		}
-	}
+      if ("model".equals(e.getPropertyName())) {
+         main.getModel().addTableModelListener(this);
+         revalidate();
+      }
+   }
 
-	//
-	// Implement the TableModelListener
-	//
-	@Override
-	public void tableChanged(TableModelEvent e)
-	{
-		revalidate();
-	}
+   @Override
+   public void tableChanged(TableModelEvent e)
+   {
+      revalidate();
+   }
 
-	/*
-	 * Attempt to mimic the table header renderer
-	 */
-	private static class RowNumberRenderer extends DefaultTableCellRenderer
-	{
-		private static final long serialVersionUID = 1L;
+   /*
+    * Attempt to mimic the table header renderer
+    */
+   private static class RowNumberRenderer extends DefaultTableCellRenderer
+   {
+      private static final long serialVersionUID = 1L;
 
-		public RowNumberRenderer()
-		{
-			setHorizontalAlignment(JLabel.CENTER);
-		}
+      public RowNumberRenderer()
+      {
+         setHorizontalAlignment(JLabel.CENTER);
+      }
 
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-		{
-			if (table.isRowSelected(row)) {
-				setForeground(UIManager.getColor("Table.selectionForeground"));
-				setBackground(UIManager.getColor("controlShadow"));
-			} else {
-				setForeground(UIManager.getColor("TableHeader.foreground"));
-				setBackground(UIManager.getColor("Table.background"));
-			}
-			setText((value == null) ? "" : value.toString());
-			setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+      @Override
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column)
+      {
+         if (table.isRowSelected(row)) {
+            setForeground(UIManager.getColor("Table.selectionForeground"));
+            setBackground(UIManager.getColor("controlShadow"));
+         } else {
+            setForeground(UIManager.getColor("TableHeader.foreground"));
+            setBackground(UIManager.getColor("Table.background"));
+         }
+         setText((value == null) ? "" : value.toString());
+         setBorder(UIManager.getBorder("TableHeader.cellBorder"));
 
-			return this;
-		}
-	}
+         return this;
+      }
+   }
 }

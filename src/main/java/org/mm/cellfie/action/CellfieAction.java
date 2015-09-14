@@ -17,78 +17,79 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 public class CellfieAction extends ProtegeOWLAction
 {
-	private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-	private JDialog cellfieDialog;
+   private JDialog cellfieDialog;
 
-	@Override
-	public void initialise() throws Exception
-	{
-		// NO-OP
-	}
+   @Override
+   public void initialise() throws Exception
+   {
+      // NO-OP
+   }
 
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
-		
-		ApplicationView appView = new ApplicationView(currentOntology, getOWLEditorKit(), new ProtegeDialogManager());
-		
-		cellfieDialog = new JDialog();
-		cellfieDialog.setTitle("Cellfie");
-		cellfieDialog.setContentPane(appView);
-		cellfieDialog.setSize(1100, 1000);
-		cellfieDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		cellfieDialog.setLocationRelativeTo(null);
-		cellfieDialog.setVisible(true);
-	}
+   @Override
+   public void actionPerformed(ActionEvent e)
+   {
+      OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
 
-	@Override
-	public void dispose() throws Exception
-	{
-		//	NO-OP
-	}
+      ApplicationView appView = new ApplicationView(currentOntology, getOWLEditorKit(), new ProtegeDialogManager());
 
-	class ProtegeDialogManager implements DialogManager
-	{
-		@Override
-		public int showConfirmDialog(Component parent, String title, String message)
-		{
-			return JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION);
-		}
+      cellfieDialog = new JDialog();
+      cellfieDialog.setTitle("Cellfie");
+      cellfieDialog.setContentPane(appView);
+      cellfieDialog.setSize(1100, 1000);
+      cellfieDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+      cellfieDialog.setLocationRelativeTo(null);
+      cellfieDialog.setVisible(true);
+   }
 
-		@Override
-		public String showInputDialog(Component parent, String message)
-		{
-			return JOptionPane.showInputDialog(parent, message, "Input", JOptionPane.OK_CANCEL_OPTION);
-		}
+   @Override
+   public void dispose() throws Exception
+   {
+      // NO-OP
+   }
 
-		@Override
-		public void showMessageDialog(Component parent, String message)
-		{
-			JOptionPane.showMessageDialog(parent, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-		}
+   class ProtegeDialogManager implements DialogManager
+   {
+      @Override
+      public int showConfirmDialog(Component parent, String title, String message)
+      {
+         return JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION);
+      }
 
-		@Override
-		public void showErrorMessageDialog(Component parent, String message)
-		{
-			JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
-		}
+      @Override
+      public String showInputDialog(Component parent, String message)
+      {
+         return JOptionPane.showInputDialog(parent, message, "Input", JOptionPane.OK_CANCEL_OPTION);
+      }
 
-		@Override
-		public File showOpenFileChooser(Component parent, String message, String fileExtension, String fileDescription)
-		{
-			Set<String> extensions = new HashSet<>();
-			extensions.add(fileExtension);
-			return UIUtil.openFile(new JDialog(), "Open", fileDescription, extensions);
-		}
+      @Override
+      public void showMessageDialog(Component parent, String message)
+      {
+         JOptionPane.showMessageDialog(parent, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+      }
 
-		@Override
-		public File showSaveFileChooser(Component parent, String message, String fileExtension, String fileDescription, boolean overwrite)
-		{
-			Set<String> extensions = new HashSet<>();
-			extensions.add(fileExtension);
-			return UIUtil.saveFile(new JDialog(), "Save", fileDescription, extensions, null);
-		}
-	}
+      @Override
+      public void showErrorMessageDialog(Component parent, String message)
+      {
+         JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
+      }
+
+      @Override
+      public File showOpenFileChooser(Component parent, String message, String fileExtension, String fileDescription)
+      {
+         Set<String> extensions = new HashSet<>();
+         extensions.add(fileExtension);
+         return UIUtil.openFile(new JDialog(), "Open", fileDescription, extensions);
+      }
+
+      @Override
+      public File showSaveFileChooser(Component parent, String message, String fileExtension, String fileDescription,
+            boolean overwrite)
+      {
+         Set<String> extensions = new HashSet<>();
+         extensions.add(fileExtension);
+         return UIUtil.saveFile(new JDialog(), "Save", fileDescription, extensions, null);
+      }
+   }
 }

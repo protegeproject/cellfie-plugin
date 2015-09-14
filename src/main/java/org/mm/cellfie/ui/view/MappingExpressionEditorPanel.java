@@ -17,95 +17,93 @@ import org.mm.core.MappingExpression;
 
 public class MappingExpressionEditorPanel extends JPanel
 {
-	private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-	private JComboBox<String> cbbSheetName;
+   private JComboBox<String> cbbSheetName;
 
-	private JTextField txtStartColumn;
-	private JTextField txtEndColumn;
-	private JTextField txtStartRow;
-	private JTextField txtEndRow;
-	private JTextField txtComment;
+   private JTextField txtStartColumn;
+   private JTextField txtEndColumn;
+   private JTextField txtStartRow;
+   private JTextField txtEndRow;
+   private JTextField txtComment;
 
-	private JTextArea txtExpression;
+   private JTextArea txtExpression;
 
-	public MappingExpressionEditorPanel()
-	{
-		setLayout(new BorderLayout());
+   public MappingExpressionEditorPanel()
+   {
+      setLayout(new BorderLayout());
 
-		JPanel pnlMain = new JPanel(new BorderLayout());
-		pnlMain.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-		
-		add(pnlMain, BorderLayout.CENTER);
+      JPanel pnlMain = new JPanel(new BorderLayout());
+      pnlMain.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		JLabel lblSheetName = new JLabel("Sheet name:");
-		cbbSheetName = new JComboBox<>();
-		cbbSheetName.setModel(new DefaultComboBoxModel<>());
+      add(pnlMain, BorderLayout.CENTER);
 
-		JLabel lblStartColumn = new JLabel("Start column:");
-		txtStartColumn = new JTextField("");
+      JLabel lblSheetName = new JLabel("Sheet name:");
+      cbbSheetName = new JComboBox<>();
+      cbbSheetName.setModel(new DefaultComboBoxModel<>());
 
-		JLabel lblEndColumn = new JLabel("End column:");
-		txtEndColumn = new JTextField("");
+      JLabel lblStartColumn = new JLabel("Start column:");
+      txtStartColumn = new JTextField("");
 
-		JLabel lblStartRow = new JLabel("Start row:");
-		txtStartRow = new JTextField("");
+      JLabel lblEndColumn = new JLabel("End column:");
+      txtEndColumn = new JTextField("");
 
-		JLabel lblEndRow = new JLabel("End row:");
-		txtEndRow = new JTextField("");
+      JLabel lblStartRow = new JLabel("Start row:");
+      txtStartRow = new JTextField("");
 
-		JLabel lblComment = new JLabel("Comment:");
-		txtComment = new JTextField("");
+      JLabel lblEndRow = new JLabel("End row:");
+      txtEndRow = new JTextField("");
 
-		JLabel lblExpression = new JLabel("DSL mapping expression:");
+      JLabel lblComment = new JLabel("Comment:");
+      txtComment = new JTextField("");
 
-		JPanel pnlFields = new JPanel(new GridLayout(7, 2));
-		pnlFields.add(lblSheetName);
-		pnlFields.add(cbbSheetName);
-		pnlFields.add(lblStartColumn);
-		pnlFields.add(txtStartColumn);
-		pnlFields.add(lblEndColumn);
-		pnlFields.add(txtEndColumn);
-		pnlFields.add(lblStartRow);
-		pnlFields.add(txtStartRow);
-		pnlFields.add(lblEndRow);
-		pnlFields.add(txtEndRow);
-		pnlFields.add(lblComment);
-		pnlFields.add(txtComment);
-		pnlFields.add(lblExpression);
+      JLabel lblExpression = new JLabel("DSL mapping expression:");
 
-		pnlMain.add(pnlFields, BorderLayout.NORTH);
+      JPanel pnlFields = new JPanel(new GridLayout(7, 2));
+      pnlFields.add(lblSheetName);
+      pnlFields.add(cbbSheetName);
+      pnlFields.add(lblStartColumn);
+      pnlFields.add(txtStartColumn);
+      pnlFields.add(lblEndColumn);
+      pnlFields.add(txtEndColumn);
+      pnlFields.add(lblStartRow);
+      pnlFields.add(txtStartRow);
+      pnlFields.add(lblEndRow);
+      pnlFields.add(txtEndRow);
+      pnlFields.add(lblComment);
+      pnlFields.add(txtComment);
+      pnlFields.add(lblExpression);
 
-		txtExpression = new JTextArea("", 20, 48);
-		pnlMain.add(txtExpression, BorderLayout.CENTER);
-	}
+      pnlMain.add(pnlFields, BorderLayout.NORTH);
 
-	public void setSheetNames(List<String> sheetNames)
-	{
-		cbbSheetName.setModel(new DefaultComboBoxModel<>(new Vector<>(sheetNames)));
-	}
+      txtExpression = new JTextArea("", 20, 48);
+      pnlMain.add(txtExpression, BorderLayout.CENTER);
+   }
 
-	public void fillFormFields(String sheetName, String startColumn, String endColumn, String startRow, String endRow, String expression, String comment)
-	{
-		cbbSheetName.setSelectedItem(sheetName);
+   public void setSheetNames(List<String> sheetNames)
+   {
+      cbbSheetName.setModel(new DefaultComboBoxModel<>(new Vector<>(sheetNames)));
+   }
 
-		txtStartColumn.setText(startColumn);
-		txtEndColumn.setText(endColumn);
-		txtStartRow.setText(startRow);
-		txtEndRow.setText(endRow);
+   public void fillFormFields(String sheetName, String startColumn, String endColumn, String startRow, String endRow,
+         String expression, String comment)
+   {
+      cbbSheetName.setSelectedItem(sheetName);
 
-		txtComment.setText(comment);
-		txtExpression.setText(expression);
-	}
+      txtStartColumn.setText(startColumn);
+      txtEndColumn.setText(endColumn);
+      txtStartRow.setText(startRow);
+      txtEndRow.setText(endRow);
 
-	public MappingExpression getUserInput()
-	{
-		return new MappingExpression((String) cbbSheetName.getSelectedItem(),
-				txtStartColumn.getText().trim().toUpperCase(),
-				txtEndColumn.getText().trim().toUpperCase(),
-				txtStartRow.getText().trim(),
-				txtEndRow.getText().trim(),
-				txtComment.getText().trim(),
-				txtExpression.getText().trim());
-	}
+      txtComment.setText(comment);
+      txtExpression.setText(expression);
+   }
+
+   public MappingExpression getUserInput()
+   {
+      return new MappingExpression((String) cbbSheetName.getSelectedItem(),
+            txtStartColumn.getText().trim().toUpperCase(), txtEndColumn.getText().trim().toUpperCase(),
+            txtStartRow.getText().trim(), txtEndRow.getText().trim(), txtComment.getText().trim(),
+            txtExpression.getText().trim());
+   }
 }
