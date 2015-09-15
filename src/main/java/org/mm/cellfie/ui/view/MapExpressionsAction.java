@@ -137,7 +137,7 @@ public class MapExpressionsAction implements ActionListener
             new ImportOption(IMPORT_TO_NEW_ONTOLOGY, "Import to a new ontology"),
             new ImportOption(IMPORT_TO_CURRENT_ONTOLOGY, "Import to the current ontology") };
       try {
-         OWLOntology currentOntology = modelManager.getActiveOntology();
+         OWLOntology currentOntology = container.getLoadedOntology();
          int answer = JOptionPaneEx.showConfirmDialog(container, "Import Axioms", createPreviewAxiomsPanel(axioms),
                JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, null);
          switch (answer) {

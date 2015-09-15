@@ -48,6 +48,7 @@ public class ApplicationView extends JPanel implements ModelView
 {
    private static final long serialVersionUID = 1L;
 
+   private OWLOntology ontology;
    private OWLEditorKit editorKit;
 
    private DialogManager applicationDialogManager;
@@ -59,10 +60,11 @@ public class ApplicationView extends JPanel implements ModelView
 
    public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, DialogManager applicationDialogManager)
    {
-      setUserOntology(ontology);
-
+      this.ontology = ontology;
       this.editorKit = editorKit;
       this.applicationDialogManager = applicationDialogManager;
+
+      setUserOntology(ontology);
 
       setLayout(new BorderLayout());
 
@@ -202,6 +204,11 @@ public class ApplicationView extends JPanel implements ModelView
    public void update()
    {
       // NO-OP
+   }
+
+   public OWLOntology getLoadedOntology()
+   {
+      return ontology;
    }
 
    public SpreadSheetDataSource getLoadedSpreadSheet() throws CellfieException
