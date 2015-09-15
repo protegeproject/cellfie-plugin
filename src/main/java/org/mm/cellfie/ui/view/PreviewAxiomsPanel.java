@@ -68,7 +68,7 @@ public class PreviewAxiomsPanel extends JPanel
       @Override
       public void mouseClicked(MouseEvent e)
       {
-         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewer(), JOptionPane.INFORMATION_MESSAGE,
+         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewer(), JOptionPane.PLAIN_MESSAGE,
                JOptionPane.DEFAULT_OPTION, null);
       }
    }
@@ -79,6 +79,7 @@ public class PreviewAxiomsPanel extends JPanel
 
       public LogViewer()
       {
+         setPreferredSize(new Dimension(1020, 420));
          setLayout(new BorderLayout());
          try {
             JTextPane txtLogMessage = new JTextPane() // To force the horizontal scrolling
