@@ -8,6 +8,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,6 +72,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       tblMappingExpression.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       tblMappingExpression.setGridColor(new Color(220, 220, 220));
       tblMappingExpression.setDefaultRenderer(String.class, new MultiLineCellRenderer());
+      tblMappingExpression.addMouseListener(new MappingExpressionSelectionListener());
 
       JScrollPane scrMappingExpression = new JScrollPane(tblMappingExpression);
 
@@ -277,8 +280,7 @@ public class MappingBrowserView extends JPanel implements ModelView
             String endRow = rowVector.get(4);
             String expression = rowVector.get(5);
             String comment = rowVector.get(6);
-            mappings
-                  .add(new MappingExpression(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
+            mappings.add(new MappingExpression(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
          }
          return mappings;
       }
@@ -313,6 +315,37 @@ public class MappingBrowserView extends JPanel implements ModelView
          }
          setText((value == null) ? "" : value.toString());
          return this;
+      }
+   }
+
+   /**
+    * To allow user editing immediately the mapping expressions by double-clicking the expression row.
+    */
+   class MappingExpressionSelectionListener extends MouseAdapter
+   {
+      @Override
+      public void mouseClicked(MouseEvent e)
+      {
+         if (e.getClickCount() == 2) {
+            selectedRow = tblMappingExpression.getSelectedRow();
+            if (selectedRow > -1) {
+               try {
+                  MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
+                  editorPanel.setSheetNames(container.getLoadedSpreadSheet().getSheetNames());
+                  editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
+                        getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
+                        getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
+                  showMappingEditorDialog(editorPanel);
+               } catch (CellfieException ex) {
+                  container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+               }
+            }
+         }
+      }
+
+      private String getValueAt(int row, int column)
+      {
+         return (String) tableModel.getValueAt(row, column);
       }
    }
 
