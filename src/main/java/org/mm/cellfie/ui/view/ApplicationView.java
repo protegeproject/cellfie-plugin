@@ -181,7 +181,7 @@ public class ApplicationView extends JPanel implements ModelView
 
       String expression = mapping.getExpressionString();
       MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
-      results.add(renderer.renderMMExpression(expressionNode).get());
+      results.add(renderer.renderExpression(expressionNode).get());
    }
 
    public void log(MappingExpression mapping, Renderer renderer, StringBuffer logMessage) throws ParseException
@@ -191,7 +191,7 @@ public class ApplicationView extends JPanel implements ModelView
 
       String expression = mapping.getExpressionString();
       MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
-      logMessage.append(renderer.renderMMExpression(expressionNode).get());
+      logMessage.append(renderer.renderExpression(expressionNode).get());
    }
 
    private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
