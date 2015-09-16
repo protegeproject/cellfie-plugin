@@ -29,6 +29,7 @@ import org.mm.parser.MappingMasterParser;
 import org.mm.parser.ParseException;
 import org.mm.parser.SimpleNode;
 import org.mm.parser.node.ExpressionNode;
+import org.mm.parser.node.MMExpressionNode;
 import org.mm.renderer.Renderer;
 import org.mm.rendering.Rendering;
 import org.mm.ss.SpreadSheetDataSource;
@@ -179,8 +180,8 @@ public class ApplicationView extends JPanel implements ModelView
       final ReferenceSettings referenceSettings = new ReferenceSettings();
 
       String expression = mapping.getExpressionString();
-      ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
-      results.add(renderer.renderExpression(expressionNode).get());
+      MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
+      results.add(renderer.renderMMExpression(expressionNode).get());
    }
 
    public void log(MappingExpression mapping, Renderer renderer, StringBuffer logMessage) throws ParseException
@@ -189,8 +190,8 @@ public class ApplicationView extends JPanel implements ModelView
       referenceSettings.setValueEncodingSetting(ValueEncodingSetting.RDFS_LABEL);
 
       String expression = mapping.getExpressionString();
-      ExpressionNode expressionNode = parseExpression(expression, referenceSettings);
-      logMessage.append(renderer.renderExpression(expressionNode).get());
+      MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
+      logMessage.append(renderer.renderMMExpression(expressionNode).get());
    }
 
    private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
