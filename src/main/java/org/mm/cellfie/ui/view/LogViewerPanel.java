@@ -19,6 +19,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledEditorKit;
 
+import org.mm.renderer.text.TextRenderer;
+
 class LogViewerPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
@@ -84,7 +86,7 @@ class LogViewerPanel extends JPanel
          super.insertString(offset, str, a);
          String content = getText(0, getLength());
 
-         Pattern singleLinecommentsPattern = Pattern.compile("#.*"); // comment symbol
+         Pattern singleLinecommentsPattern = Pattern.compile(TextRenderer.COMMENT_HEADER + ".*"); // comment symbol
          Matcher matcher = singleLinecommentsPattern.matcher(content);
          while (matcher.find()) {
             setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), green, false);
