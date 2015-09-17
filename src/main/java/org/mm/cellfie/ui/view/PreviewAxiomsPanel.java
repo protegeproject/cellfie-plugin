@@ -3,13 +3,11 @@ package org.mm.cellfie.ui.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
-import java.io.FileReader;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
 import org.mm.cellfie.ui.list.OWLAxiomList;
@@ -30,8 +27,6 @@ public class PreviewAxiomsPanel extends JPanel
    private static final long serialVersionUID = 1L;
 
    private ApplicationView container;
-
-   private JLabel lblViewLog;
 
    public PreviewAxiomsPanel(ApplicationView container, OWLEditorKit editorKit, Set<OWLAxiom> axioms)
    {
@@ -51,7 +46,7 @@ public class PreviewAxiomsPanel extends JPanel
       pnlViewLog.setLayout(new FlowLayout(FlowLayout.RIGHT));
       add(pnlViewLog, BorderLayout.SOUTH);
 
-      lblViewLog = new JLabel("View Log");
+      JLabel lblViewLog = new JLabel("View Log");
       lblViewLog.setBorder(new EmptyBorder(0, 7, 0, 0));
       Font font = lblViewLog.getFont();
       Map attributes = font.getAttributes();
@@ -68,44 +63,8 @@ public class PreviewAxiomsPanel extends JPanel
       @Override
       public void mouseClicked(MouseEvent e)
       {
-         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewer(), JOptionPane.PLAIN_MESSAGE,
+         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewerPanel(container), JOptionPane.PLAIN_MESSAGE,
                JOptionPane.DEFAULT_OPTION, null);
-      }
-   }
-
-   class LogViewer extends JPanel
-   {
-      private static final long serialVersionUID = 1L;
-
-      public LogViewer()
-      {
-         setPreferredSize(new Dimension(1020, 420));
-         setLayout(new BorderLayout());
-         try {
-            JTextPane txtLogMessage = new JTextPane() // To force the horizontal scrolling
-            {
-               private static final long serialVersionUID = 1L;
-
-               @Override
-               public boolean getScrollableTracksViewportWidth()
-               {
-                  return (getSize().width < getParent().getSize().width);
-               }
-
-               @Override
-               public void setSize(Dimension d)
-               {
-                  if (d.width < getParent().getSize().width) {
-                     d.width = getParent().getSize().width;
-                  }
-                  super.setSize(d);
-               }
-            };
-            txtLogMessage.read(new FileReader(container.getLogFile()), container.getLogFile());
-            add(new JScrollPane(txtLogMessage), BorderLayout.CENTER);
-         } catch (Exception e) {
-            throw new RuntimeException("Unable to open log file", e);
-         }
       }
    }
 }
