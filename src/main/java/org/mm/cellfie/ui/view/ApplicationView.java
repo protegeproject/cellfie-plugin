@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JLabel;
@@ -181,7 +182,10 @@ public class ApplicationView extends JPanel implements ModelView
 
       String expression = mapping.getExpressionString();
       MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
-      results.add(renderer.renderExpression(expressionNode).get());
+      Optional<? extends Rendering> renderingResult = renderer.renderExpression(expressionNode);
+      if (renderingResult.isPresent()) {
+         results.add(renderingResult.get());
+      }
    }
 
    public void log(MappingExpression mapping, Renderer renderer, StringBuffer logMessage) throws ParseException
@@ -191,7 +195,10 @@ public class ApplicationView extends JPanel implements ModelView
 
       String expression = mapping.getExpressionString();
       MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
-      logMessage.append(renderer.renderExpression(expressionNode).get());
+      Optional<? extends Rendering> renderingResult = renderer.renderExpression(expressionNode);
+      if (renderingResult.isPresent()) {
+         logMessage.append(renderingResult.get());
+      }
    }
 
    private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
