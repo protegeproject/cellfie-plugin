@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -18,16 +17,16 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
@@ -37,6 +36,7 @@ import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSetFactory;
 import org.mm.ui.DialogManager;
 import org.mm.ui.ModelView;
+import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 
 public class MappingBrowserView extends JPanel implements ModelView
@@ -45,28 +45,29 @@ public class MappingBrowserView extends JPanel implements ModelView
 
    private ApplicationView container;
 
-   private JButton cmdRunMapping;
+   private JPanel pnlContainer;
+
    private JButton cmdAdd;
    private JButton cmdEdit;
    private JButton cmdDelete;
    private JButton cmdSave;
+   private JButton cmdSaveAs;
+   private JButton cmdGenerateAxioms;
 
-   private JTextField txtMappingPath;
    private JTable tblMappingExpression;
 
    private MappingExpressionTableModel tableModel;
-
-   private int selectedRow = -1; // -1 means no row selection
-
-   private static final int CANCEL_OPTION = 0;
-   private static final int SAVE_CHANGES_OPTION = 1;
 
    public MappingBrowserView(ApplicationView container)
    {
       this.container = container;
 
       setLayout(new BorderLayout());
-      setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mapping"));
+      setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
+      pnlContainer = new JPanel();
+      pnlContainer.setLayout(new BorderLayout());
+      add(pnlContainer, BorderLayout.CENTER);
 
       tblMappingExpression = new JTable();
       tblMappingExpression.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -78,92 +79,95 @@ public class MappingBrowserView extends JPanel implements ModelView
 
       JPanel pnlTop = new JPanel(new BorderLayout());
       pnlTop.setBorder(new EmptyBorder(2, 5, 7, 5));
-      add(pnlTop, BorderLayout.NORTH);
-
-      JLabel lblMappingFile = new JLabel("Mapping File: ");
-      pnlTop.add(lblMappingFile, BorderLayout.WEST);
-
-      txtMappingPath = new JTextField();
-      txtMappingPath.setPreferredSize(new Dimension(80, 30));
-      txtMappingPath.setEnabled(true);
-      pnlTop.add(txtMappingPath, BorderLayout.CENTER);
-
-      JPanel pnlMappingOpenSave = new JPanel(new GridLayout(1, 4));
-      pnlTop.add(pnlMappingOpenSave, BorderLayout.EAST);
-
-      JButton cmdOpen = new JButton("Browse...");
-      cmdOpen.addActionListener(new OpenMappingAction());
-      pnlMappingOpenSave.add(cmdOpen);
-
-      cmdSave = new JButton("Save");
-      cmdSave.addActionListener(new SaveMappingAction());
-      cmdSave.setEnabled(false);
-      pnlMappingOpenSave.add(cmdSave);
-
-      JButton cmdSaveAs = new JButton("Save As...");
-      cmdSaveAs.addActionListener(new SaveAsMappingAction());
-      pnlMappingOpenSave.add(cmdSaveAs);
-
-      JPanel pnlCenter = new JPanel(new BorderLayout());
-      add(pnlCenter, BorderLayout.CENTER);
-
-      pnlCenter.add(scrMappingExpression, BorderLayout.CENTER);
-
-      JPanel pnlBottom = new JPanel(new BorderLayout());
-      add(pnlBottom, BorderLayout.SOUTH);
+      pnlContainer.add(pnlTop, BorderLayout.NORTH);
 
       JPanel pnlCommandButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      pnlBottom.add(pnlCommandButton, BorderLayout.WEST);
+      pnlTop.add(pnlCommandButton, BorderLayout.WEST);
 
       cmdAdd = new JButton("Add");
+      cmdAdd.setSize(72, 22);
       cmdAdd.addActionListener(new AddButtonActionListener());
       pnlCommandButton.add(cmdAdd);
 
       cmdEdit = new JButton("Edit");
+      cmdEdit.setSize(72, 22);
       cmdEdit.addActionListener(new EditButtonActionListener());
       pnlCommandButton.add(cmdEdit);
 
       cmdDelete = new JButton("Delete");
+      cmdDelete.setSize(72, 22);
       cmdDelete.addActionListener(new DeleteButtonActionListener());
       pnlCommandButton.add(cmdDelete);
 
-      JPanel pnlRunMappingButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      pnlBottom.add(pnlRunMappingButton, BorderLayout.EAST);
+      JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+      pnlTop.add(pnlMappingOpenSave, BorderLayout.EAST);
 
-      cmdRunMapping = new JButton("Run Mapping");
-      cmdRunMapping.addActionListener(new MapExpressionsAction(container));
-      pnlRunMappingButton.add(cmdRunMapping);
+      JButton cmdLoad = new JButton("Load Mappings");
+      cmdLoad.setSize(152, 22);
+      cmdLoad.addActionListener(new OpenMappingAction());
+      pnlMappingOpenSave.add(cmdLoad);
 
+      cmdSave = new JButton("Save Mappings");
+      cmdSave.setSize(152, 22);
+      cmdSave.addActionListener(new SaveMappingAction());
+      cmdSave.setEnabled(false);
+      pnlMappingOpenSave.add(cmdSave);
+
+      cmdSaveAs = new JButton("Save As...");
+      cmdSaveAs.setSize(new Dimension(152, 22));
+      cmdSaveAs.addActionListener(new SaveAsMappingAction());
+      cmdSaveAs.setEnabled(false);
+      pnlMappingOpenSave.add(cmdSaveAs);
+
+      JPanel pnlCenter = new JPanel(new BorderLayout());
+      pnlContainer.add(pnlCenter, BorderLayout.CENTER);
+
+      pnlCenter.add(scrMappingExpression, BorderLayout.CENTER);
+
+      JPanel pnlGenerateAxioms = new JPanel();
+      pnlContainer.add(pnlGenerateAxioms, BorderLayout.SOUTH);
+
+      cmdGenerateAxioms = new JButton("Generate Axioms");
+      cmdGenerateAxioms.setSize(152, 22);
+      cmdGenerateAxioms.addActionListener(new MapExpressionsAction(container));
+      pnlGenerateAxioms.add(cmdGenerateAxioms);
+
+      update();
       validate();
-   }
-
-   public String getMappingFilename()
-   {
-      File file = new File(txtMappingPath.getText());
-      return file.getName();
-   }
-
-   public String getResourcePath()
-   {
-      File file = new File(txtMappingPath.getText());
-      return file.getPath();
    }
 
    @Override
    public void update()
    {
-      try {
-         tableModel = new MappingExpressionTableModel(container.getLoadedMappingExpressions());
-         tblMappingExpression.setModel(tableModel);
-         setPreferredColumnSize();
-         resizeColumnHeight();
-      } catch (CellfieException ex) {
-         container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
-      }
+      tableModel = new MappingExpressionTableModel(container.getActiveMappingExpressions());
+      tblMappingExpression.setModel(tableModel);
+      setTableHeaderAlignment(SwingConstants.CENTER);
+      setPreferredColumnWidth();
+      setPreferredColumnHeight();
+      updateBorderUI();
    }
 
-   public void updateTableModel(String sheetName, String startColumn, String endColumn, String startRow, String endRow,
-         String expression, String comment)
+   private void setTableHeaderAlignment(int alignment)
+   {
+      ((DefaultTableCellRenderer) tblMappingExpression.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
+   }
+
+   private void updateBorderUI()
+   {
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder(getTitle()));
+   }
+
+   private String getTitle()
+   {
+      String filename = container.getMappingFileLocation();
+      if (filename == null || filename.isEmpty()) {
+         return String.format("Mapping Expressions");
+      }
+      return String.format("Mapping Expressions (%s)", filename);
+   }
+
+   private void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn,
+         String startRow, String endRow, String expression, String comment)
    {
       Vector<String> row = new Vector<>();
       row.add(0, sheetName);
@@ -178,35 +182,28 @@ public class MappingBrowserView extends JPanel implements ModelView
          tableModel.removeRow(selectedRow);
       }
       tableModel.addRow(row);
-      resizeColumnHeight();
    }
 
-   private void setPreferredColumnSize()
+   private void setPreferredColumnWidth()
    {
       final TableColumnModel columnModel = tblMappingExpression.getColumnModel();
-      columnModel.getColumn(0).setPreferredWidth(80);
-      columnModel.getColumn(1).setPreferredWidth(80);
-      columnModel.getColumn(2).setPreferredWidth(80);
-      columnModel.getColumn(3).setPreferredWidth(80);
-      columnModel.getColumn(4).setPreferredWidth(80);
-      columnModel.getColumn(5).setPreferredWidth(400);
-      columnModel.getColumn(6).setPreferredWidth(280);
+      columnModel.getColumn(0).setPreferredWidth(100);
+      columnModel.getColumn(1).setPreferredWidth(100);
+      columnModel.getColumn(2).setPreferredWidth(100);
+      columnModel.getColumn(3).setPreferredWidth(100);
+      columnModel.getColumn(4).setPreferredWidth(100);
+      columnModel.getColumn(5).setPreferredWidth(360);
+      columnModel.getColumn(6).setPreferredWidth(180);
    }
 
-   private void resizeColumnHeight()
+   private void setPreferredColumnHeight()
    {
-      for (int column = 0; column < tblMappingExpression.getColumnCount(); column++) {
-         if (column == 5) {
-            for (int row = 0; row < tblMappingExpression.getRowCount(); row++) {
-               int height = 35; // min height;
-               Object value = tblMappingExpression.getModel().getValueAt(row, column);
-               TableCellRenderer renderer = tblMappingExpression.getDefaultRenderer(String.class);
-               Component comp = renderer.getTableCellRendererComponent(tblMappingExpression, value, false, false, row,
-                     column);
-               height = Math.max(comp.getPreferredSize().height, height);
-               tblMappingExpression.setRowHeight(row, height);
-            }
-         }
+      int columnIndex = 5; // only for expression column
+      for (int row = 0; row < tblMappingExpression.getRowCount(); row++) {
+         Object value = tblMappingExpression.getModel().getValueAt(row, columnIndex);
+         TableCellRenderer renderer = tblMappingExpression.getDefaultRenderer(String.class);
+         Component comp = renderer.getTableCellRendererComponent(tblMappingExpression, value, false, false, row, columnIndex);
+         tblMappingExpression.setRowHeight(row, comp.getPreferredSize().height);
       }
    }
 
@@ -327,18 +324,15 @@ public class MappingBrowserView extends JPanel implements ModelView
       public void mouseClicked(MouseEvent e)
       {
          if (e.getClickCount() == 2) {
-            selectedRow = tblMappingExpression.getSelectedRow();
+            int selectedRow = tblMappingExpression.getSelectedRow();
             if (selectedRow > -1) {
-               try {
                   MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
-                  editorPanel.setSheetNames(container.getLoadedSpreadSheet().getSheetNames());
+                  editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
                   editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
                         getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
                         getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
                   showMappingEditorDialog(editorPanel);
-               } catch (CellfieException ex) {
-                  container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
-               }
+               
             }
          }
       }
@@ -359,14 +353,9 @@ public class MappingBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         try {
-            selectedRow = -1;
-            MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
-            editorPanel.setSheetNames(container.getLoadedSpreadSheet().getSheetNames());
-            showMappingEditorDialog(editorPanel);
-         } catch (CellfieException ex) {
-            container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
-         }
+         MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
+         editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
+         showMappingEditorDialog(editorPanel);
       }
    }
 
@@ -375,20 +364,17 @@ public class MappingBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         selectedRow = tblMappingExpression.getSelectedRow();
-         if (selectedRow == -1) {
-            getApplicationDialogManager().showMessageDialog(container, "No mapping expression was selected");
-            return;
-         }
+         int selectedRow = tblMappingExpression.getSelectedRow();
          try {
+            validateSelection(selectedRow);
             MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
-            editorPanel.setSheetNames(container.getLoadedSpreadSheet().getSheetNames());
+            editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
             editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
                   getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
                   getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
             showMappingEditorDialog(editorPanel);
          } catch (CellfieException ex) {
-            container.getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+            getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
          }
       }
 
@@ -400,21 +386,16 @@ public class MappingBrowserView extends JPanel implements ModelView
 
    private void showMappingEditorDialog(MappingExpressionEditorPanel editorPanel)
    {
-      final SaveOption[] options = { new SaveOption(CANCEL_OPTION, "Cancel"),
-            new SaveOption(SAVE_CHANGES_OPTION, "Save Changes") };
-      try {
-         int answer = JOptionPaneEx.showConfirmDialog(container, "Mapping Editor", editorPanel,
-               JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, null);
-         switch (answer) {
-            case SAVE_CHANGES_OPTION :
-               MappingExpression userInput = editorPanel.getUserInput();
-               updateTableModel(userInput.getSheetName(), userInput.getStartColumn(), userInput.getEndColumn(),
-                     userInput.getStartRow(), userInput.getEndRow(), userInput.getExpressionString(),
-                     userInput.getComment());
-               break;
-         }
-      } catch (ClassCastException ex) {
-         // NO-OP: Fix should be to Protege API
+      int answer = JOptionPaneEx.showConfirmDialog(
+            container, "Mapping Editor", editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null);
+      switch (answer) {
+         case JOptionPane.OK_OPTION :
+            int selectedRow = tblMappingExpression.getSelectedRow();
+            MappingExpression userInput = editorPanel.getUserInput();
+            updateTableModel(selectedRow, userInput.getSheetName(), userInput.getStartColumn(),
+                  userInput.getEndColumn(), userInput.getStartRow(), userInput.getEndRow(),
+                  userInput.getExpressionString(), userInput.getComment());
+            break;
       }
    }
 
@@ -422,15 +403,16 @@ public class MappingBrowserView extends JPanel implements ModelView
    {
       public void actionPerformed(ActionEvent e)
       {
-         selectedRow = tblMappingExpression.getSelectedRow();
-         if (selectedRow == -1) {
-            getApplicationDialogManager().showMessageDialog(container, "No mapping expression was selected");
-            return;
-         }
-         int answer = getApplicationDialogManager().showConfirmDialog(container, "Delete",
-               "Do you really want to delete the selected expression?");
-         if (answer == JOptionPane.YES_OPTION) {
-            tableModel.removeRow(selectedRow);
+         int selectedRow = tblMappingExpression.getSelectedRow();
+         try {
+            validateSelection(selectedRow);
+            int answer = getApplicationDialogManager().showConfirmDialog(
+                  container, "Delete", "Do you really want to delete the selected expression?");
+            switch (answer) {
+               case JOptionPane.YES_OPTION: tableModel.removeRow(selectedRow); break;
+            }
+         } catch (CellfieException ex) {
+            getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
          }
       }
    }
@@ -441,18 +423,25 @@ public class MappingBrowserView extends JPanel implements ModelView
       public void actionPerformed(ActionEvent e)
       {
          try {
-            File file = getApplicationDialogManager().showOpenFileChooser(container, "Open", "json",
-                  "MappingMaster DSL Mapping Expression (.json)");
+            File file = getApplicationDialogManager().showOpenFileChooser(
+                  container, "Open", "json", "MappingMaster DSL Mapping Expression (.json)");
             if (file != null) {
                String filePath = file.getAbsolutePath();
                container.loadMappingDocument(filePath);
-               txtMappingPath.setText(filePath);
                cmdSave.setEnabled(true);
+               cmdSaveAs.setEnabled(true);
             }
          } catch (Exception ex) {
             getApplicationDialogManager().showErrorMessageDialog(container, "Error opening file: " + ex.getMessage());
-            txtMappingPath.setText("");
+            ex.printStackTrace();
          }
+      }
+   }
+
+   private void validateSelection(int selectedRow) throws CellfieException
+   {
+      if (selectedRow == -1) {
+         throw new CellfieException("No mapping expression was selected");
       }
    }
 
@@ -462,7 +451,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       public void actionPerformed(ActionEvent e)
       {
          try {
-            MappingExpressionSetFactory.saveMappingExpressionSetToDocument(txtMappingPath.getText(),
+            MappingExpressionSetFactory.saveMappingExpressionSetToDocument(container.getMappingFileLocation(),
                   tableModel.getMappingExpressions());
             container.updateMappingExpressionModel(tableModel.getMappingExpressions());
          } catch (IOException ex) {
@@ -477,8 +466,8 @@ public class MappingBrowserView extends JPanel implements ModelView
       public void actionPerformed(ActionEvent e)
       {
          try {
-            File file = getApplicationDialogManager().showSaveFileChooser(container, "Save As", "json",
-                  "MappingMaster DSL Mapping Expression (.json)", true);
+            File file = getApplicationDialogManager().showSaveFileChooser(
+                  container, "Save As", "json", "MappingMaster DSL Mapping Expression (.json)", true);
             if (file != null) {
                String filePath = file.getAbsolutePath();
                String ext = ".json";
@@ -488,11 +477,9 @@ public class MappingBrowserView extends JPanel implements ModelView
                MappingExpressionSetFactory.saveMappingExpressionSetToDocument(filePath,
                      tableModel.getMappingExpressions());
                container.updateMappingExpressionModel(tableModel.getMappingExpressions());
-               txtMappingPath.setText(filePath);
             }
          } catch (Exception ex) {
             getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
-            txtMappingPath.setText("");
          }
       }
    }

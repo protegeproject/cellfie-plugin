@@ -3,7 +3,6 @@ package org.mm.cellfie.ui.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.FileReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,10 +50,10 @@ class LogViewerPanel extends JPanel
             }
          };
          txtLogMessage.setEditorKit(createHighlightEditorKit());
-         txtLogMessage.read(new FileReader(container.getLogFile()), container.getLogFile());
+         txtLogMessage.read(container.getRenderLogging().load(), null);
          add(new JScrollPane(txtLogMessage), BorderLayout.CENTER);
       } catch (Exception e) {
-         throw new RuntimeException("Unable to open log file", e);
+         throw new RuntimeException("Failed to open the log file", e);
       }
    }
 

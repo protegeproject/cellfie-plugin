@@ -5,6 +5,10 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,7 +24,6 @@ import javax.swing.border.EmptyBorder;
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
 import org.mm.app.MMApplicationModel;
-import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.core.MappingExpression;
 import org.mm.core.MappingExpressionSet;
 import org.mm.core.settings.ReferenceSettings;
@@ -57,28 +60,28 @@ public class ApplicationView extends JPanel implements ModelView
    private DataSourceView dataSourceView;
    private MappingBrowserView mappingExpressionView;
 
+   private RenderLogging renderLogging;
+
    private MMApplication application;
    private MMApplicationFactory applicationFactory = new MMApplicationFactory();
 
-   public ApplicationView(OWLOntology ontology, OWLEditorKit editorKit, DialogManager applicationDialogManager)
+   public ApplicationView(OWLOntology ontology, String workbookFilePath, OWLEditorKit editorKit, DialogManager applicationDialogManager)
    {
       this.ontology = ontology;
       this.editorKit = editorKit;
       this.applicationDialogManager = applicationDialogManager;
 
-      setUserOntology(ontology);
-
       setLayout(new BorderLayout());
 
       JPanel pnlTargetOntology = new JPanel(new FlowLayout(FlowLayout.LEFT));
-      pnlTargetOntology.setBorder(new EmptyBorder(2, 5, 2, 5));
+      pnlTargetOntology.setBorder(new EmptyBorder(5, 5, 0, 5));
       add(pnlTargetOntology, BorderLayout.NORTH);
 
       JLabel lblTargetOntology = new JLabel("Target Ontology: ");
       lblTargetOntology.setForeground(Color.DARK_GRAY);
       pnlTargetOntology.add(lblTargetOntology);
 
-      JLabel lblOntologyID = new JLabel(createName(ontology));
+      JLabel lblOntologyID = new JLabel(getTitle(ontology));
       lblOntologyID.setForeground(Color.DARK_GRAY);
       pnlTargetOntology.add(lblOntologyID);
 
@@ -86,6 +89,10 @@ public class ApplicationView extends JPanel implements ModelView
       splitPane.setDividerLocation(500);
       splitPane.setResizeWeight(0.8);
       add(splitPane, BorderLayout.CENTER);
+
+      loadWorkbookDocument(workbookFilePath);
+//      loadMappingDocument(mappingFilePath) // XXX In case the UI will allow users to input mapping file in advance
+      setupApplication();
 
       /*
        * Workbook sheet GUI presentation
@@ -102,70 +109,50 @@ public class ApplicationView extends JPanel implements ModelView
       validate();
    }
 
-   private String createName(OWLOntology ontology)
+   private String getTitle(OWLOntology ontology)
    {
       IRI ontologyID = ontology.getOntologyID().getOntologyIRI();
       return String.format("%s (%s)", ontologyID.getFragment(), ontologyID);
    }
 
-   protected void setUserOntology(OWLOntology ontology)
-   {
-      if (ontology != null) {
-         applicationFactory.setUserOntology(ontology);
-      }
-   }
-
-   public void updateOntologyDocument(String path)
-   {
-      applicationFactory.setOntologyLocation(path);
-      fireOntologyDocumentChanged();
-   }
-
-   public void loadWorkbookDocument(String path)
+   private void loadWorkbookDocument(String path)
    {
       applicationFactory.setWorkbookLocation(path);
-      fireWorkbookDocumentChanged();
+   }
+
+   public String getWorkbookFileLocation()
+   {
+      return applicationFactory.getWorkbookLocation();
    }
 
    public void loadMappingDocument(String path)
    {
       applicationFactory.setMappingLocation(path);
-      fireMappingDocumentChanged();
-   }
-
-   private void fireOntologyDocumentChanged()
-   {
       setupApplication();
-   }
-
-   private void fireWorkbookDocumentChanged()
-   {
-      setupApplication();
-      updateDataSourceView();
-      updateMappingBrowserView();
-   }
-
-   private void fireMappingDocumentChanged()
-   {
-      setupApplication();
-      prepareLogFileLocation();
-      updateMappingBrowserView();
-   }
-
-   private void updateDataSourceView()
-   {
-      dataSourceView.update();
-   }
-
-   private void updateMappingBrowserView()
-   {
       mappingExpressionView.update();
+      initLogging();
+   }
+
+   private void initLogging()
+   {
+      renderLogging = new RenderLogging();
+      renderLogging.init();
+   }
+
+   public RenderLogging getRenderLogging()
+   {
+      return renderLogging;
+   }
+
+   public String getMappingFileLocation()
+   {
+      return applicationFactory.getMappingLocation();
    }
 
    private void setupApplication()
    {
       try {
-         application = applicationFactory.createApplication();
+         application = applicationFactory.createApplication(getActiveOntology());
       } catch (Exception e) {
          applicationDialogManager.showErrorMessageDialog(this, "Initialization error: " + e.getMessage());
       }
@@ -188,7 +175,7 @@ public class ApplicationView extends JPanel implements ModelView
       }
    }
 
-   public void log(MappingExpression mapping, Renderer renderer, StringBuffer logMessage) throws ParseException
+   public void log(MappingExpression mapping, Renderer renderer, RenderLogging logging) throws ParseException
    {
       final ReferenceSettings referenceSettings = new ReferenceSettings();
       referenceSettings.setValueEncodingSetting(ValueEncodingSetting.RDFS_LABEL);
@@ -197,7 +184,7 @@ public class ApplicationView extends JPanel implements ModelView
       MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
       Optional<? extends Rendering> renderingResult = renderer.renderExpression(expressionNode);
       if (renderingResult.isPresent()) {
-         logMessage.append(renderingResult.get());
+         logging.append(renderingResult.get().getRendering());
       }
    }
 
@@ -214,31 +201,19 @@ public class ApplicationView extends JPanel implements ModelView
       // NO-OP
    }
 
-   public OWLOntology getLoadedOntology()
+   public OWLOntology getActiveOntology()
    {
       return ontology;
    }
 
-   public SpreadSheetDataSource getLoadedSpreadSheet() throws CellfieException
+   public SpreadSheetDataSource getActiveWorkbook()
    {
-      try {
-         SpreadSheetDataSource spreadsheet = getApplicationModel().getDataSourceModel().getDataSource();
-         spreadsheet.getSheets(); // just to check NullPointerException
-         return spreadsheet;
-      } catch (NullPointerException ex) {
-         throw new CellfieException(
-               "Unable to find the spreadsheet. Please load the source spreadsheet first and try again.", ex);
-      }
+      return getApplicationModel().getDataSourceModel().getDataSource();
    }
 
-   public List<MappingExpression> getLoadedMappingExpressions() throws CellfieException
+   public List<MappingExpression> getActiveMappingExpressions()
    {
-      try {
-         return getApplicationModel().getMappingExpressionsModel().getExpressions();
-      } catch (NullPointerException ex) {
-         throw new CellfieException(
-               "Unable to find the mapping expressions. Please load the expressions first and try again.", ex);
-      }
+      return getApplicationModel().getMappingExpressionsModel().getExpressions();
    }
 
    public void updateMappingExpressionModel(List<MappingExpression> mappingList)
@@ -277,47 +252,58 @@ public class ApplicationView extends JPanel implements ModelView
       return mappingExpressionView;
    }
 
-   private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
-
-   private String logFileLocation;
-   private File logFile;
-
-   /* protected */File getLogFile()
+   class RenderLogging
    {
-      return logFile;
-   }
+      private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
 
-   /* protected */File createLogFile()
-   {
-      if (logFileLocation == null) {
-         logFileLocation = getDefaultLogFileLocation();
+      private String logFileLocation;
+      private StringBuffer logMessage;
+      private File logFile;
+
+      public void init()
+      {
+         logMessage = new StringBuffer();
+         
+         String mappingFilePath = applicationFactory.getMappingLocation();
+         if (mappingFilePath == null) {
+            logFileLocation = getDefaultLogFileLocation();
+         } else {
+            logFileLocation = getLogFileLocation(new File(mappingFilePath));
+         }
+         String timestamp = dateFormat.format(new Date());
+         String fileName = String.format("%s%s.log", logFileLocation, timestamp);
+         logFile = new File(fileName);
       }
-      String timestamp = dateFormat.format(new Date());
-      String fileName = String.format("%s%s.log", logFileLocation, timestamp);
-      logFile = new File(fileName);
-      return logFile;
-   }
 
-   private void prepareLogFileLocation()
-   {
-      String mappingFilePath = applicationFactory.getMappingLocation();
-      if (mappingFilePath == null) {
-         logFileLocation = getDefaultLogFileLocation();
-      } else {
-         logFileLocation = getLogFileLocation(new File(mappingFilePath));
+      public RenderLogging append(String message)
+      {
+         logMessage.append(message);
+         return this;
       }
-   }
 
-   private String getLogFileLocation(File mappingFile)
-   {
-      String mappingPath = mappingFile.getParent();
-      String mappingFileName = mappingFile.getName().substring(0, mappingFile.getName().lastIndexOf("."));
-      return mappingPath + System.getProperty("file.separator") + mappingFileName + "_mmexec";
-   }
+      public void save() throws FileNotFoundException
+      {
+         PrintWriter printer = new PrintWriter(logFile);
+         printer.print(logMessage.toString());
+         printer.close();
+      }
 
-   private String getDefaultLogFileLocation()
-   {
-      String tmpPath = System.getProperty("java.io.tmpdir");
-      return tmpPath + System.getProperty("file.separator") + "mmexec";
+      public InputStreamReader load() throws FileNotFoundException
+      {
+         return new FileReader(logFile);
+      }
+
+      private String getLogFileLocation(File mappingFile)
+      {
+         String mappingPath = mappingFile.getParent();
+         String mappingFileName = mappingFile.getName().substring(0, mappingFile.getName().lastIndexOf("."));
+         return mappingPath + System.getProperty("file.separator") + mappingFileName + "_mmexec";
+      }
+
+      private String getDefaultLogFileLocation()
+      {
+         String tmpPath = System.getProperty("java.io.tmpdir");
+         return tmpPath + System.getProperty("file.separator") + "mmexec";
+      }
    }
 }

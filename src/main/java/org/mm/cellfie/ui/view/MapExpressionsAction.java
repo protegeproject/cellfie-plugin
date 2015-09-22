@@ -2,9 +2,7 @@ package org.mm.cellfie.ui.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +14,7 @@ import javax.swing.JPanel;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.mm.cellfie.ui.exception.CellfieException;
+import org.mm.cellfie.ui.view.ApplicationView.RenderLogging;
 import org.mm.core.MappingExpression;
 import org.mm.parser.ParseException;
 import org.mm.renderer.RendererException;
@@ -47,8 +46,8 @@ public class MapExpressionsAction implements ActionListener
    private OWLModelManager modelManager;
 
    private static final int CANCEL_IMPORT = 0;
-   private static final int IMPORT_TO_NEW_ONTOLOGY = 1;
-   private static final int IMPORT_TO_CURRENT_ONTOLOGY = 2;
+   private static final int ADD_TO_NEW_ONTOLOGY = 1;
+   private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
    public MapExpressionsAction(ApplicationView container)
    {
@@ -61,7 +60,7 @@ public class MapExpressionsAction implements ActionListener
    public void actionPerformed(ActionEvent e)
    {
       try {
-         SpreadSheetDataSource dataSource = container.getLoadedSpreadSheet();
+         SpreadSheetDataSource dataSource = container.getActiveWorkbook();
          Workbook workbook = dataSource.getWorkbook();
 
          List<MappingExpression> mappings = getUserExpressions();
@@ -71,7 +70,6 @@ public class MapExpressionsAction implements ActionListener
 
          // TODO: Move this business logic inside the renderer
          Set<Rendering> results = new HashSet<Rendering>();
-         StringBuffer logMessage = new StringBuffer();
          for (MappingExpression mapping : mappings) {
             if (mapping.isActive()) {
                String sheetName = mapping.getSheetName();
@@ -84,10 +82,10 @@ public class MapExpressionsAction implements ActionListener
                      : SpreadSheetUtil.row2Number(mapping.getEndRow());
 
                if (startColumn > endColumn) {
-                  throw new CellfieException("start column after finish column in expression " + mapping);
+                  throw new CellfieException("Start column after finish column in expression " + mapping);
                }
                if (startRow > endRow) {
-                  throw new CellfieException("start row after finish row in expression " + mapping);
+                  throw new CellfieException("Start row after finish row in expression " + mapping);
                }
 
                SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumn, endRow);
@@ -96,7 +94,7 @@ public class MapExpressionsAction implements ActionListener
 
                dataSource.setCurrentLocation(currentLocation);
                do {
-                  evaluate(mapping, results, logMessage);
+                  evaluate(mapping, results, container.getRenderLogging());
                   if (currentLocation.equals(endLocation)) {
                      break;
                   }
@@ -105,19 +103,16 @@ public class MapExpressionsAction implements ActionListener
                } while (true);
             }
          }
-         storeLogToFile(logMessage);
          showAxiomPreviewDialog(toAxioms(results));
+         saveLogging();
       } catch (Exception ex) {
          getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
       }
    }
 
-   private void storeLogToFile(StringBuffer logMessage) throws FileNotFoundException
+   private void saveLogging() throws FileNotFoundException
    {
-      File logFile = container.createLogFile();
-      PrintWriter printer = new PrintWriter(logFile);
-      printer.print(logMessage);
-      printer.close();
+      container.getRenderLogging().save();
    }
 
    private Set<OWLAxiom> toAxioms(Set<Rendering> results)
@@ -134,17 +129,17 @@ public class MapExpressionsAction implements ActionListener
    private void showAxiomPreviewDialog(Set<OWLAxiom> axioms) throws CellfieException
    {
       final ImportOption[] options = { new ImportOption(CANCEL_IMPORT, "Cancel"),
-            new ImportOption(IMPORT_TO_NEW_ONTOLOGY, "Import to a new ontology"),
-            new ImportOption(IMPORT_TO_CURRENT_ONTOLOGY, "Import to the current ontology") };
+            new ImportOption(ADD_TO_NEW_ONTOLOGY, "Add to a new ontology"),
+            new ImportOption(ADD_TO_CURRENT_ONTOLOGY, "Add to current ontology") };
       try {
-         OWLOntology currentOntology = container.getLoadedOntology();
-         int answer = JOptionPaneEx.showConfirmDialog(container, "Import Axioms", createPreviewAxiomsPanel(axioms),
+         OWLOntology currentOntology = container.getActiveOntology();
+         int answer = JOptionPaneEx.showConfirmDialog(container, "Generated Axioms", createPreviewAxiomsPanel(axioms),
                JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, null);
          switch (answer) {
-            case IMPORT_TO_CURRENT_ONTOLOGY :
+            case ADD_TO_CURRENT_ONTOLOGY :
                modelManager.applyChanges(addAxioms(currentOntology, axioms));
                break;
-            case IMPORT_TO_NEW_ONTOLOGY :
+            case ADD_TO_NEW_ONTOLOGY :
                OWLOntologyID id = createOntologyID();
                OWLOntology newOntology = modelManager.createNewOntology(id, id.getDefaultDocumentIRI().toURI());
                modelManager.applyChanges(addImport(newOntology, currentOntology));
@@ -188,10 +183,10 @@ public class MapExpressionsAction implements ActionListener
       return new PreviewAxiomsPanel(container, editorKit, axioms);
    }
 
-   private void evaluate(MappingExpression mapping, Set<Rendering> results, StringBuffer logMessage) throws ParseException
+   private void evaluate(MappingExpression mapping, Set<Rendering> results, RenderLogging logging) throws ParseException
    {
       container.evaluate(mapping, container.getDefaultRenderer(), results);
-      container.log(mapping, container.getLogRenderer(), logMessage);
+      container.log(mapping, container.getLogRenderer(), logging);
    }
 
    private SpreadsheetLocation incrementLocation(SpreadsheetLocation current, SpreadsheetLocation start,

@@ -3,7 +3,7 @@
 
 <plugin name="Cellfie Plugin" version="1.0.0">
    <extension id="cellfie" point="org.protege.editor.core.application.EditorKitMenuAction">
-      <name value="Import Spreadsheet..." />
+      <name value="Create axioms from Excel workbook..." />
       <toolTip value="Generate OWL axioms from Excel spreadsheet" />
       <class value="org.mm.cellfie.action.CellfieAction" />
       <path value="org.protege.editor.owl.menu.tools/SlotF-B"></path>

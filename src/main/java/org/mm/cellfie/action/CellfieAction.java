@@ -21,6 +21,8 @@ public class CellfieAction extends ProtegeOWLAction
 
    private JDialog cellfieDialog;
 
+   private DialogManager dialogManager = new ProtegeDialogManager();
+
    @Override
    public void initialise() throws Exception
    {
@@ -30,9 +32,24 @@ public class CellfieAction extends ProtegeOWLAction
    @Override
    public void actionPerformed(ActionEvent e)
    {
+      File file = dialogManager.showOpenFileChooser(null, "Open Excel Workbook", "xlsx", "Excel Workbook (.xlsx)");
+      if (file != null) {
+         String filename = file.getAbsolutePath();
+         try {
+            initCellfie(filename);
+         } catch (Exception ex) {
+            dialogManager.showErrorMessageDialog(null, "Error opening file " + filename);
+            ex.printStackTrace();
+            
+         }
+      }
+   }
+
+   private void initCellfie(String workbookFilePath)
+   {
       OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
 
-      ApplicationView appView = new ApplicationView(currentOntology, getOWLEditorKit(), new ProtegeDialogManager());
+      ApplicationView appView = new ApplicationView(currentOntology, workbookFilePath, getOWLEditorKit(), dialogManager);
 
       cellfieDialog = new JDialog();
       cellfieDialog.setTitle("Cellfie");
