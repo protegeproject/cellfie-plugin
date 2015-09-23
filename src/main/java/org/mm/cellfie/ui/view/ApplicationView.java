@@ -93,6 +93,7 @@ public class ApplicationView extends JPanel implements ModelView
       loadWorkbookDocument(workbookFilePath);
 //      loadMappingDocument(mappingFilePath) // XXX In case the UI will allow users to input mapping file in advance
       setupApplication();
+      initLogging();
 
       /*
        * Workbook sheet GUI presentation
@@ -129,8 +130,8 @@ public class ApplicationView extends JPanel implements ModelView
    {
       applicationFactory.setMappingLocation(path);
       setupApplication();
-      mappingExpressionView.update();
       initLogging();
+      mappingExpressionView.update();
    }
 
    private void initLogging()
