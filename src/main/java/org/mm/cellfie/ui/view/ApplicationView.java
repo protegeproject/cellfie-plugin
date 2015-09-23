@@ -86,8 +86,7 @@ public class ApplicationView extends JPanel implements ModelView
       pnlTargetOntology.add(lblOntologyID);
 
       ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.VERTICAL_SPLIT);
-      splitPane.setDividerLocation(500);
-      splitPane.setResizeWeight(0.8);
+      splitPane.setResizeWeight(0.4);
       add(splitPane, BorderLayout.CENTER);
 
       loadWorkbookDocument(workbookFilePath);
