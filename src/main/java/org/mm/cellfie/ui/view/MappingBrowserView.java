@@ -3,7 +3,6 @@ package org.mm.cellfie.ui.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -91,11 +90,13 @@ public class MappingBrowserView extends JPanel implements ModelView
 
       cmdEdit = new JButton("Edit");
       cmdEdit.setSize(72, 22);
+      cmdEdit.setEnabled(false);
       cmdEdit.addActionListener(new EditButtonActionListener());
       pnlCommandButton.add(cmdEdit);
 
       cmdDelete = new JButton("Delete");
       cmdDelete.setSize(72, 22);
+      cmdDelete.setEnabled(false);
       cmdDelete.addActionListener(new DeleteButtonActionListener());
       pnlCommandButton.add(cmdDelete);
 
@@ -114,7 +115,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       pnlMappingOpenSave.add(cmdSave);
 
       cmdSaveAs = new JButton("Save As...");
-      cmdSaveAs.setSize(new Dimension(152, 22));
+      cmdSaveAs.setSize(152, 22);
       cmdSaveAs.addActionListener(new SaveAsMappingAction());
       cmdSaveAs.setEnabled(false);
       pnlMappingOpenSave.add(cmdSaveAs);
@@ -200,10 +201,12 @@ public class MappingBrowserView extends JPanel implements ModelView
    {
       int columnIndex = 5; // only for expression column
       for (int row = 0; row < tblMappingExpression.getRowCount(); row++) {
+         int height = 0; // min height;
          Object value = tblMappingExpression.getModel().getValueAt(row, columnIndex);
          TableCellRenderer renderer = tblMappingExpression.getDefaultRenderer(String.class);
          Component comp = renderer.getTableCellRendererComponent(tblMappingExpression, value, false, false, row, columnIndex);
-         tblMappingExpression.setRowHeight(row, comp.getPreferredSize().height);
+         height = Math.max(comp.getPreferredSize().height, height);
+         tblMappingExpression.setRowHeight(row, height);
       }
    }
 
@@ -320,11 +323,24 @@ public class MappingBrowserView extends JPanel implements ModelView
     */
    class MappingExpressionSelectionListener extends MouseAdapter
    {
+      private int lastSelectedRow = -1;
+
       @Override
       public void mouseClicked(MouseEvent e)
       {
-         if (e.getClickCount() == 2) {
-            int selectedRow = tblMappingExpression.getSelectedRow();
+         int selectedRow = tblMappingExpression.getSelectedRow();
+         if (e.getClickCount() == 1) { // single click
+            if (selectedRow != lastSelectedRow) {
+               cmdEdit.setEnabled(true);
+               cmdDelete.setEnabled(true);
+               lastSelectedRow = selectedRow;
+            } else {
+               tblMappingExpression.clearSelection();
+               cmdEdit.setEnabled(false);
+               cmdDelete.setEnabled(false);
+               lastSelectedRow = -1; // reset
+            }
+         } else if (e.getClickCount() == 2) { // double-click
             if (selectedRow > -1) {
                   MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
                   editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
@@ -395,6 +411,8 @@ public class MappingBrowserView extends JPanel implements ModelView
             updateTableModel(selectedRow, userInput.getSheetName(), userInput.getStartColumn(),
                   userInput.getEndColumn(), userInput.getStartRow(), userInput.getEndRow(),
                   userInput.getExpressionString(), userInput.getComment());
+            cmdSaveAs.setEnabled(true);
+            setPreferredColumnHeight();
             break;
       }
    }
@@ -409,7 +427,11 @@ public class MappingBrowserView extends JPanel implements ModelView
             int answer = getApplicationDialogManager().showConfirmDialog(
                   container, "Delete", "Do you really want to delete the selected expression?");
             switch (answer) {
-               case JOptionPane.YES_OPTION: tableModel.removeRow(selectedRow); break;
+               case JOptionPane.YES_OPTION:
+                  tableModel.removeRow(selectedRow);
+                  cmdEdit.setEnabled(false);
+                  cmdDelete.setEnabled(false);
+                  break;
             }
          } catch (CellfieException ex) {
             getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
@@ -477,6 +499,8 @@ public class MappingBrowserView extends JPanel implements ModelView
                MappingExpressionSetFactory.saveMappingExpressionSetToDocument(filePath,
                      tableModel.getMappingExpressions());
                container.updateMappingExpressionModel(tableModel.getMappingExpressions());
+               cmdSave.setEnabled(true);
+               updateBorderUI();
             }
          } catch (Exception ex) {
             getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
