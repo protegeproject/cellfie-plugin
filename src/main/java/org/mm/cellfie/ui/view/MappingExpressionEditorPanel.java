@@ -57,7 +57,7 @@ public class MappingExpressionEditorPanel extends JPanel
       JLabel lblComment = new JLabel("Comment:");
       txtComment = new JTextField("");
 
-      JLabel lblExpression = new JLabel("DSL mapping expression:");
+      JLabel lblExpression = new JLabel("Mapping expression:");
 
       JPanel pnlFields = new JPanel(new GridLayout(7, 2));
       pnlFields.add(lblSheetName);
