@@ -3,6 +3,7 @@ package org.mm.cellfie.ui.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -84,18 +85,18 @@ public class MappingBrowserView extends JPanel implements ModelView
       pnlTop.add(pnlCommandButton, BorderLayout.WEST);
 
       cmdAdd = new JButton("Add");
-      cmdAdd.setSize(72, 22);
+      cmdAdd.setPreferredSize(new Dimension(72, 22));
       cmdAdd.addActionListener(new AddButtonActionListener());
       pnlCommandButton.add(cmdAdd);
 
       cmdEdit = new JButton("Edit");
-      cmdEdit.setSize(72, 22);
+      cmdEdit.setPreferredSize(new Dimension(72, 22));
       cmdEdit.setEnabled(false);
       cmdEdit.addActionListener(new EditButtonActionListener());
       pnlCommandButton.add(cmdEdit);
 
       cmdDelete = new JButton("Delete");
-      cmdDelete.setSize(72, 22);
+      cmdDelete.setPreferredSize(new Dimension(72, 22));
       cmdDelete.setEnabled(false);
       cmdDelete.addActionListener(new DeleteButtonActionListener());
       pnlCommandButton.add(cmdDelete);
@@ -104,18 +105,18 @@ public class MappingBrowserView extends JPanel implements ModelView
       pnlTop.add(pnlMappingOpenSave, BorderLayout.EAST);
 
       JButton cmdLoad = new JButton("Load Mappings");
-      cmdLoad.setSize(152, 22);
+      cmdLoad.setPreferredSize(new Dimension(152, 22));
       cmdLoad.addActionListener(new OpenMappingAction());
       pnlMappingOpenSave.add(cmdLoad);
 
       cmdSave = new JButton("Save Mappings");
-      cmdSave.setSize(152, 22);
+      cmdSave.setPreferredSize(new Dimension(152, 22));
       cmdSave.addActionListener(new SaveMappingAction());
       cmdSave.setEnabled(false);
       pnlMappingOpenSave.add(cmdSave);
 
       cmdSaveAs = new JButton("Save As...");
-      cmdSaveAs.setSize(152, 22);
+      cmdSaveAs.setPreferredSize(new Dimension(152, 22));
       cmdSaveAs.addActionListener(new SaveAsMappingAction());
       cmdSaveAs.setEnabled(false);
       pnlMappingOpenSave.add(cmdSaveAs);
@@ -129,7 +130,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       pnlContainer.add(pnlGenerateAxioms, BorderLayout.SOUTH);
 
       cmdGenerateAxioms = new JButton("Generate Axioms");
-      cmdGenerateAxioms.setSize(152, 22);
+      cmdGenerateAxioms.setPreferredSize(new Dimension(152, 22));
       cmdGenerateAxioms.addActionListener(new MapExpressionsAction(container));
       pnlGenerateAxioms.add(cmdGenerateAxioms);
 
