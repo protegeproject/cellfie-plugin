@@ -131,7 +131,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
 
       cmdGenerateAxioms = new JButton("Generate Axioms");
       cmdGenerateAxioms.setPreferredSize(new Dimension(152, 22));
-      cmdGenerateAxioms.addActionListener(new MapExpressionsAction(container));
+      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(container));
       pnlGenerateAxioms.add(cmdGenerateAxioms);
 
       update();

@@ -38,7 +38,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
-public class MapExpressionsAction implements ActionListener
+public class GenerateAxiomsAction implements ActionListener
 {
    private ApplicationView container;
 
@@ -49,7 +49,7 @@ public class MapExpressionsAction implements ActionListener
    private static final int ADD_TO_NEW_ONTOLOGY = 1;
    private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
-   public MapExpressionsAction(ApplicationView container)
+   public GenerateAxiomsAction(ApplicationView container)
    {
       this.container = container;
       editorKit = container.getEditorKit();
