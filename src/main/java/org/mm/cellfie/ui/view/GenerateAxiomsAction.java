@@ -134,7 +134,7 @@ public class GenerateAxiomsAction implements ActionListener
       try {
          OWLOntology currentOntology = container.getActiveOntology();
          int answer = JOptionPaneEx.showConfirmDialog(container, "Generated Axioms", createPreviewAxiomsPanel(axioms),
-               JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, null);
+               JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, options, options[1]);
          switch (answer) {
             case ADD_TO_CURRENT_ONTOLOGY :
                modelManager.applyChanges(addAxioms(currentOntology, axioms));
