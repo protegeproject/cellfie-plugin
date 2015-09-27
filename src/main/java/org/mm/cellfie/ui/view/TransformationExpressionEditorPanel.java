@@ -15,7 +15,7 @@ import javax.swing.JTextField;
 
 import org.mm.core.MappingExpression;
 
-public class MappingExpressionEditorPanel extends JPanel
+public class TransformationExpressionEditorPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class MappingExpressionEditorPanel extends JPanel
 
    private JTextArea txtExpression;
 
-   public MappingExpressionEditorPanel()
+   public TransformationExpressionEditorPanel()
    {
       setLayout(new BorderLayout());
 
@@ -57,7 +57,7 @@ public class MappingExpressionEditorPanel extends JPanel
       JLabel lblComment = new JLabel("Comment:");
       txtComment = new JTextField("");
 
-      JLabel lblExpression = new JLabel("Mapping expression:");
+      JLabel lblExpression = new JLabel("Transformation expression:");
 
       JPanel pnlFields = new JPanel(new GridLayout(7, 2));
       pnlFields.add(lblSheetName);

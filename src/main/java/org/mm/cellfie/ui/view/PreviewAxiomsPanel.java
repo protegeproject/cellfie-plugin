@@ -35,7 +35,7 @@ public class PreviewAxiomsPanel extends JPanel
       setLayout(new BorderLayout());
 
       JLabel lblPreview = new JLabel();
-      lblPreview.setText("Mapping Master generates " + axioms.size() + " axioms:");
+      lblPreview.setText("Cellfie generates " + axioms.size() + " axioms:");
       add(lblPreview, BorderLayout.NORTH);
 
       OWLAxiomList previewList = new OWLAxiomList(editorKit);

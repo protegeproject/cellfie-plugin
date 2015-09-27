@@ -58,7 +58,7 @@ public class ApplicationView extends JPanel implements ModelView
 
    private DialogManager applicationDialogManager;
    private DataSourceView dataSourceView;
-   private MappingBrowserView mappingExpressionView;
+   private TransformationExpressionBrowserView mappingExpressionView;
 
    private RenderLogging renderLogging;
 
@@ -103,7 +103,7 @@ public class ApplicationView extends JPanel implements ModelView
       /*
        * Mapping browser, create, edit, remove panel
        */
-      mappingExpressionView = new MappingBrowserView(this);
+      mappingExpressionView = new TransformationExpressionBrowserView(this);
       splitPane.setBottomComponent(mappingExpressionView);
 
       validate();
@@ -247,7 +247,7 @@ public class ApplicationView extends JPanel implements ModelView
       return dataSourceView;
    }
 
-   public MappingBrowserView getMappingBrowserView()
+   public TransformationExpressionBrowserView getMappingBrowserView()
    {
       return mappingExpressionView;
    }

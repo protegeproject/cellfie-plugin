@@ -65,7 +65,7 @@ public class MapExpressionsAction implements ActionListener
 
          List<MappingExpression> mappings = getUserExpressions();
          if (mappings.isEmpty()) {
-            throw new CellfieException("No mappings defined");
+            throw new CellfieException("No transformation expressions created");
          }
 
          // TODO: Move this business logic inside the renderer

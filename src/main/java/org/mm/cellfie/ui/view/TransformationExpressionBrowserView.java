@@ -39,7 +39,7 @@ import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 
-public class MappingBrowserView extends JPanel implements ModelView
+public class TransformationExpressionBrowserView extends JPanel implements ModelView
 {
    private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class MappingBrowserView extends JPanel implements ModelView
 
    private MappingExpressionTableModel tableModel;
 
-   public MappingBrowserView(ApplicationView container)
+   public TransformationExpressionBrowserView(ApplicationView container)
    {
       this.container = container;
 
@@ -104,12 +104,12 @@ public class MappingBrowserView extends JPanel implements ModelView
       JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       pnlTop.add(pnlMappingOpenSave, BorderLayout.EAST);
 
-      JButton cmdLoad = new JButton("Load Mappings");
+      JButton cmdLoad = new JButton("Load Expressions");
       cmdLoad.setPreferredSize(new Dimension(152, 22));
       cmdLoad.addActionListener(new OpenMappingAction());
       pnlMappingOpenSave.add(cmdLoad);
 
-      cmdSave = new JButton("Save Mappings");
+      cmdSave = new JButton("Save Expressions");
       cmdSave.setPreferredSize(new Dimension(152, 22));
       cmdSave.addActionListener(new SaveMappingAction());
       cmdSave.setEnabled(false);
@@ -163,9 +163,9 @@ public class MappingBrowserView extends JPanel implements ModelView
    {
       String filename = container.getMappingFileLocation();
       if (filename == null || filename.isEmpty()) {
-         return String.format("Mapping Expressions");
+         return String.format("Transformation Expressions");
       }
-      return String.format("Mapping Expressions (%s)", filename);
+      return String.format("Transformation Expressions (%s)", filename);
    }
 
    private void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn,
@@ -226,7 +226,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       private static final long serialVersionUID = 1L;
 
       private final String[] COLUMN_NAMES = { "Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
-            "Mapping Expression", "Comment" };
+            "Transformation Expression", "Comment" };
 
       public MappingExpressionTableModel(final List<MappingExpression> mappings)
       {
@@ -288,7 +288,7 @@ public class MappingBrowserView extends JPanel implements ModelView
    }
 
    /**
-    * To allow cells in the mapping browser table to have multilines.
+    * To allow cells in the mapping browser table to have multi-lines.
     */
    class MultiLineCellRenderer extends JTextArea implements TableCellRenderer
    {
@@ -343,7 +343,7 @@ public class MappingBrowserView extends JPanel implements ModelView
             }
          } else if (e.getClickCount() == 2) { // double-click
             if (selectedRow > -1) {
-                  MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
+                  TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
                   editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
                   editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
                         getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
@@ -370,7 +370,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
+         TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
          editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
          showMappingEditorDialog(editorPanel);
       }
@@ -384,7 +384,7 @@ public class MappingBrowserView extends JPanel implements ModelView
          int selectedRow = tblMappingExpression.getSelectedRow();
          try {
             validateSelection(selectedRow);
-            MappingExpressionEditorPanel editorPanel = new MappingExpressionEditorPanel();
+            TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
             editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
             editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
                   getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
@@ -401,10 +401,11 @@ public class MappingBrowserView extends JPanel implements ModelView
       }
    }
 
-   private void showMappingEditorDialog(MappingExpressionEditorPanel editorPanel)
+   private void showMappingEditorDialog(TransformationExpressionEditorPanel editorPanel)
    {
       int answer = JOptionPaneEx.showConfirmDialog(
-            container, "Mapping Editor", editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null);
+            container, "Transformation Expression Editor", editorPanel, JOptionPane.PLAIN_MESSAGE,
+            JOptionPane.OK_CANCEL_OPTION, null);
       switch (answer) {
          case JOptionPane.OK_OPTION :
             int selectedRow = tblMappingExpression.getSelectedRow();
@@ -447,7 +448,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       {
          try {
             File file = getApplicationDialogManager().showOpenFileChooser(
-                  container, "Open", "json", "MappingMaster DSL Mapping Expression (.json)");
+                  container, "Open", "json", "Transformation Expression File (.json)");
             if (file != null) {
                String filePath = file.getAbsolutePath();
                container.loadMappingDocument(filePath);
@@ -464,7 +465,7 @@ public class MappingBrowserView extends JPanel implements ModelView
    private void validateSelection(int selectedRow) throws CellfieException
    {
       if (selectedRow == -1) {
-         throw new CellfieException("No mapping expression was selected");
+         throw new CellfieException("No transformation expression was selected");
       }
    }
 
@@ -490,7 +491,7 @@ public class MappingBrowserView extends JPanel implements ModelView
       {
          try {
             File file = getApplicationDialogManager().showSaveFileChooser(
-                  container, "Save As", "json", "MappingMaster DSL Mapping Expression (.json)", true);
+                  container, "Save As", "json", "Transformationg Expression File (.json)", true);
             if (file != null) {
                String filePath = file.getAbsolutePath();
                String ext = ".json";
