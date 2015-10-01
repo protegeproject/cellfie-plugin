@@ -427,12 +427,18 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
             switch (answer) {
                case JOptionPane.YES_OPTION:
                   tableModel.removeRow(selectedRow);
-                  cmdEdit.setEnabled(false);
-                  cmdDelete.setEnabled(false);
+                  tblMappingExpression.setRowSelectionInterval(selectedRow, selectedRow);
                   break;
             }
          } catch (CellfieException ex) {
             getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
+         } catch (IllegalArgumentException ex) {
+            /*
+             * In case the table becomes empty or out of bound
+             */
+            tblMappingExpression.clearSelection();
+            cmdEdit.setEnabled(false);
+            cmdDelete.setEnabled(false);
          }
       }
    }
