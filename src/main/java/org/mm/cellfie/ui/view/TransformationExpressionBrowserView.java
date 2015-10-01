@@ -342,15 +342,12 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
                lastSelectedRow = -1; // reset
             }
          } else if (e.getClickCount() == 2) { // double-click
-            if (selectedRow > -1) {
-                  TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
-                  editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
-                  editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
-                        getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
-                        getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
-                  showMappingEditorDialog(editorPanel);
-               
-            }
+            TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
+            editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
+            editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
+                  getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
+                  getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
+            showMappingEditorDialog(editorPanel, selectedRow);
          }
       }
 
@@ -372,7 +369,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       {
          TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
          editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
-         showMappingEditorDialog(editorPanel);
+         showMappingEditorDialog(editorPanel, -1);
       }
    }
 
@@ -389,7 +386,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
             editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
                   getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
                   getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
-            showMappingEditorDialog(editorPanel);
+            showMappingEditorDialog(editorPanel, selectedRow);
          } catch (CellfieException ex) {
             getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
          }
@@ -401,14 +398,13 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       }
    }
 
-   private void showMappingEditorDialog(TransformationExpressionEditorPanel editorPanel)
+   private void showMappingEditorDialog(TransformationExpressionEditorPanel editorPanel, int selectedRow)
    {
       int answer = JOptionPaneEx.showConfirmDialog(
             container, "Transformation Expression Editor", editorPanel, JOptionPane.PLAIN_MESSAGE,
             JOptionPane.OK_CANCEL_OPTION, null);
       switch (answer) {
          case JOptionPane.OK_OPTION :
-            int selectedRow = tblMappingExpression.getSelectedRow();
             MappingExpression userInput = editorPanel.getUserInput();
             updateTableModel(selectedRow, userInput.getSheetName(), userInput.getStartColumn(),
                   userInput.getEndColumn(), userInput.getStartRow(), userInput.getEndRow(),
