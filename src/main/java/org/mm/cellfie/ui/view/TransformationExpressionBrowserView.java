@@ -433,9 +433,18 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
          } catch (CellfieException ex) {
             getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
          } catch (IllegalArgumentException ex) {
-            /*
-             * In case the table becomes empty or out of bound
-             */
+            resolveNextRowSelection(selectedRow);
+         }
+      }
+
+      private void resolveNextRowSelection(int selectedRow)
+      {
+         try {
+            // Select the previous row if there is no next row
+            int previousRow = selectedRow - 1;
+            tblMappingExpression.setRowSelectionInterval(previousRow, previousRow);
+         } catch (IllegalArgumentException ex2) {
+            // Clear the selection if the table has become empty
             tblMappingExpression.clearSelection();
             cmdEdit.setEnabled(false);
             cmdDelete.setEnabled(false);
