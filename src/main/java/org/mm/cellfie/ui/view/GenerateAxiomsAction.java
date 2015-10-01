@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.cellfie.ui.view.ApplicationView.RenderLogging;
-import org.mm.core.MappingExpression;
+import org.mm.core.TransformationRule;
 import org.mm.parser.ParseException;
 import org.mm.renderer.RendererException;
 import org.mm.rendering.Rendering;
@@ -63,29 +63,29 @@ public class GenerateAxiomsAction implements ActionListener
          SpreadSheetDataSource dataSource = container.getActiveWorkbook();
          Workbook workbook = dataSource.getWorkbook();
 
-         List<MappingExpression> mappings = getUserExpressions();
-         if (mappings.isEmpty()) {
+         List<TransformationRule> rules = getUserRules();
+         if (rules.isEmpty()) {
             throw new CellfieException("No transformation rules created");
          }
 
          // TODO: Move this business logic inside the renderer
          Set<Rendering> results = new HashSet<Rendering>();
-         for (MappingExpression mapping : mappings) {
-            if (mapping.isActive()) {
-               String sheetName = mapping.getSheetName();
+         for (TransformationRule rule : rules) {
+            if (rule.isActive()) {
+               String sheetName = rule.getSheetName();
                Sheet sheet = workbook.getSheet(sheetName);
-               int startColumn = SpreadSheetUtil.columnName2Number(mapping.getStartColumn());
-               int startRow = SpreadSheetUtil.row2Number(mapping.getStartRow());
-               int endColumn = mapping.hasEndColumnWildcard() ? sheet.getRow(startRow).getLastCellNum()
-                     : SpreadSheetUtil.columnName2Number(mapping.getEndColumn());
-               int endRow = mapping.hasEndRowWildcard() ? sheet.getLastRowNum()
-                     : SpreadSheetUtil.row2Number(mapping.getEndRow());
+               int startColumn = SpreadSheetUtil.columnName2Number(rule.getStartColumn());
+               int startRow = SpreadSheetUtil.row2Number(rule.getStartRow());
+               int endColumn = rule.hasEndColumnWildcard() ? sheet.getRow(startRow).getLastCellNum()
+                     : SpreadSheetUtil.columnName2Number(rule.getEndColumn());
+               int endRow = rule.hasEndRowWildcard() ? sheet.getLastRowNum()
+                     : SpreadSheetUtil.row2Number(rule.getEndRow());
 
                if (startColumn > endColumn) {
-                  throw new CellfieException("Start column after finish column in rule " + mapping);
+                  throw new CellfieException("Start column after finish column in rule " + rule);
                }
                if (startRow > endRow) {
-                  throw new CellfieException("Start row after finish row in rule " + mapping);
+                  throw new CellfieException("Start row after finish row in rule " + rule);
                }
 
                SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumn, endRow);
@@ -94,7 +94,7 @@ public class GenerateAxiomsAction implements ActionListener
 
                dataSource.setCurrentLocation(currentLocation);
                do {
-                  evaluate(mapping, results, container.getRenderLogging());
+                  evaluate(rule, results, container.getRenderLogging());
                   if (currentLocation.equals(endLocation)) {
                      break;
                   }
@@ -183,10 +183,10 @@ public class GenerateAxiomsAction implements ActionListener
       return new PreviewAxiomsPanel(container, editorKit, axioms);
    }
 
-   private void evaluate(MappingExpression mapping, Set<Rendering> results, RenderLogging logging) throws ParseException
+   private void evaluate(TransformationRule rule, Set<Rendering> results, RenderLogging logging) throws ParseException
    {
-      container.evaluate(mapping, container.getDefaultRenderer(), results);
-      container.log(mapping, container.getLogRenderer(), logging);
+      container.evaluate(rule, container.getDefaultRenderer(), results);
+      container.log(rule, container.getLogRenderer(), logging);
    }
 
    private SpreadsheetLocation incrementLocation(SpreadsheetLocation current, SpreadsheetLocation start,
@@ -203,9 +203,9 @@ public class GenerateAxiomsAction implements ActionListener
       throw new RendererException("incrementLocation called redundantly");
    }
 
-   private List<MappingExpression> getUserExpressions()
+   private List<TransformationRule> getUserRules()
    {
-      return container.getMappingBrowserView().getMappingExpressions();
+      return container.getMappingBrowserView().getTransformationRules();
    }
 
    private DialogManager getApplicationDialogManager()

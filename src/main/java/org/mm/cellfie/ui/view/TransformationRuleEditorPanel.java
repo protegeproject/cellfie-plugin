@@ -13,9 +13,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.mm.core.MappingExpression;
+import org.mm.core.TransformationRule;
 
-public class TransformationExpressionEditorPanel extends JPanel
+public class TransformationRuleEditorPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
@@ -27,9 +27,9 @@ public class TransformationExpressionEditorPanel extends JPanel
    private JTextField txtEndRow;
    private JTextField txtComment;
 
-   private JTextArea txtExpression;
+   private JTextArea txtRule;
 
-   public TransformationExpressionEditorPanel()
+   public TransformationRuleEditorPanel()
    {
       setLayout(new BorderLayout());
 
@@ -57,7 +57,7 @@ public class TransformationExpressionEditorPanel extends JPanel
       JLabel lblComment = new JLabel("Comment:");
       txtComment = new JTextField("");
 
-      JLabel lblExpression = new JLabel("Rule:");
+      JLabel lblRule = new JLabel("Rule:");
 
       JPanel pnlFields = new JPanel(new GridLayout(7, 2));
       pnlFields.add(lblSheetName);
@@ -72,12 +72,12 @@ public class TransformationExpressionEditorPanel extends JPanel
       pnlFields.add(txtEndRow);
       pnlFields.add(lblComment);
       pnlFields.add(txtComment);
-      pnlFields.add(lblExpression);
+      pnlFields.add(lblRule);
 
       pnlMain.add(pnlFields, BorderLayout.NORTH);
 
-      txtExpression = new JTextArea("", 20, 48);
-      pnlMain.add(txtExpression, BorderLayout.CENTER);
+      txtRule = new JTextArea("", 20, 48);
+      pnlMain.add(txtRule, BorderLayout.CENTER);
    }
 
    public void setSheetNames(List<String> sheetNames)
@@ -86,7 +86,7 @@ public class TransformationExpressionEditorPanel extends JPanel
    }
 
    public void fillFormFields(String sheetName, String startColumn, String endColumn, String startRow, String endRow,
-         String expression, String comment)
+         String rule, String comment)
    {
       cbbSheetName.setSelectedItem(sheetName);
 
@@ -96,14 +96,14 @@ public class TransformationExpressionEditorPanel extends JPanel
       txtEndRow.setText(endRow);
 
       txtComment.setText(comment);
-      txtExpression.setText(expression);
+      txtRule.setText(rule);
    }
 
-   public MappingExpression getUserInput()
+   public TransformationRule getUserInput()
    {
-      return new MappingExpression((String) cbbSheetName.getSelectedItem(),
+      return new TransformationRule((String) cbbSheetName.getSelectedItem(),
             txtStartColumn.getText().trim().toUpperCase(), txtEndColumn.getText().trim().toUpperCase(),
             txtStartRow.getText().trim(), txtEndRow.getText().trim(), txtComment.getText().trim(),
-            txtExpression.getText().trim());
+            txtRule.getText().trim());
    }
 }

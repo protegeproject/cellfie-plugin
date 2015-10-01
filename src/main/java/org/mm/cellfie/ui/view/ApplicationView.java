@@ -24,8 +24,8 @@ import javax.swing.border.EmptyBorder;
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
 import org.mm.app.MMApplicationModel;
-import org.mm.core.MappingExpression;
-import org.mm.core.MappingExpressionSet;
+import org.mm.core.TransformationRule;
+import org.mm.core.TransformationRuleSet;
 import org.mm.core.settings.ReferenceSettings;
 import org.mm.core.settings.ValueEncodingSetting;
 import org.mm.parser.ASTExpression;
@@ -46,8 +46,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
  * This is the main Mapping Master user interface. It contains a view of a
- * spreadsheet and a control area to edit and execute Mapping Master
- * expressions.
+ * spreadsheet and a control area to edit and execute Mapping Master rules.
  */
 public class ApplicationView extends JPanel implements ModelView
 {
@@ -58,7 +57,7 @@ public class ApplicationView extends JPanel implements ModelView
 
    private DialogManager applicationDialogManager;
    private DataSourceView dataSourceView;
-   private TransformationExpressionBrowserView mappingExpressionView;
+   private TransformationRuleBrowserView transformationRuleBrowserView;
 
    private RenderLogging renderLogging;
 
@@ -103,8 +102,8 @@ public class ApplicationView extends JPanel implements ModelView
       /*
        * Mapping browser, create, edit, remove panel
        */
-      mappingExpressionView = new TransformationExpressionBrowserView(this);
-      splitPane.setBottomComponent(mappingExpressionView);
+      transformationRuleBrowserView = new TransformationRuleBrowserView(this);
+      splitPane.setBottomComponent(transformationRuleBrowserView);
 
       validate();
    }
@@ -130,7 +129,7 @@ public class ApplicationView extends JPanel implements ModelView
       applicationFactory.setMappingLocation(path);
       setupApplication();
       initLogging();
-      mappingExpressionView.update();
+      transformationRuleBrowserView.update();
    }
 
    private void initLogging()
@@ -144,7 +143,7 @@ public class ApplicationView extends JPanel implements ModelView
       return renderLogging;
    }
 
-   public String getMappingFileLocation()
+   public String getRuleFileLocation()
    {
       return applicationFactory.getMappingLocation();
    }
@@ -163,34 +162,34 @@ public class ApplicationView extends JPanel implements ModelView
       return application.getApplicationModel();
    }
 
-   public void evaluate(MappingExpression mapping, Renderer renderer, Set<Rendering> results) throws ParseException
+   public void evaluate(TransformationRule rule, Renderer renderer, Set<Rendering> results) throws ParseException
    {
       final ReferenceSettings referenceSettings = new ReferenceSettings();
 
-      String expression = mapping.getExpressionString();
-      MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
-      Optional<? extends Rendering> renderingResult = renderer.renderExpression(expressionNode);
+      String ruleString = rule.getRuleString();
+      MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
+      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          results.add(renderingResult.get());
       }
    }
 
-   public void log(MappingExpression mapping, Renderer renderer, RenderLogging logging) throws ParseException
+   public void log(TransformationRule rule, Renderer renderer, RenderLogging logging) throws ParseException
    {
       final ReferenceSettings referenceSettings = new ReferenceSettings();
       referenceSettings.setValueEncodingSetting(ValueEncodingSetting.RDFS_LABEL);
 
-      String expression = mapping.getExpressionString();
-      MMExpressionNode expressionNode = parseExpression(expression, referenceSettings).getMMExpressionNode();
-      Optional<? extends Rendering> renderingResult = renderer.renderExpression(expressionNode);
+      String ruleString = rule.getRuleString();
+      MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
+      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          logging.append(renderingResult.get().getRendering());
       }
    }
 
-   private ExpressionNode parseExpression(String expression, ReferenceSettings settings) throws ParseException
+   private ExpressionNode parseRule(String ruleString, ReferenceSettings settings) throws ParseException
    {
-      MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(expression.getBytes()), settings, -1);
+      MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(ruleString.getBytes()), settings, -1);
       SimpleNode simpleNode = parser.expression();
       return new ExpressionNode((ASTExpression) simpleNode);
    }
@@ -211,15 +210,15 @@ public class ApplicationView extends JPanel implements ModelView
       return getApplicationModel().getDataSourceModel().getDataSource();
    }
 
-   public List<MappingExpression> getActiveMappingExpressions()
+   public List<TransformationRule> getActiveTransformationRules()
    {
-      return getApplicationModel().getMappingExpressionsModel().getExpressions();
+      return getApplicationModel().getTransformationRuleModel().getRules();
    }
 
-   public void updateMappingExpressionModel(List<MappingExpression> mappingList)
+   public void updateTransformationRuleModel(List<TransformationRule> rules)
    {
-      MappingExpressionSet mappings = MappingExpressionSet.create(mappingList);
-      getApplicationModel().getMappingExpressionsModel().changeMappingExpressionSet(mappings);
+      TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
+      getApplicationModel().getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
    }
 
    public Renderer getDefaultRenderer()
@@ -247,9 +246,9 @@ public class ApplicationView extends JPanel implements ModelView
       return dataSourceView;
    }
 
-   public TransformationExpressionBrowserView getMappingBrowserView()
+   public TransformationRuleBrowserView getMappingBrowserView()
    {
-      return mappingExpressionView;
+      return transformationRuleBrowserView;
    }
 
    class RenderLogging

@@ -32,14 +32,14 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import org.mm.cellfie.ui.exception.CellfieException;
-import org.mm.core.MappingExpression;
-import org.mm.core.MappingExpressionSetFactory;
+import org.mm.core.TransformationRule;
+import org.mm.core.TransformationRuleSetFactory;
 import org.mm.ui.DialogManager;
 import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 
-public class TransformationExpressionBrowserView extends JPanel implements ModelView
+public class TransformationRuleBrowserView extends JPanel implements ModelView
 {
    private static final long serialVersionUID = 1L;
 
@@ -54,11 +54,11 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    private JButton cmdSaveAs;
    private JButton cmdGenerateAxioms;
 
-   private JTable tblMappingExpression;
+   private JTable tblTransformationRules;
 
-   private MappingExpressionTableModel tableModel;
+   private TransformationRulesTableModel tableModel;
 
-   public TransformationExpressionBrowserView(ApplicationView container)
+   public TransformationRuleBrowserView(ApplicationView container)
    {
       this.container = container;
 
@@ -69,13 +69,13 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       pnlContainer.setLayout(new BorderLayout());
       add(pnlContainer, BorderLayout.CENTER);
 
-      tblMappingExpression = new JTable();
-      tblMappingExpression.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      tblMappingExpression.setGridColor(new Color(220, 220, 220));
-      tblMappingExpression.setDefaultRenderer(String.class, new MultiLineCellRenderer());
-      tblMappingExpression.addMouseListener(new MappingExpressionSelectionListener());
+      tblTransformationRules = new JTable();
+      tblTransformationRules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+      tblTransformationRules.setGridColor(new Color(220, 220, 220));
+      tblTransformationRules.setDefaultRenderer(String.class, new MultiLineCellRenderer());
+      tblTransformationRules.addMouseListener(new MappingExpressionSelectionListener());
 
-      JScrollPane scrMappingExpression = new JScrollPane(tblMappingExpression);
+      JScrollPane scrMappingExpression = new JScrollPane(tblTransformationRules);
 
       JPanel pnlTop = new JPanel(new BorderLayout());
       pnlTop.setBorder(new EmptyBorder(2, 5, 7, 5));
@@ -141,8 +141,8 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    @Override
    public void update()
    {
-      tableModel = new MappingExpressionTableModel(container.getActiveMappingExpressions());
-      tblMappingExpression.setModel(tableModel);
+      tableModel = new TransformationRulesTableModel(container.getActiveTransformationRules());
+      tblTransformationRules.setModel(tableModel);
       setTableHeaderAlignment(SwingConstants.CENTER);
       setPreferredColumnWidth();
       setPreferredColumnHeight();
@@ -151,7 +151,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
 
    private void setTableHeaderAlignment(int alignment)
    {
-      ((DefaultTableCellRenderer) tblMappingExpression.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
+      ((DefaultTableCellRenderer) tblTransformationRules.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
    }
 
    private void updateBorderUI()
@@ -161,7 +161,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
 
    private String getTitle()
    {
-      String filename = container.getMappingFileLocation();
+      String filename = container.getRuleFileLocation();
       if (filename == null || filename.isEmpty()) {
          return String.format("Transformation Rules");
       }
@@ -188,7 +188,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
 
    private void setPreferredColumnWidth()
    {
-      final TableColumnModel columnModel = tblMappingExpression.getColumnModel();
+      final TableColumnModel columnModel = tblTransformationRules.getColumnModel();
       columnModel.getColumn(0).setPreferredWidth(100);
       columnModel.getColumn(1).setPreferredWidth(100);
       columnModel.getColumn(2).setPreferredWidth(100);
@@ -201,19 +201,19 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    private void setPreferredColumnHeight()
    {
       int columnIndex = 5; // only for expression column
-      for (int row = 0; row < tblMappingExpression.getRowCount(); row++) {
+      for (int row = 0; row < tblTransformationRules.getRowCount(); row++) {
          int height = 0; // min height;
-         Object value = tblMappingExpression.getModel().getValueAt(row, columnIndex);
-         TableCellRenderer renderer = tblMappingExpression.getDefaultRenderer(String.class);
-         Component comp = renderer.getTableCellRendererComponent(tblMappingExpression, value, false, false, row, columnIndex);
+         Object value = tblTransformationRules.getModel().getValueAt(row, columnIndex);
+         TableCellRenderer renderer = tblTransformationRules.getDefaultRenderer(String.class);
+         Component comp = renderer.getTableCellRendererComponent(tblTransformationRules, value, false, false, row, columnIndex);
          height = Math.max(comp.getPreferredSize().height, height);
-         tblMappingExpression.setRowHeight(row, height);
+         tblTransformationRules.setRowHeight(row, height);
       }
    }
 
-   public List<MappingExpression> getMappingExpressions()
+   public List<TransformationRule> getTransformationRules()
    {
-      return tableModel.getMappingExpressions();
+      return tableModel.getTransformationRules();
    }
 
    private DialogManager getApplicationDialogManager()
@@ -221,25 +221,25 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       return container.getApplicationDialogManager();
    }
 
-   class MappingExpressionTableModel extends DefaultTableModel
+   class TransformationRulesTableModel extends DefaultTableModel
    {
       private static final long serialVersionUID = 1L;
 
       private final String[] COLUMN_NAMES = { "Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
             "Rule", "Comment" };
 
-      public MappingExpressionTableModel(final List<MappingExpression> mappings)
+      public TransformationRulesTableModel(final List<TransformationRule> rules)
       {
          super();
-         for (MappingExpression mapping : mappings) {
+         for (TransformationRule rule : rules) {
             Vector<Object> row = new Vector<Object>();
-            row.add(mapping.getSheetName());
-            row.add(mapping.getStartColumn());
-            row.add(mapping.getEndColumn());
-            row.add(mapping.getStartRow());
-            row.add(mapping.getEndRow());
-            row.add(mapping.getExpressionString());
-            row.add(mapping.getComment());
+            row.add(rule.getSheetName());
+            row.add(rule.getStartColumn());
+            row.add(rule.getEndColumn());
+            row.add(rule.getStartRow());
+            row.add(rule.getEndRow());
+            row.add(rule.getRuleString());
+            row.add(rule.getComment());
             addRow(row);
          }
       }
@@ -268,9 +268,9 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
          return false;
       }
 
-      public List<MappingExpression> getMappingExpressions()
+      public List<TransformationRule> getTransformationRules()
       {
-         List<MappingExpression> mappings = new ArrayList<>();
+         List<TransformationRule> rules = new ArrayList<>();
          for (int row = 0; row < getRowCount(); row++) {
             @SuppressWarnings("unchecked")
             Vector<String> rowVector = (Vector<String>) getDataVector().elementAt(row);
@@ -281,9 +281,9 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
             String endRow = rowVector.get(4);
             String expression = rowVector.get(5);
             String comment = rowVector.get(6);
-            mappings.add(new MappingExpression(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
+            rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
          }
-         return mappings;
+         return rules;
       }
    }
 
@@ -320,7 +320,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    }
 
    /**
-    * To allow user editing immediately the mapping expressions by double-clicking the expression row.
+    * To allow user editing immediately the transformation rules by double-clicking the row.
     */
    class MappingExpressionSelectionListener extends MouseAdapter
    {
@@ -329,20 +329,20 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       @Override
       public void mouseClicked(MouseEvent e)
       {
-         int selectedRow = tblMappingExpression.getSelectedRow();
+         int selectedRow = tblTransformationRules.getSelectedRow();
          if (e.getClickCount() == 1) { // single click
             if (selectedRow != lastSelectedRow) {
                cmdEdit.setEnabled(true);
                cmdDelete.setEnabled(true);
                lastSelectedRow = selectedRow;
             } else {
-               tblMappingExpression.clearSelection();
+               tblTransformationRules.clearSelection();
                cmdEdit.setEnabled(false);
                cmdDelete.setEnabled(false);
                lastSelectedRow = -1; // reset
             }
          } else if (e.getClickCount() == 2) { // double-click
-            TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
+            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
             editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
             editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
                   getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
@@ -358,8 +358,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    }
 
    /*
-    * Action listener implementations for command buttons in
-    * MappingExpressionView panel
+    * Action listener implementations for command buttons
     */
 
    class AddButtonActionListener implements ActionListener
@@ -367,7 +366,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
+         TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
          editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
          showMappingEditorDialog(editorPanel, -1);
       }
@@ -378,10 +377,10 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         int selectedRow = tblMappingExpression.getSelectedRow();
+         int selectedRow = tblTransformationRules.getSelectedRow();
          try {
             validateSelection(selectedRow);
-            TransformationExpressionEditorPanel editorPanel = new TransformationExpressionEditorPanel();
+            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
             editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
             editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
                   getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
@@ -398,16 +397,16 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       }
    }
 
-   private void showMappingEditorDialog(TransformationExpressionEditorPanel editorPanel, int selectedRow)
+   private void showMappingEditorDialog(TransformationRuleEditorPanel editorPanel, int selectedRow)
    {
       int answer = JOptionPaneEx.showConfirmDialog(
             container, "Transformation Rule Editor", editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null);
       switch (answer) {
          case JOptionPane.OK_OPTION :
-            MappingExpression userInput = editorPanel.getUserInput();
+            TransformationRule userInput = editorPanel.getUserInput();
             updateTableModel(selectedRow, userInput.getSheetName(), userInput.getStartColumn(),
                   userInput.getEndColumn(), userInput.getStartRow(), userInput.getEndRow(),
-                  userInput.getExpressionString(), userInput.getComment());
+                  userInput.getRuleString(), userInput.getComment());
             cmdSaveAs.setEnabled(true);
             setPreferredColumnHeight();
             break;
@@ -418,7 +417,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    {
       public void actionPerformed(ActionEvent e)
       {
-         int selectedRow = tblMappingExpression.getSelectedRow();
+         int selectedRow = tblTransformationRules.getSelectedRow();
          try {
             validateSelection(selectedRow);
             int answer = getApplicationDialogManager().showConfirmDialog(
@@ -426,7 +425,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
             switch (answer) {
                case JOptionPane.YES_OPTION:
                   tableModel.removeRow(selectedRow);
-                  tblMappingExpression.setRowSelectionInterval(selectedRow, selectedRow);
+                  tblTransformationRules.setRowSelectionInterval(selectedRow, selectedRow);
                   break;
             }
          } catch (CellfieException ex) {
@@ -441,10 +440,10 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
          try {
             // Select the previous row if there is no next row
             int previousRow = selectedRow - 1;
-            tblMappingExpression.setRowSelectionInterval(previousRow, previousRow);
+            tblTransformationRules.setRowSelectionInterval(previousRow, previousRow);
          } catch (IllegalArgumentException ex2) {
             // Clear the selection if the table has become empty
-            tblMappingExpression.clearSelection();
+            tblTransformationRules.clearSelection();
             cmdEdit.setEnabled(false);
             cmdDelete.setEnabled(false);
          }
@@ -485,9 +484,9 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       public void actionPerformed(ActionEvent e)
       {
          try {
-            MappingExpressionSetFactory.saveMappingExpressionSetToDocument(container.getMappingFileLocation(),
-                  tableModel.getMappingExpressions());
-            container.updateMappingExpressionModel(tableModel.getMappingExpressions());
+            TransformationRuleSetFactory.saveTransformationRulesToDocument(container.getRuleFileLocation(),
+                  tableModel.getTransformationRules());
+            container.updateTransformationRuleModel(tableModel.getTransformationRules());
          } catch (IOException ex) {
             getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
          }
@@ -508,9 +507,8 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
                if (!filePath.endsWith(ext)) {
                   filePath = filePath + ext;
                }
-               MappingExpressionSetFactory.saveMappingExpressionSetToDocument(filePath,
-                     tableModel.getMappingExpressions());
-               container.updateMappingExpressionModel(tableModel.getMappingExpressions());
+               TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath, tableModel.getTransformationRules());
+               container.updateTransformationRuleModel(tableModel.getTransformationRules());
                cmdSave.setEnabled(true);
                updateBorderUI();
             }
