@@ -104,12 +104,12 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       pnlTop.add(pnlMappingOpenSave, BorderLayout.EAST);
 
-      JButton cmdLoad = new JButton("Load Expressions");
+      JButton cmdLoad = new JButton("Load Rules");
       cmdLoad.setPreferredSize(new Dimension(152, 22));
       cmdLoad.addActionListener(new OpenMappingAction());
       pnlMappingOpenSave.add(cmdLoad);
 
-      cmdSave = new JButton("Save Expressions");
+      cmdSave = new JButton("Save Rules");
       cmdSave.setPreferredSize(new Dimension(152, 22));
       cmdSave.addActionListener(new SaveMappingAction());
       cmdSave.setEnabled(false);
@@ -163,9 +163,9 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    {
       String filename = container.getMappingFileLocation();
       if (filename == null || filename.isEmpty()) {
-         return String.format("Transformation Expressions");
+         return String.format("Transformation Rules");
       }
-      return String.format("Transformation Expressions (%s)", filename);
+      return String.format("Transformation Rules (%s)", filename);
    }
 
    private void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn,
@@ -226,7 +226,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       private static final long serialVersionUID = 1L;
 
       private final String[] COLUMN_NAMES = { "Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
-            "Transformation Expression", "Comment" };
+            "Rule", "Comment" };
 
       public MappingExpressionTableModel(final List<MappingExpression> mappings)
       {
@@ -401,8 +401,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    private void showMappingEditorDialog(TransformationExpressionEditorPanel editorPanel, int selectedRow)
    {
       int answer = JOptionPaneEx.showConfirmDialog(
-            container, "Transformation Expression Editor", editorPanel, JOptionPane.PLAIN_MESSAGE,
-            JOptionPane.OK_CANCEL_OPTION, null);
+            container, "Transformation Rule Editor", editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null);
       switch (answer) {
          case JOptionPane.OK_OPTION :
             MappingExpression userInput = editorPanel.getUserInput();
@@ -423,7 +422,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
          try {
             validateSelection(selectedRow);
             int answer = getApplicationDialogManager().showConfirmDialog(
-                  container, "Delete", "Do you really want to delete the selected expression?");
+                  container, "Delete", "Do you really want to delete the selected transformation rule?");
             switch (answer) {
                case JOptionPane.YES_OPTION:
                   tableModel.removeRow(selectedRow);
@@ -459,7 +458,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       {
          try {
             File file = getApplicationDialogManager().showOpenFileChooser(
-                  container, "Open", "json", "Transformation Expression File (.json)");
+                  container, "Open", "json", "Transformation Rule File (.json)");
             if (file != null) {
                String filePath = file.getAbsolutePath();
                container.loadMappingDocument(filePath);
@@ -476,7 +475,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
    private void validateSelection(int selectedRow) throws CellfieException
    {
       if (selectedRow == -1) {
-         throw new CellfieException("No transformation expression was selected");
+         throw new CellfieException("No transformation rule was selected");
       }
    }
 
@@ -502,7 +501,7 @@ public class TransformationExpressionBrowserView extends JPanel implements Model
       {
          try {
             File file = getApplicationDialogManager().showSaveFileChooser(
-                  container, "Save As", "json", "Transformationg Expression File (.json)", true);
+                  container, "Save As", "json", "Transformation Rule File (.json)", true);
             if (file != null) {
                String filePath = file.getAbsolutePath();
                String ext = ".json";

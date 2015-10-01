@@ -65,7 +65,7 @@ public class GenerateAxiomsAction implements ActionListener
 
          List<MappingExpression> mappings = getUserExpressions();
          if (mappings.isEmpty()) {
-            throw new CellfieException("No transformation expressions created");
+            throw new CellfieException("No transformation rules created");
          }
 
          // TODO: Move this business logic inside the renderer
@@ -82,10 +82,10 @@ public class GenerateAxiomsAction implements ActionListener
                      : SpreadSheetUtil.row2Number(mapping.getEndRow());
 
                if (startColumn > endColumn) {
-                  throw new CellfieException("Start column after finish column in expression " + mapping);
+                  throw new CellfieException("Start column after finish column in rule " + mapping);
                }
                if (startRow > endRow) {
-                  throw new CellfieException("Start row after finish row in expression " + mapping);
+                  throw new CellfieException("Start row after finish row in rule " + mapping);
                }
 
                SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumn, endRow);

@@ -57,7 +57,7 @@ public class TransformationExpressionEditorPanel extends JPanel
       JLabel lblComment = new JLabel("Comment:");
       txtComment = new JTextField("");
 
-      JLabel lblExpression = new JLabel("Transformation expression:");
+      JLabel lblExpression = new JLabel("Rule:");
 
       JPanel pnlFields = new JPanel(new GridLayout(7, 2));
       pnlFields.add(lblSheetName);
