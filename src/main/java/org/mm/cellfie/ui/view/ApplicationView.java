@@ -311,7 +311,11 @@ public class ApplicationView extends JPanel implements ModelView
       private String getDefaultLogFileLocation()
       {
          String tmpPath = System.getProperty("java.io.tmpdir");
-         return tmpPath + "mmexec";
+         if (tmpPath.endsWith(System.getProperty("file.separator"))) {
+            return tmpPath + "mmexec";
+         } else {
+            return tmpPath + System.getProperty("file.separator") + "mmexec";
+         }
       }
 
       private void clearLog()
