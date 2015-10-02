@@ -92,7 +92,6 @@ public class ApplicationView extends JPanel implements ModelView
       loadWorkbookDocument(workbookFilePath);
 //      loadMappingDocument(mappingFilePath) // XXX In case the UI will allow users to input mapping file in advance
       setupApplication();
-      initLogging();
 
       /*
        * Workbook sheet GUI presentation
@@ -127,26 +126,19 @@ public class ApplicationView extends JPanel implements ModelView
 
    public void loadMappingDocument(String path)
    {
-      applicationFactory.setMappingLocation(path);
+      setRuleFileLocation(path);
       setupApplication();
-      initLogging();
       transformationRuleBrowserView.update();
-   }
-
-   private void initLogging()
-   {
-      renderLogging = new RenderLogging();
-      renderLogging.init();
-   }
-
-   public RenderLogging getRenderLogging()
-   {
-      return renderLogging;
    }
 
    public String getRuleFileLocation()
    {
       return applicationFactory.getMappingLocation();
+   }
+
+   public void setRuleFileLocation(String path)
+   {
+      applicationFactory.setMappingLocation(path);
    }
 
    private void setupApplication()
@@ -161,6 +153,17 @@ public class ApplicationView extends JPanel implements ModelView
    private MMApplicationModel getApplicationModel()
    {
       return application.getApplicationModel();
+   }
+
+   public void initLogging()
+   {
+      renderLogging = new RenderLogging();
+      renderLogging.init();
+   }
+
+   public RenderLogging getRenderLogging()
+   {
+      return renderLogging;
    }
 
    public void evaluate(TransformationRule rule, Renderer renderer, Set<Rendering> results) throws ParseException

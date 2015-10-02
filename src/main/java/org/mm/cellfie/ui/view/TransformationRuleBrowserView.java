@@ -508,6 +508,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                   filePath = filePath + ext;
                }
                TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath, tableModel.getTransformationRules());
+               container.setRuleFileLocation(filePath);
                container.updateTransformationRuleModel(tableModel.getTransformationRules());
                cmdSave.setEnabled(true);
                updateBorderUI();

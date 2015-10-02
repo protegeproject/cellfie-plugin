@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.mm.cellfie.ui.exception.CellfieException;
 import org.mm.cellfie.ui.view.ApplicationView.RenderLogging;
 import org.mm.core.TransformationRule;
@@ -60,20 +59,18 @@ public class GenerateAxiomsAction implements ActionListener
    public void actionPerformed(ActionEvent e)
    {
       try {
-         SpreadSheetDataSource dataSource = container.getActiveWorkbook();
-         Workbook workbook = dataSource.getWorkbook();
-
+         // Get all user-defined transformation rules
          List<TransformationRule> rules = getUserRules();
-         if (rules.isEmpty()) {
-            throw new CellfieException("No transformation rules created");
-         }
+         
+         // Initialize Cellfie logging
+         initLogging();
 
          // TODO: Move this business logic inside the renderer
          Set<Rendering> results = new HashSet<Rendering>();
          for (TransformationRule rule : rules) {
             if (rule.isActive()) {
                String sheetName = rule.getSheetName();
-               Sheet sheet = workbook.getSheet(sheetName);
+               Sheet sheet = getActiveWorkbook().getWorkbook().getSheet(sheetName);
                int startColumn = SpreadSheetUtil.columnName2Number(rule.getStartColumn());
                int startRow = SpreadSheetUtil.row2Number(rule.getStartRow());
                int endColumn = rule.hasEndColumnWildcard() ? sheet.getRow(startRow).getLastCellNum()
@@ -92,27 +89,25 @@ public class GenerateAxiomsAction implements ActionListener
                SpreadsheetLocation startLocation = new SpreadsheetLocation(sheetName, startColumn, startRow);
                SpreadsheetLocation currentLocation = new SpreadsheetLocation(sheetName, startColumn, startRow);
 
-               dataSource.setCurrentLocation(currentLocation);
+               getActiveWorkbook().setCurrentLocation(currentLocation);
                do {
                   evaluate(rule, results, container.getRenderLogging());
                   if (currentLocation.equals(endLocation)) {
                      break;
                   }
                   currentLocation = incrementLocation(currentLocation, startLocation, endLocation);
-                  dataSource.setCurrentLocation(currentLocation);
+                  getActiveWorkbook().setCurrentLocation(currentLocation);
                } while (true);
             }
          }
+         // Store Cellfie logging to a file
          saveLogging();
+         
+         // Show the preview dialog to users to see all the generated axioms
          showAxiomPreviewDialog(toAxioms(results));
       } catch (Exception ex) {
          getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
       }
-   }
-
-   private void saveLogging() throws FileNotFoundException
-   {
-      container.getRenderLogging().save();
    }
 
    private Set<OWLAxiom> toAxioms(Set<Rendering> results)
@@ -203,14 +198,37 @@ public class GenerateAxiomsAction implements ActionListener
       throw new RendererException("incrementLocation called redundantly");
    }
 
-   private List<TransformationRule> getUserRules()
+   private SpreadSheetDataSource getActiveWorkbook() throws CellfieException
    {
-      return container.getMappingBrowserView().getTransformationRules();
+      SpreadSheetDataSource dataSource = container.getActiveWorkbook();
+      if (dataSource == null) {
+         throw new CellfieException("No workbook was loaded");
+      }
+      return dataSource;
+   }
+   
+   private List<TransformationRule> getUserRules() throws CellfieException
+   {
+      List<TransformationRule> rules = container.getMappingBrowserView().getTransformationRules();
+      if (rules.isEmpty()) {
+         throw new CellfieException("No transformation rules were created");
+      }
+      return rules;
    }
 
    private DialogManager getApplicationDialogManager()
    {
       return container.getApplicationDialogManager();
+   }
+
+   private void initLogging()
+   {
+      container.initLogging();
+   }
+
+   private void saveLogging() throws FileNotFoundException
+   {
+      container.getRenderLogging().save();
    }
 
    /**
