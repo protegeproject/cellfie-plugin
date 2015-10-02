@@ -103,8 +103,8 @@ public class GenerateAxiomsAction implements ActionListener
                } while (true);
             }
          }
-         showAxiomPreviewDialog(toAxioms(results));
          saveLogging();
+         showAxiomPreviewDialog(toAxioms(results));
       } catch (Exception ex) {
          getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
       }
