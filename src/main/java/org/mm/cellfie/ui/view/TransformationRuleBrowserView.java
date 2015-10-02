@@ -460,7 +460,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                   container, "Open", "json", "Transformation Rule File (.json)");
             if (file != null) {
                String filePath = file.getAbsolutePath();
-               container.loadMappingDocument(filePath);
+               container.loadTransformationRuleDocument(filePath);
                cmdSave.setEnabled(true);
                cmdSaveAs.setEnabled(true);
             }

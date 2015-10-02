@@ -90,7 +90,7 @@ public class ApplicationView extends JPanel implements ModelView
       add(splitPane, BorderLayout.CENTER);
 
       loadWorkbookDocument(workbookFilePath);
-//      loadMappingDocument(mappingFilePath) // XXX In case the UI will allow users to input mapping file in advance
+//      loadTransformationRuleDocument(ruleFilePath) // XXX In case the UI will allow users to input rule file in advance
       setupApplication();
 
       /*
@@ -100,7 +100,7 @@ public class ApplicationView extends JPanel implements ModelView
       splitPane.setTopComponent(dataSourceView);
 
       /*
-       * Mapping browser, create, edit, remove panel
+       * Transformation rule browser, create, edit, remove panel
        */
       transformationRuleBrowserView = new TransformationRuleBrowserView(this);
       splitPane.setBottomComponent(transformationRuleBrowserView);
@@ -116,15 +116,15 @@ public class ApplicationView extends JPanel implements ModelView
 
    private void loadWorkbookDocument(String path)
    {
-      applicationFactory.setWorkbookLocation(path);
+      applicationFactory.setWorkbookFileLocation(path);
    }
 
    public String getWorkbookFileLocation()
    {
-      return applicationFactory.getWorkbookLocation();
+      return applicationFactory.getWorkbookFileLocation();
    }
 
-   public void loadMappingDocument(String path)
+   public void loadTransformationRuleDocument(String path)
    {
       setRuleFileLocation(path);
       setupApplication();
@@ -133,12 +133,12 @@ public class ApplicationView extends JPanel implements ModelView
 
    public String getRuleFileLocation()
    {
-      return applicationFactory.getMappingLocation();
+      return applicationFactory.getRuleFileLocation();
    }
 
    public void setRuleFileLocation(String path)
    {
-      applicationFactory.setMappingLocation(path);
+      applicationFactory.setRuleFileLocation(path);
    }
 
    private void setupApplication()
@@ -250,7 +250,7 @@ public class ApplicationView extends JPanel implements ModelView
       return dataSourceView;
    }
 
-   public TransformationRuleBrowserView getMappingBrowserView()
+   public TransformationRuleBrowserView getTransformationRuleBrowserView()
    {
       return transformationRuleBrowserView;
    }
@@ -269,11 +269,11 @@ public class ApplicationView extends JPanel implements ModelView
       {
          clearLog();
          
-         String mappingFilePath = applicationFactory.getMappingLocation();
-         if (mappingFilePath == null) {
+         String ruleFilePath = applicationFactory.getRuleFileLocation();
+         if (ruleFilePath == null) {
             logFileLocation = getDefaultLogFileLocation();
          } else {
-            logFileLocation = getLogFileLocation(new File(mappingFilePath));
+            logFileLocation = getLogFileLocation(new File(ruleFilePath));
          }
          String timestamp = dateFormat.format(new Date());
          String fileName = String.format("%s%s.log", logFileLocation, timestamp);
@@ -301,11 +301,11 @@ public class ApplicationView extends JPanel implements ModelView
          return new FileReader(logFile);
       }
 
-      private String getLogFileLocation(File mappingFile)
+      private String getLogFileLocation(File ruleFile)
       {
-         String mappingPath = mappingFile.getParent();
-         String mappingFileName = mappingFile.getName().substring(0, mappingFile.getName().lastIndexOf("."));
-         return mappingPath + System.getProperty("file.separator") + mappingFileName + "_mmexec";
+         String ruleFilePath = ruleFile.getParent();
+         String ruleFileName = ruleFile.getName().substring(0, ruleFile.getName().lastIndexOf("."));
+         return ruleFilePath + System.getProperty("file.separator") + ruleFileName + "_mmexec";
       }
 
       private String getDefaultLogFileLocation()

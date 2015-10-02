@@ -209,7 +209,7 @@ public class GenerateAxiomsAction implements ActionListener
    
    private List<TransformationRule> getUserRules() throws CellfieException
    {
-      List<TransformationRule> rules = container.getMappingBrowserView().getTransformationRules();
+      List<TransformationRule> rules = container.getTransformationRuleBrowserView().getTransformationRules();
       if (rules.isEmpty()) {
          throw new CellfieException("No transformation rules were created");
       }
