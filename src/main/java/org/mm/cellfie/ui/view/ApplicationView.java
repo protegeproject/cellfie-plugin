@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -256,12 +257,14 @@ public class ApplicationView extends JPanel implements ModelView
       private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
 
       private String logFileLocation;
-      private StringBuffer logMessage;
+      private StringBuffer logMessage = new StringBuffer();
       private File logFile;
+
+      private final Logger LOG = Logger.getLogger(RenderLogging.class.getName()); 
 
       public void init()
       {
-         logMessage = new StringBuffer();
+         clearLog();
          
          String mappingFilePath = applicationFactory.getMappingLocation();
          if (mappingFilePath == null) {
@@ -272,6 +275,8 @@ public class ApplicationView extends JPanel implements ModelView
          String timestamp = dateFormat.format(new Date());
          String fileName = String.format("%s%s.log", logFileLocation, timestamp);
          logFile = new File(fileName);
+         
+         LOG.info("Cellfie log file: " + fileName);
       }
 
       public RenderLogging append(String message)
@@ -283,8 +288,9 @@ public class ApplicationView extends JPanel implements ModelView
       public void save() throws FileNotFoundException
       {
          PrintWriter printer = new PrintWriter(logFile);
-         printer.print(logMessage.toString());
+         printer.print(flushLog());
          printer.close();
+         clearLog();
       }
 
       public InputStreamReader load() throws FileNotFoundException
@@ -302,7 +308,17 @@ public class ApplicationView extends JPanel implements ModelView
       private String getDefaultLogFileLocation()
       {
          String tmpPath = System.getProperty("java.io.tmpdir");
-         return tmpPath + System.getProperty("file.separator") + "mmexec";
+         return tmpPath + "mmexec";
+      }
+
+      private void clearLog()
+      {
+         logMessage.setLength(0);
+      }
+
+      private String flushLog()
+      {
+         return logMessage.toString();
       }
    }
 }
