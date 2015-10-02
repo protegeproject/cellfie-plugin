@@ -4,7 +4,7 @@
 
    <groupId>org.mm</groupId>
    <artifactId>cellfie-plugin</artifactId>
-   <version>1.0.0</version>
+   <version>1.0.0-alpha-5</version>
    <name>Cellfie Protege 5.0+ Plugin</name>
    <description>MappingMaster plugin for Desktop Protege 5.0+</description>
    <packaging>bundle</packaging>
