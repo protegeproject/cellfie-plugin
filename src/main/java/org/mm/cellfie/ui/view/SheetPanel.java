@@ -8,6 +8,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.ss.SpreadSheetUtil;
 
@@ -62,9 +63,12 @@ public class SheetPanel extends JPanel
       {
          int maxCount = 0;
          for (int i = 0; i < getRowCount(); i++) {
-            int currentCount = sheet.getRow(i).getLastCellNum();
-            if (currentCount > maxCount) {
-               maxCount = currentCount;
+            Row row = sheet.getRow(i);
+            if (row != null) {
+               int currentCount = row.getLastCellNum();
+               if (currentCount > maxCount) {
+                  maxCount = currentCount;
+               }
             }
          }
          return maxCount;
