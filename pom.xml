@@ -12,7 +12,7 @@
    <properties>
       <java.version>1.8</java.version>
       <protege.version>5.0.0-beta-17</protege.version>
-      <mappingmaster.version>1.1.0</mappingmaster.version>
+      <mappingmaster.version>1.1.1</mappingmaster.version>
       <log4j.version>1.2.17</log4j.version>
       <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
       <maven.bundle.plugin.version>2.5.3</maven.bundle.plugin.version>
