@@ -26,9 +26,9 @@ public class PreviewAxiomsPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
-   private ApplicationView container;
+   private WorkspacePanel container;
 
-   public PreviewAxiomsPanel(ApplicationView container, OWLEditorKit editorKit, Set<OWLAxiom> axioms)
+   public PreviewAxiomsPanel(WorkspacePanel container, OWLEditorKit editorKit, Set<OWLAxiom> axioms)
    {
       this.container = container;
 

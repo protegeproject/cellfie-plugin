@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.cellfie.ui.exception.CellfieException;
-import org.mm.cellfie.ui.view.ApplicationView.RenderLogging;
+import org.mm.cellfie.ui.view.WorkspacePanel.RenderLogging;
 import org.mm.core.TransformationRule;
 import org.mm.parser.ParseException;
 import org.mm.renderer.RendererException;
@@ -39,7 +39,7 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
 
 public class GenerateAxiomsAction implements ActionListener
 {
-   private ApplicationView container;
+   private WorkspacePanel container;
 
    private OWLEditorKit editorKit;
    private OWLModelManager modelManager;
@@ -48,7 +48,7 @@ public class GenerateAxiomsAction implements ActionListener
    private static final int ADD_TO_NEW_ONTOLOGY = 1;
    private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
-   public GenerateAxiomsAction(ApplicationView container)
+   public GenerateAxiomsAction(WorkspacePanel container)
    {
       this.container = container;
       editorKit = container.getEditorKit();

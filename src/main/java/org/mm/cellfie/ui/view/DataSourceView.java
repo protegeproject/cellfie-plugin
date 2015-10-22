@@ -14,7 +14,7 @@ public class DataSourceView extends JPanel implements ModelView
 {
    private static final long serialVersionUID = 1L;
 
-   public DataSourceView(ApplicationView container)
+   public DataSourceView(WorkspacePanel container)
    {
       String title = String.format("Workbook (%s)", container.getWorkbookFileLocation());
 

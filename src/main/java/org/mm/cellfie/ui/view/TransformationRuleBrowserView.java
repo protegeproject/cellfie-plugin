@@ -43,7 +43,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
 {
    private static final long serialVersionUID = 1L;
 
-   private ApplicationView container;
+   private WorkspacePanel container;
 
    private JPanel pnlContainer;
 
@@ -58,7 +58,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
 
    private TransformationRulesTableModel tableModel;
 
-   public TransformationRuleBrowserView(ApplicationView container)
+   public TransformationRuleBrowserView(WorkspacePanel container)
    {
       this.container = container;
 

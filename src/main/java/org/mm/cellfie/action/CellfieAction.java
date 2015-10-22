@@ -9,7 +9,7 @@ import java.util.Set;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import org.mm.cellfie.ui.view.ApplicationView;
+import org.mm.cellfie.ui.view.WorkspacePanel;
 import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
@@ -49,7 +49,7 @@ public class CellfieAction extends ProtegeOWLAction
    {
       OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
 
-      ApplicationView appView = new ApplicationView(currentOntology, workbookFilePath, getOWLEditorKit(), dialogManager);
+      WorkspacePanel appView = new WorkspacePanel(currentOntology, workbookFilePath, getOWLEditorKit(), dialogManager);
 
       cellfieDialog = new JDialog();
       cellfieDialog.setTitle("Cellfie");

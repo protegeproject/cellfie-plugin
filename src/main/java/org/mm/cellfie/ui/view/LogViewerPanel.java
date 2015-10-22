@@ -24,7 +24,7 @@ class LogViewerPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
-   public LogViewerPanel(ApplicationView container)
+   public LogViewerPanel(WorkspacePanel container)
    {
       setPreferredSize(new Dimension(1020, 420));
       setLayout(new BorderLayout());

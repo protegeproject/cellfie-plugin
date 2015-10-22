@@ -39,7 +39,6 @@ import org.mm.renderer.Renderer;
 import org.mm.rendering.Rendering;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ui.DialogManager;
-import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
@@ -49,7 +48,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
  * This is the main Mapping Master user interface. It contains a view of a
  * spreadsheet and a control area to edit and execute Mapping Master rules.
  */
-public class ApplicationView extends JPanel implements ModelView
+public class WorkspacePanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
@@ -65,7 +64,7 @@ public class ApplicationView extends JPanel implements ModelView
    private MMApplication application;
    private MMApplicationFactory applicationFactory = new MMApplicationFactory();
 
-   public ApplicationView(OWLOntology ontology, String workbookFilePath, OWLEditorKit editorKit, DialogManager applicationDialogManager)
+   public WorkspacePanel(OWLOntology ontology, String workbookFilePath, OWLEditorKit editorKit, DialogManager applicationDialogManager)
    {
       this.ontology = ontology;
       this.editorKit = editorKit;
@@ -196,12 +195,6 @@ public class ApplicationView extends JPanel implements ModelView
       MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(ruleString.getBytes()), settings, -1);
       SimpleNode simpleNode = parser.expression();
       return new ExpressionNode((ASTExpression) simpleNode);
-   }
-
-   @Override
-   public void update()
-   {
-      // NO-OP
    }
 
    public OWLOntology getActiveOntology()
