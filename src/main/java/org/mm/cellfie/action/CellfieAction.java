@@ -32,7 +32,7 @@ public class CellfieAction extends ProtegeOWLAction
    @Override
    public void actionPerformed(ActionEvent e)
    {
-      File file = dialogManager.showOpenFileChooser(null, "Open Excel Workbook", "xlsx", "Excel Workbook (.xlsx)");
+      File file = dialogManager.showOpenFileChooser(null, "Open Excel Workbook", "xlsx, xls", "Excel Workbook (.xlsx, .xls)");
       if (file != null) {
          String filename = file.getAbsolutePath();
          try {
@@ -96,7 +96,9 @@ public class CellfieAction extends ProtegeOWLAction
       public File showOpenFileChooser(Component parent, String message, String fileExtension, String fileDescription)
       {
          Set<String> extensions = new HashSet<>();
-         extensions.add(fileExtension);
+         for (String ext : fileExtension.split(",")) {
+            extensions.add(ext.trim());
+         }
          return UIUtil.openFile(new JDialog(), "Open", fileDescription, extensions);
       }
 
