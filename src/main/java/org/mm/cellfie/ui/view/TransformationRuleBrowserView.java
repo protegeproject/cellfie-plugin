@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -22,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -76,6 +79,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       tblTransformationRules.setGridColor(new Color(220, 220, 220));
       tblTransformationRules.setDefaultRenderer(String.class, new MultiLineCellRenderer());
       tblTransformationRules.addMouseListener(new MappingExpressionSelectionListener());
+      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_RULE");
+      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "DELETE_RULE");
+      tblTransformationRules.getActionMap().put("DELETE_RULE", new DeleteRuleAction());
 
       JScrollPane scrMappingExpression = new JScrollPane(tblTransformationRules);
 
@@ -440,40 +446,55 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
+   class DeleteRuleAction extends AbstractAction
+   {
+      private static final long serialVersionUID = 1L;
+      
+      @Override
+      public void actionPerformed(ActionEvent e)
+      {
+         removeTransformationRule();
+      }
+   }
+
    class DeleteButtonActionListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
-         int selectedRow = tblTransformationRules.getSelectedRow();
-         try {
-            validateSelection(selectedRow);
-            int answer = getApplicationDialogManager().showConfirmDialog(
-                  container, "Delete", "Do you really want to delete the selected transformation rule?");
-            switch (answer) {
-               case JOptionPane.YES_OPTION:
-                  tableModel.removeRow(selectedRow);
-                  tblTransformationRules.setRowSelectionInterval(selectedRow, selectedRow);
-                  break;
-            }
-         } catch (CellfieException ex) {
-            getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
-         } catch (IllegalArgumentException ex) {
-            resolveNextRowSelection(selectedRow);
-         }
+         removeTransformationRule();
       }
+   }
 
-      private void resolveNextRowSelection(int selectedRow)
-      {
-         try {
-            // Select the previous row if there is no next row
-            int previousRow = selectedRow - 1;
-            tblTransformationRules.setRowSelectionInterval(previousRow, previousRow);
-         } catch (IllegalArgumentException ex2) {
-            // Clear the selection if the table has become empty
-            tblTransformationRules.clearSelection();
-            cmdEdit.setEnabled(false);
-            cmdDelete.setEnabled(false);
+   private void removeTransformationRule()
+   {
+      int selectedRow = tblTransformationRules.getSelectedRow();
+      try {
+         validateSelection(selectedRow);
+         int answer = getApplicationDialogManager().showConfirmDialog(container, "Confirm Delete",
+               "Do you really want to delete the selected transformation rule?");
+         switch (answer) {
+            case JOptionPane.YES_OPTION :
+               tableModel.removeRow(selectedRow);
+               tblTransformationRules.setRowSelectionInterval(selectedRow, selectedRow);
          }
+      } catch (CellfieException ex) {
+         getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+      } catch (IllegalArgumentException ex) {
+         resolveNextRowSelection(selectedRow);
+      }
+   }
+
+   private void resolveNextRowSelection(int selectedRow)
+   {
+      try {
+         // Select the previous row if there is no next row
+         int previousRow = selectedRow - 1;
+         tblTransformationRules.setRowSelectionInterval(previousRow, previousRow);
+      } catch (IllegalArgumentException ex2) {
+         // Clear the selection if the table has become empty
+         tblTransformationRules.clearSelection();
+         cmdEdit.setEnabled(false);
+         cmdDelete.setEnabled(false);
       }
    }
 
