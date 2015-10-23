@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 import org.mm.cellfie.ui.view.WorkspacePanel;
 import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.UIUtil;
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.OWLWorkspace;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -19,14 +21,14 @@ public class CellfieAction extends ProtegeOWLAction
 {
    private static final long serialVersionUID = 1L;
 
-   private JDialog cellfieDialog;
-
-   private DialogManager dialogManager = new ProtegeDialogManager();
+   private DialogManager dialogManager;
+   private OWLEditorKit editorKit;
 
    @Override
    public void initialise() throws Exception
    {
-      // NO-OP
+      dialogManager = new ProtegeDialogManager();
+      editorKit = getOWLEditorKit();
    }
 
    @Override
@@ -36,27 +38,20 @@ public class CellfieAction extends ProtegeOWLAction
       if (file != null) {
          String filename = file.getAbsolutePath();
          try {
-            initCellfie(filename);
+            showCellfieDialog(filename);
          } catch (Exception ex) {
             dialogManager.showErrorMessageDialog(null, "Error opening file " + filename);
             ex.printStackTrace();
-            
          }
       }
    }
 
-   private void initCellfie(String workbookFilePath)
+   private void showCellfieDialog(String workbookPath)
    {
-      OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
-
-      WorkspacePanel appView = new WorkspacePanel(currentOntology, workbookFilePath, getOWLEditorKit(), dialogManager);
-
-      cellfieDialog = new JDialog();
-      cellfieDialog.setTitle("Cellfie");
-      cellfieDialog.setContentPane(appView);
-      cellfieDialog.setSize(1100, 1000);
-      cellfieDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-      cellfieDialog.setLocationRelativeTo(null);
+      final OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
+      final OWLWorkspace editorWindow = editorKit.getOWLWorkspace();
+      JDialog cellfieDialog = WorkspacePanel.createDialog(editorWindow, currentOntology, workbookPath, editorKit, dialogManager);
+      cellfieDialog.setLocationRelativeTo(editorWindow);
       cellfieDialog.setVisible(true);
    }
 

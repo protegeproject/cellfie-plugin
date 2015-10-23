@@ -2,7 +2,10 @@ package org.mm.cellfie.ui.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,9 +20,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.mm.app.MMApplication;
@@ -55,7 +64,7 @@ public class WorkspacePanel extends JPanel
    private OWLOntology ontology;
    private OWLEditorKit editorKit;
 
-   private DialogManager applicationDialogManager;
+   private DialogManager dialogHelper;
    private DataSourceView dataSourceView;
    private TransformationRuleBrowserView transformationRuleBrowserView;
 
@@ -64,11 +73,11 @@ public class WorkspacePanel extends JPanel
    private MMApplication application;
    private MMApplicationFactory applicationFactory = new MMApplicationFactory();
 
-   public WorkspacePanel(OWLOntology ontology, String workbookFilePath, OWLEditorKit editorKit, DialogManager applicationDialogManager)
+   public WorkspacePanel(OWLOntology ontology, String workbookFilePath, OWLEditorKit editorKit, DialogManager dialogHelper)
    {
       this.ontology = ontology;
       this.editorKit = editorKit;
-      this.applicationDialogManager = applicationDialogManager;
+      this.dialogHelper = dialogHelper;
 
       setLayout(new BorderLayout());
 
@@ -145,7 +154,7 @@ public class WorkspacePanel extends JPanel
       try {
          application = applicationFactory.createApplication(getActiveOntology());
       } catch (Exception e) {
-         applicationDialogManager.showErrorMessageDialog(this, "Initialization error: " + e.getMessage());
+         dialogHelper.showErrorMessageDialog(this, "Initialization error: " + e.getMessage());
       }
    }
 
@@ -235,7 +244,7 @@ public class WorkspacePanel extends JPanel
 
    public DialogManager getApplicationDialogManager()
    {
-      return applicationDialogManager;
+      return dialogHelper;
    }
 
    public DataSourceView getDataSourceView()
@@ -246,6 +255,29 @@ public class WorkspacePanel extends JPanel
    public TransformationRuleBrowserView getTransformationRuleBrowserView()
    {
       return transformationRuleBrowserView;
+   }
+
+   public static JDialog createDialog(JComponent parent, OWLOntology ontology, String workbookPath, OWLEditorKit editorKit, DialogManager dialogHelper)
+   {
+      JFrame parentFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, parent);
+      final JDialog dialog = new JDialog(parentFrame, "Cellfie", Dialog.ModalityType.MODELESS);
+      
+      final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit, dialogHelper);
+      workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
+      workspacePanel.getActionMap().put("CLOSE_DIALOG", new AbstractAction()
+      {
+         private static final long serialVersionUID = 1L;
+         
+         @Override
+         public void actionPerformed(ActionEvent e)
+         {
+            dialog.setVisible(false);
+         }
+      });
+      dialog.setContentPane(workspacePanel);
+      dialog.setSize(1200, 900);
+      dialog.setResizable(true);
+      return dialog;
    }
 
    class RenderLogging
