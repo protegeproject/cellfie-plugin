@@ -23,13 +23,11 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import org.mm.app.MMApplication;
@@ -265,10 +263,9 @@ public class WorkspacePanel extends JPanel
       return transformationRuleBrowserView;
    }
 
-   public static JDialog createDialog(JComponent parent, OWLOntology ontology, String workbookPath, OWLEditorKit editorKit, DialogManager dialogHelper)
+   public static JDialog createDialog(OWLOntology ontology, String workbookPath, OWLEditorKit editorKit, DialogManager dialogHelper)
    {
-      JFrame parentFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, parent);
-      final JDialog dialog = new JDialog(parentFrame, "Cellfie", Dialog.ModalityType.MODELESS);
+      final JDialog dialog = new JDialog(null, "Cellfie", Dialog.ModalityType.MODELESS);
       
       final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit, dialogHelper);
       workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");

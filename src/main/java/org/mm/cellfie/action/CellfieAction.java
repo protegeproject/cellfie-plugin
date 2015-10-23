@@ -50,7 +50,7 @@ public class CellfieAction extends ProtegeOWLAction
    {
       final OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
       final OWLWorkspace editorWindow = editorKit.getOWLWorkspace();
-      JDialog cellfieDialog = WorkspacePanel.createDialog(editorWindow, currentOntology, workbookPath, editorKit, dialogManager);
+      JDialog cellfieDialog = WorkspacePanel.createDialog(currentOntology, workbookPath, editorKit, dialogManager);
       cellfieDialog.setLocationRelativeTo(editorWindow);
       cellfieDialog.setVisible(true);
    }
