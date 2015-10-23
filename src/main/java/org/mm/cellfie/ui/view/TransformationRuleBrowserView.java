@@ -482,6 +482,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
+         safeGuardChanges();
          try {
             File file = getApplicationDialogManager().showOpenFileChooser(
                   container, "Open", "json", "Transformation Rule File (.json)");
@@ -528,18 +529,20 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
 
    public boolean doSave(String filePath)
    {
+      boolean isSuccessful = true;
       try {
          TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath, tableModel.getTransformationRulesAndSave());
          container.updateTransformationRuleModel();
       } catch (IOException e) {
+         isSuccessful = false;
          getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + e.getMessage());
-         return false;
       }
-      return true;
+      return isSuccessful;
    }
 
    public boolean doSelectFileAndSave()
    {
+      boolean isSuccessful = true;
       File file = getApplicationDialogManager().showSaveFileChooser(container, "Save As", "json", "Transformation Rule File (.json)", true);
       if (file != null) {
          String filePath = file.getAbsolutePath();
@@ -548,27 +551,33 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
             filePath = filePath + ext;
          }
          container.setRuleFileLocation(filePath);
-         return doSave(filePath);
+         isSuccessful = doSave(filePath);
+      } else {
+         isSuccessful = false;
       }
-      return false;
+      return isSuccessful;
    }
 
-   public boolean close()
+   public boolean safeGuardChanges()
    {
-      if (tableModel.hasUnsavedChanges) {
+      boolean isSuccessful = true;
+      if (tableModel.hasUnsavedChanges()) {
          int answer = getApplicationDialogManager().showConfirmDialog(
                container, "Closing Cellfie", "There are unsaved changes in your transformation rules. Do you want to save them?");
          switch (answer) {
-         case JOptionPane.YES_OPTION:
-            String filePath = container.getRuleFileLocation();
-            if (filePath == null) {
-               return doSelectFileAndSave();
-            } else {
-               return doSave(filePath);
-            }
+            case JOptionPane.YES_OPTION:
+               String filePath = container.getRuleFileLocation();
+               if (filePath == null) {
+                  isSuccessful = doSelectFileAndSave();
+               } else {
+                  isSuccessful = doSave(filePath);
+               }
+               if (isSuccessful) {
+                  getApplicationDialogManager().showMessageDialog(container, "Transformation rules saved successfully");
+               }
          }
       }
-      return true;
+      return isSuccessful;
    }
 
    /**

@@ -305,7 +305,7 @@ public class WorkspacePanel extends JPanel
 
    protected boolean close()
    {
-      return transformationRuleBrowserView.close();
+      return transformationRuleBrowserView.safeGuardChanges();
    }
 
    class RenderLogging
