@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
@@ -139,6 +140,12 @@ public class WorkspacePanel extends JPanel
       transformationRuleBrowserView.update();
    }
 
+   /**
+    * Gets the directory location of the transformation rule file. This method returns <code>null</code>
+    * if the location hasn't been defined by the users.
+    *
+    * @return the file path location.
+    */
    public String getRuleFileLocation()
    {
       return applicationFactory.getRuleFileLocation();
@@ -221,8 +228,9 @@ public class WorkspacePanel extends JPanel
       return getApplicationModel().getTransformationRuleModel().getRules();
    }
 
-   public void updateTransformationRuleModel(List<TransformationRule> rules)
+   /* package */ void updateTransformationRuleModel()
    {
+      final List<TransformationRule> rules = getTransformationRuleBrowserView().getTransformationRules();
       TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
       getApplicationModel().getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
    }
@@ -271,13 +279,24 @@ public class WorkspacePanel extends JPanel
          @Override
          public void actionPerformed(ActionEvent e)
          {
-            dialog.setVisible(false);
+            int answer = dialogHelper.showConfirmDialog(null, "Confirm Exit", "Exit Cellfie?");
+            switch (answer) {
+               case JOptionPane.YES_OPTION:
+                  if (workspacePanel.close()) {
+                     dialog.setVisible(false);
+                  }
+            }
          }
       });
       dialog.setContentPane(workspacePanel);
       dialog.setSize(1200, 900);
       dialog.setResizable(true);
       return dialog;
+   }
+
+   protected boolean close()
+   {
+      return transformationRuleBrowserView.close();
    }
 
    class RenderLogging

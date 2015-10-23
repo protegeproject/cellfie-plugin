@@ -26,6 +26,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -154,6 +156,11 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       ((DefaultTableCellRenderer) tblTransformationRules.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
    }
 
+   private void enableSaveButton()
+   {
+      cmdSave.setEnabled(true);
+   }
+
    private void updateBorderUI()
    {
       pnlContainer.setBorder(ComponentFactory.createTitledBorder(getTitle()));
@@ -221,12 +228,14 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       return container.getApplicationDialogManager();
    }
 
-   class TransformationRulesTableModel extends DefaultTableModel
+   class TransformationRulesTableModel extends DefaultTableModel implements TableModelListener
    {
       private static final long serialVersionUID = 1L;
 
       private final String[] COLUMN_NAMES = { "Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
             "Rule", "Comment" };
+
+      private boolean hasUnsavedChanges = false;
 
       public TransformationRulesTableModel(final List<TransformationRule> rules)
       {
@@ -242,6 +251,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
             row.add(rule.getComment());
             addRow(row);
          }
+         addTableModelListener(this);
       }
 
       @Override
@@ -284,6 +294,23 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
             rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
          }
          return rules;
+      }
+
+      protected List<TransformationRule> getTransformationRulesAndSave()
+      {
+         hasUnsavedChanges = false;
+         return getTransformationRules();
+      }
+
+      public boolean hasUnsavedChanges()
+      {
+         return hasUnsavedChanges;
+      }
+
+      @Override
+      public void tableChanged(TableModelEvent e)
+      {
+         hasUnsavedChanges = true;
       }
    }
 
@@ -483,13 +510,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         try {
-            TransformationRuleSetFactory.saveTransformationRulesToDocument(container.getRuleFileLocation(),
-                  tableModel.getTransformationRules());
-            container.updateTransformationRuleModel(tableModel.getTransformationRules());
-         } catch (IOException ex) {
-            getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
-         }
+         doSave(container.getRuleFileLocation());
       }
    }
 
@@ -498,25 +519,56 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         try {
-            File file = getApplicationDialogManager().showSaveFileChooser(
-                  container, "Save As", "json", "Transformation Rule File (.json)", true);
-            if (file != null) {
-               String filePath = file.getAbsolutePath();
-               String ext = ".json";
-               if (!filePath.endsWith(ext)) {
-                  filePath = filePath + ext;
-               }
-               TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath, tableModel.getTransformationRules());
-               container.setRuleFileLocation(filePath);
-               container.updateTransformationRuleModel(tableModel.getTransformationRules());
-               cmdSave.setEnabled(true);
-               updateBorderUI();
-            }
-         } catch (Exception ex) {
-            getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + ex.getMessage());
+         if (doSelectFileAndSave()) {
+            enableSaveButton();
+            updateBorderUI();
          }
       }
+   }
+
+   public boolean doSave(String filePath)
+   {
+      try {
+         TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath, tableModel.getTransformationRulesAndSave());
+         container.updateTransformationRuleModel();
+      } catch (IOException e) {
+         getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + e.getMessage());
+         return false;
+      }
+      return true;
+   }
+
+   public boolean doSelectFileAndSave()
+   {
+      File file = getApplicationDialogManager().showSaveFileChooser(container, "Save As", "json", "Transformation Rule File (.json)", true);
+      if (file != null) {
+         String filePath = file.getAbsolutePath();
+         String ext = ".json";
+         if (!filePath.endsWith(ext)) {
+            filePath = filePath + ext;
+         }
+         container.setRuleFileLocation(filePath);
+         return doSave(filePath);
+      }
+      return false;
+   }
+
+   public boolean close()
+   {
+      if (tableModel.hasUnsavedChanges) {
+         int answer = getApplicationDialogManager().showConfirmDialog(
+               container, "Closing Cellfie", "There are unsaved changes in your transformation rules. Do you want to save them?");
+         switch (answer) {
+         case JOptionPane.YES_OPTION:
+            String filePath = container.getRuleFileLocation();
+            if (filePath == null) {
+               return doSelectFileAndSave();
+            } else {
+               return doSave(filePath);
+            }
+         }
+      }
+      return true;
    }
 
    /**
