@@ -6,6 +6,8 @@ import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -269,7 +271,7 @@ public class WorkspacePanel extends JPanel
       
       final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit, dialogHelper);
       workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
-      workspacePanel.getActionMap().put("CLOSE_DIALOG", new AbstractAction()
+      workspacePanel.getActionMap().put("CLOSE_DIALOG", new AbstractAction() // Closing Cellfie using ESC key
       {
          private static final long serialVersionUID = 1L;
          
@@ -282,6 +284,16 @@ public class WorkspacePanel extends JPanel
                   if (workspacePanel.close()) {
                      dialog.setVisible(false);
                   }
+            }
+         }
+      });
+      dialog.addWindowListener(new WindowAdapter() // Closing Cellfie using close [x] button
+      {
+         @Override
+         public void windowClosing(WindowEvent e)
+         {
+            if (workspacePanel.close()) {
+               dialog.setVisible(false);
             }
          }
       });
