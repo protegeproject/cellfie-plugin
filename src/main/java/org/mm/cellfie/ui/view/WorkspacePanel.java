@@ -18,7 +18,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -53,6 +52,8 @@ import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
+
+import com.google.common.base.Optional;
 
 /**
  * This is the main Mapping Master user interface. It contains a view of a
@@ -119,8 +120,12 @@ public class WorkspacePanel extends JPanel
 
    private String getTitle(OWLOntology ontology)
    {
-      IRI ontologyID = ontology.getOntologyID().getOntologyIRI();
-      return String.format("%s (%s)", ontologyID.getFragment(), ontologyID);
+      Optional<IRI> ontologyID = ontology.getOntologyID().getOntologyIRI();
+      if (ontologyID.isPresent()) {
+         IRI id = ontologyID.get();
+         return String.format("%s (%s)", id.getRemainder().get(), id);
+      }
+      return "N/A";
    }
 
    private void loadWorkbookDocument(String path)
@@ -187,7 +192,7 @@ public class WorkspacePanel extends JPanel
 
       String ruleString = rule.getRuleString();
       MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
-      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
+      java.util.Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          results.add(renderingResult.get());
       }
@@ -200,7 +205,7 @@ public class WorkspacePanel extends JPanel
 
       String ruleString = rule.getRuleString();
       MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
-      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
+      java.util.Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          logging.append(renderingResult.get().getRendering());
       }
