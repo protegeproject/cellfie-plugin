@@ -11,8 +11,8 @@
 
    <properties>
       <java.version>1.8</java.version>
-      <protege.version>5.0.0-beta-17</protege.version>
-      <mappingmaster.version>1.1.1</mappingmaster.version>
+      <protege.version>5.0.0-beta-18-SNAPSHOT</protege.version>
+      <mappingmaster.version>1.2</mappingmaster.version>
       <log4j.version>1.2.17</log4j.version>
       <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
       <maven.bundle.plugin.version>2.5.3</maven.bundle.plugin.version>
@@ -24,13 +24,11 @@
          <groupId>edu.stanford.protege</groupId>
          <artifactId>org.protege.editor.owl</artifactId>
          <version>${protege.version}</version>
-         <scope>provided</scope>
       </dependency>
       <dependency>
          <groupId>org.mm</groupId>
          <artifactId>mapping-master</artifactId>
          <version>${mappingmaster.version}</version>
-         <scope>provided</scope>
       </dependency>
    </dependencies>
 
@@ -56,7 +54,7 @@
                   <Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
                   <Bundle-ClassPath>.</Bundle-ClassPath>
                   <Bundle-Vendor>The Protege Development Team</Bundle-Vendor>
-                  <Embed-Transitive>true</Embed-Transitive>
+                  <!-- <Embed-Transitive>true</Embed-Transitive> -->
                   <Embed-Dependency>
                      commons-logging,
                      commons-codec,
@@ -71,28 +69,20 @@
                   <Import-Package>
                      org.apache.log4j.*;version="[1.2,2)",
                      org.protege.editor.owl.*;version="[5.0, 6.0)",
-                     org.semanticweb.owlapi.*;version="[3.0,4)",
-                     <!-- org.apache.commons.logging;resolution:=optional,
-                     org.apache.poi.*;resolution:=optional, -->
-                     <!-- com.microsoft.schemas.office.*;resolution:=optional, -->
+                     org.semanticweb.owlapi.*;version="[4.0, 4.9)",
                      junit.framework;resolution:=optional,
-                     <!-- org.apache.jcp.xml.*;resolution:=optional,
-                     org.apache.xml.*;resolution:=optional, -->
                      org.apache.*;resolution:=optional,
                      org.bouncycastle.*;resolution:=optional,
                      org.etsi.*;resolution:=optional,
                      org.junit.*;resolution:=optional,
                      org.openxmlformats.*;resolution:=optional,
-                     <!-- org.semanticweb.*;resolution:=optional, -->
-                     <!-- org.w3.*;resolution:=optional, -->
                      schemasMicrosoftCom*;resolution:=optional,
                      com.sun.*;resolution:=optional,
-                     <!-- com.google.*;resolution:=optional, -->
                      javax.*;resolution:=optional,
                      *
                   </Import-Package>
                   <Include-Resource>plugin.xml, {maven-resources}, {maven-dependencies}</Include-Resource>
-                  <Private-Package>org.mm.*</Private-Package>
+                  <!-- <Private-Package>org.mm.*</Private-Package> -->
                </instructions>
                <executions>
                   <execution>
