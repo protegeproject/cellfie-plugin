@@ -54,7 +54,7 @@
                   <Bundle-SymbolicName>${project.artifactId};singleton:=true</Bundle-SymbolicName>
                   <Bundle-ClassPath>.</Bundle-ClassPath>
                   <Bundle-Vendor>The Protege Development Team</Bundle-Vendor>
-                  <!-- <Embed-Transitive>true</Embed-Transitive> -->
+                  <Embed-Transitive>true</Embed-Transitive>
                   <Embed-Dependency>
                      commons-logging,
                      commons-codec,
