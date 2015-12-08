@@ -89,7 +89,6 @@
                   <Bundle-Vendor>The Protege Development Team</Bundle-Vendor>
                   <Embed-Transitive>true</Embed-Transitive>
                   <Embed-Dependency>
-                     commons-logging,
                      commons-codec,
                      poi,
                      poi-ooxml,
