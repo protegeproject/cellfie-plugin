@@ -7,10 +7,10 @@
       <artifactId>oss-parent</artifactId>
       <version>7</version>
    </parent>
-    
+
    <groupId>edu.stanford.protege</groupId>
-   <artifactId>org.mm.cellfie</artifactId>
-   <version>2.0.0-beta-5</version>
+   <artifactId>cellfie</artifactId>
+   <version>2.0.0-beta-5-SNAPSHOT</version>
    <packaging>bundle</packaging>
 
    <name>Cellfie Protege 5.0+ Plugin</name>
@@ -26,8 +26,8 @@
    <dependencies>
       <dependency>
          <groupId>edu.stanford.protege</groupId>
-         <artifactId>org.protege.editor.owl</artifactId>
-         <version>5.0.0-beta-18-SNAPSHOT</version>
+         <artifactId>protege-editor-owl</artifactId>
+         <version>5.0.0-beta-19</version>
       </dependency>
       <dependency>
          <groupId>org.mm</groupId>
@@ -46,35 +46,6 @@
                <source>1.8</source>
                <target>1.8</target>
             </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-               <execution>
-                  <id>attach-sources</id>
-                  <goals>
-                     <goal>jar</goal>
-                  </goals>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <executions>
-               <execution>
-                  <configuration>
-                     <failOnError>false</failOnError>
-                  </configuration>
-                  <id>attach-javadocs</id>
-                  <goals>
-                     <goal>jar</goal>
-                  </goals>
-               </execution>
-            </executions>
          </plugin>
          <plugin>
             <groupId>org.apache.felix</groupId>
@@ -113,7 +84,8 @@
                      javax.*;resolution:=optional,
                      *
                   </Import-Package>
-                  <Include-Resource>plugin.xml, {maven-resources}, {maven-dependencies}</Include-Resource>
+                  <Include-Resource>plugin.xml, {maven-resources},
+                     {maven-dependencies}</Include-Resource>
                   <!-- <Private-Package>org.mm.*</Private-Package> -->
                </instructions>
                <executions>
@@ -134,6 +106,77 @@
                <pde>true</pde>
             </configuration>
          </plugin>
+         <plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5</version>
+            <dependencies>
+               <dependency>
+                  <groupId>org.apache.maven.scm</groupId>
+                  <artifactId>maven-scm-provider-gitexe</artifactId>
+                  <version>1.9</version>
+               </dependency>
+            </dependencies>
+         </plugin>
       </plugins>
    </build>
+
+   <!-- Generate source and Javadoc JAR files, and sign artifacts. Required by Sonatype OSSRH for deployment. -->
+   <profiles>
+      <profile>
+         <id>release</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-source-plugin</artifactId>
+                  <version>2.2.1</version>
+                  <executions>
+                     <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                           <goal>jar</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-javadoc-plugin</artifactId>
+                  <version>2.9.1</version>
+                  <executions>
+                     <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                           <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                           <failOnError>false</failOnError>
+                           <quiet>true</quiet>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-gpg-plugin</artifactId>
+                  <version>1.5</version>
+                  <executions>
+                     <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                           <goal>sign</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
 </project>
