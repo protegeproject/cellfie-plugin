@@ -42,3 +42,10 @@ Once you are satisfied with all your transformation rules, continue by selecting
 <img src="https://raw.githubusercontent.com/protegeproject/github-wiki-resources/master/cellfie/README/cellfie-generated-axioms.png" width="500">
 
 You have two import options for these new axioms, which are, import them to a new ontology or import them to the current open ontology.
+
+### Questions
+
+If you have questions about this plugin, please go to the main
+Protégé website and subscribe to the [Protégé Developer Support
+mailing list](http://protege.stanford.edu/support.php#mailingListSupport).
+After subscribing, send messages to protege-dev at lists.stanford.edu.
