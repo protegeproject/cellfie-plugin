@@ -1,8 +1,24 @@
 # Maven
-target/
 
 # Eclipse
 .classpath
 .project
 .settings/
 META-INF/
+
+# Ignore temporary Emacs files
+*~
+
+.pydevproject
+.metadata
+.idea
+
+*.iml
+
+# Exclude build directory
+target/*
+.
+/target
+
+*.pyc
+.DS_Store

@@ -43,6 +43,33 @@ Once you are satisfied with all your transformation rules, continue by selecting
 
 You have two import options for these new axioms, which are, import them to a new ontology or import them to the current open ontology.
 
+### Building and Installing
+
+To build and install this plugin you must have the following items installed:
+
++ [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
++ A tool for checking out a [Git](http://git-scm.com/) repository
++ Apache's [Maven](http://maven.apache.org/index.html)
++ A Protégé (5.0.0 Beta 21 or higher) distribution. Download [here](http://protege.stanford.edu/products.php#desktop-protege).
+
+Get a copy of the latest code:
+
+    git clone https://github.com/protegeproject/cellfie-plugin.git
+    
+Change into the cellfie-plugin directory:
+
+    cd cellfie-plugin
+
+Build with Maven:
+
+    mvn clean package  
+
+On build completion the ```target``` directory will contain a cellfie-${version}.jar file. 
+The JAR is generated in the OSGi bundle format required by Protégé's plugin-in mechanism.
+
+To install in your local Protégé, copy this JAR file to the ```plugins``` subdirectory of your Protégé installation (e.g.,
+/Applications/Protege-5.0.0/plugins/).  
+
 ### Questions
 
 If you have questions about this plugin, please go to the main
