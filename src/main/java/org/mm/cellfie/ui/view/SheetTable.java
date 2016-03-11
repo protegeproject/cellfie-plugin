@@ -2,11 +2,13 @@ package org.mm.cellfie.ui.view;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -26,9 +28,10 @@ public class SheetTable extends JTable
       header.setDefaultRenderer(new ColumnHeaderRenderer());
       setTableHeader(header);
 
+      setDefaultRenderer(String.class, new WorksheetCellRenderer());
+
       resizeColumnWidth();
       setCellSelectionEnabled(true);
-      setIntercellSpacing(new Dimension(4, 4));
       setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
       setGridColor(new Color(220, 220, 220));
    }
@@ -63,7 +66,10 @@ public class SheetTable extends JTable
       }
    }
 
-   public static class ColumnHeaderRenderer extends DefaultTableCellRenderer
+   /*
+    * Custom cell renderer for the table header
+    */
+   public class ColumnHeaderRenderer extends DefaultTableCellRenderer
    {
       private static final long serialVersionUID = 1L;
 
@@ -85,6 +91,43 @@ public class SheetTable extends JTable
             setBackground(UIManager.getColor("Table.background"));
          }
          setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+         return this;
+      }
+   }
+
+   /*
+    * Custom cell renderer for the table sheet
+    */
+   public class WorksheetCellRenderer extends DefaultTableCellRenderer
+   {
+      private static final long serialVersionUID = 1L;
+
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            final int row, int column)
+      {
+         JLabel cell = (JLabel) (this);
+         if (hasFocus) {
+            setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+            cell = null;
+         } else {
+            setBackground(table.getBackground());
+            setBorder(null);
+         }
+
+         if (isSelected) {
+            setBackground(table.getSelectionBackground());
+            setBorder(null);
+         } else {
+            setBackground(table.getBackground());
+            setBorder(null);
+         }
+
+         if (cell != null) {
+            cell.setBorder(new CompoundBorder(new EmptyBorder(new Insets(1, 4, 1, 4)), cell.getBorder()));
+         }
+
+         this.setOpaque(true);
+         setText((String) value);
          return this;
       }
    }
