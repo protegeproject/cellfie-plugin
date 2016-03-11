@@ -75,9 +75,9 @@ public class GenerateAxiomsAction implements ActionListener
                Sheet sheet = getActiveWorkbook().getWorkbook().getSheet(sheetName);
                int startColumn = SpreadSheetUtil.columnName2Number(rule.getStartColumn());
                int startRow = SpreadSheetUtil.row2Number(rule.getStartRow());
-               int endColumn = rule.hasEndColumnWildcard() ? sheet.getRow(startRow).getLastCellNum()
+               int endColumn = rule.hasEndColumnWildcard() ? sheet.getRow(startRow).getLastCellNum() + 1
                      : SpreadSheetUtil.columnName2Number(rule.getEndColumn());
-               int endRow = rule.hasEndRowWildcard() ? sheet.getLastRowNum()
+               int endRow = rule.hasEndRowWildcard() ? sheet.getLastRowNum() + 1
                      : SpreadSheetUtil.row2Number(rule.getEndRow());
 
                if (startColumn > endColumn) {
