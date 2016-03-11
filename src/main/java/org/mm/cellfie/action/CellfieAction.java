@@ -88,22 +88,22 @@ public class CellfieAction extends ProtegeOWLAction
       }
 
       @Override
-      public File showOpenFileChooser(Component parent, String message, String fileExtension, String fileDescription)
+      public File showOpenFileChooser(Component parent, String title, String fileExtension, String fileDescription)
       {
          Set<String> extensions = new HashSet<>();
          for (String ext : fileExtension.split(",")) {
             extensions.add(ext.trim());
          }
-         return UIUtil.openFile(new JDialog(), "Open", fileDescription, extensions);
+         return UIUtil.openFile(new JDialog(), title, fileDescription, extensions);
       }
 
       @Override
-      public File showSaveFileChooser(Component parent, String message, String fileExtension, String fileDescription,
+      public File showSaveFileChooser(Component parent, String title, String fileExtension, String fileDescription,
             boolean overwrite)
       {
          Set<String> extensions = new HashSet<>();
          extensions.add(fileExtension);
-         return UIUtil.saveFile(new JDialog(), "Save", fileDescription, extensions, null);
+         return UIUtil.saveFile(new JDialog(), title, fileDescription, extensions, null);
       }
    }
 }

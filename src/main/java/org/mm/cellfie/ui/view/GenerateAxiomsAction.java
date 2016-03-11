@@ -18,7 +18,7 @@ import org.mm.core.TransformationRule;
 import org.mm.parser.ParseException;
 import org.mm.renderer.RendererException;
 import org.mm.rendering.Rendering;
-import org.mm.rendering.owlapi.OWLAPIRendering;
+import org.mm.rendering.owlapi.OWLRendering;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
@@ -116,8 +116,8 @@ public class GenerateAxiomsAction implements ActionListener
    {
       Set<OWLAxiom> axiomSet = new HashSet<OWLAxiom>();
       for (Rendering rendering : results) {
-         if (rendering instanceof OWLAPIRendering) {
-            axiomSet.addAll(((OWLAPIRendering) rendering).getOWLAxioms());
+         if (rendering instanceof OWLRendering) {
+            axiomSet.addAll(((OWLRendering) rendering).getOWLAxioms());
          }
       }
       return axiomSet;

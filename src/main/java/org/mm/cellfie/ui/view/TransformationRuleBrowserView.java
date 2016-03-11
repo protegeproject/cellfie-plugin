@@ -506,7 +506,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          safeGuardChanges();
          try {
             File file = getApplicationDialogManager().showOpenFileChooser(
-                  container, "Open", "json", "Transformation Rule File (.json)");
+                  container, "Open Transformation Rule File", "json", "Transformation Rule File (.json)");
             if (file != null) {
                String filePath = file.getAbsolutePath();
                container.loadTransformationRuleDocument(filePath);
