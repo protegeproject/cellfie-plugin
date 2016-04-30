@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
 import org.mm.app.MMApplicationModel;
+import org.mm.core.OWLOntologySourceHook;
 import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSet;
 import org.mm.core.settings.ReferenceSettings;
@@ -164,7 +165,8 @@ public class WorkspacePanel extends JPanel
    private void setupApplication()
    {
       try {
-         application = applicationFactory.createApplication(getActiveOntology());
+         OWLOntologySourceHook ontologySourceHook = new OWLProtegeOntology(getEditorKit());
+         application = applicationFactory.createApplication(ontologySourceHook);
       } catch (Exception e) {
          dialogHelper.showErrorMessageDialog(this, "Initialization error: " + e.getMessage());
       }
