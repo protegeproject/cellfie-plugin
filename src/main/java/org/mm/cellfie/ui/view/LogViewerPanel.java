@@ -51,6 +51,7 @@ class LogViewerPanel extends JPanel
          };
          txtLogMessage.setEditorKit(createHighlightEditorKit());
          txtLogMessage.read(container.getRenderLogging().load(), null);
+         txtLogMessage.setEditable(false);
          add(new JScrollPane(txtLogMessage), BorderLayout.CENTER);
       } catch (Exception e) {
          throw new RuntimeException("Failed to open the log file", e);
