@@ -140,6 +140,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       cmdGenerateAxioms = new JButton("Generate Axioms");
       cmdGenerateAxioms.setPreferredSize(new Dimension(152, 22));
       cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(container));
+      cmdGenerateAxioms.setEnabled(false);
       pnlGenerateAxioms.add(cmdGenerateAxioms);
 
       update();
@@ -402,6 +403,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
          editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
          showMappingEditorDialog(editorPanel, -1);
+         fireTransformationRuleChange();
       }
    }
 
@@ -454,6 +456,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       public void actionPerformed(ActionEvent e)
       {
          removeTransformationRule();
+         fireTransformationRuleChange();
       }
    }
 
@@ -462,6 +465,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       public void actionPerformed(ActionEvent e)
       {
          removeTransformationRule();
+         fireTransformationRuleChange();
       }
    }
 
@@ -510,8 +514,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
             if (file != null) {
                String filePath = file.getAbsolutePath();
                container.loadTransformationRuleDocument(filePath);
-               cmdSave.setEnabled(true);
-               cmdSaveAs.setEnabled(true);
+               fireTransformationRuleChange();
             }
          } catch (Exception ex) {
             getApplicationDialogManager().showErrorMessageDialog(container, "Error opening file: " + ex.getMessage());
@@ -524,6 +527,17 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    {
       if (selectedRow == -1) {
          throw new CellfieException("No transformation rule was selected");
+      }
+   }
+
+   public void fireTransformationRuleChange()
+   {
+      if (tblTransformationRules.getRowCount() > 0) {
+         cmdSave.setEnabled(true);
+         cmdSaveAs.setEnabled(true);
+         cmdGenerateAxioms.setEnabled(true);
+      } else {
+         cmdGenerateAxioms.setEnabled(false);
       }
    }
 
