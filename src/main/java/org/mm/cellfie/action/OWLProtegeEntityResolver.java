@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.action;
 
 import org.mm.core.OWLEntityResolver;
 import org.mm.exceptions.EntityCreationException;

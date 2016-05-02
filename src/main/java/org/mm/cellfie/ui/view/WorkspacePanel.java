@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
 import org.mm.app.MMApplicationModel;
+import org.mm.cellfie.action.OWLProtegeOntology;
 import org.mm.core.OWLOntologySourceHook;
 import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSet;
