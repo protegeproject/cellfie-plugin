@@ -3,27 +3,30 @@ package org.mm.cellfie.ui.view;
 import org.mm.core.OWLEntityResolver;
 import org.mm.exceptions.EntityCreationException;
 import org.mm.exceptions.EntityNotFoundException;
-import org.protege.editor.owl.model.entity.EntityCreationPreferences;
-import org.protege.editor.owl.model.entity.OWLEntityCreationException;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
+import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.find.OWLEntityFinder;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.PrefixManager;
 
 public class OWLProtegeEntityResolver implements OWLEntityResolver
 {
+   private PrefixManager prefixManager;
+
    private OWLEntityFinder entityFinder;
-   private OWLEntityFactory entityFactory;
+   private OWLDataFactory dataFactory;
 
-   public OWLProtegeEntityResolver(OWLEntityFinder entityFinder, OWLEntityFactory entityFactory)
+   public OWLProtegeEntityResolver(OWLEditorKit editorKit, PrefixManager prefixManager)
    {
-      this.entityFinder = entityFinder;
-      this.entityFactory = entityFactory;
-   }
-
-   @Override
-   public String getDefaultPrefix()
-   {
-      return EntityCreationPreferences.getDefaultBaseIRI().toString();
+      this.prefixManager = prefixManager;
+      entityFinder = editorKit.getModelManager().getOWLEntityFinder();
+      dataFactory = editorKit.getOWLModelManager().getOWLDataFactory();
    }
 
    @Override
@@ -47,11 +50,20 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver
    @Override
    public <T extends OWLEntity> T create(String shortName, final Class<T> entityType) throws EntityCreationException
    {
-      try {
-         return entityFactory.createOWLEntity(entityType, shortName, null).getOWLEntity();
-      } catch (OWLEntityCreationException e) {
-         String template = "Failed to create entity from input value '%s'";
-         throw new EntityCreationException(String.format(template, shortName), e);
+      if (OWLClass.class.isAssignableFrom(entityType)) {
+         return entityType.cast(dataFactory.getOWLClass(shortName, prefixManager));
+      } else if (OWLObjectProperty.class.isAssignableFrom(entityType)) {
+         return entityType.cast(dataFactory.getOWLObjectProperty(shortName, prefixManager));
+      } else if (OWLDataProperty.class.isAssignableFrom(entityType)) {
+         return entityType.cast(dataFactory.getOWLDataProperty(shortName, prefixManager));
+      } else if (OWLNamedIndividual.class.isAssignableFrom(entityType)) {
+         return entityType.cast(dataFactory.getOWLNamedIndividual(shortName, prefixManager));
+      } else if (OWLAnnotationProperty.class.isAssignableFrom(entityType)) {
+         return entityType.cast(dataFactory.getOWLAnnotationProperty(shortName, prefixManager));
+      } else if (OWLDatatype.class.isAssignableFrom(entityType)) {
+         return entityType.cast(dataFactory.getOWLDatatype(shortName, prefixManager));
       }
+      String template = "Failed to create entity from input value '%s'";
+      throw new EntityCreationException(String.format(template, shortName));
    }
 }
