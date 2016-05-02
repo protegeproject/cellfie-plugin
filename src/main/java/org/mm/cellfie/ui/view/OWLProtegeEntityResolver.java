@@ -4,29 +4,28 @@ import org.mm.core.OWLEntityResolver;
 import org.mm.exceptions.EntityCreationException;
 import org.mm.exceptions.EntityNotFoundException;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.entity.OWLEntityCreationException;
+import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.protege.editor.owl.model.find.OWLEntityFinder;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLDataProperty;
-import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.formats.PrefixDocumentFormat;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.PrefixManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.vocab.Namespaces;
 
 public class OWLProtegeEntityResolver implements OWLEntityResolver
 {
-   private PrefixManager prefixManager;
-
+   private OWLEditorKit editorKit;
    private OWLEntityFinder entityFinder;
-   private OWLDataFactory dataFactory;
+   private OWLEntityFactory entityFactory;
 
-   public OWLProtegeEntityResolver(OWLEditorKit editorKit, PrefixManager prefixManager)
+   public OWLProtegeEntityResolver(OWLEditorKit editorKit)
    {
-      this.prefixManager = prefixManager;
+      this.editorKit = editorKit;
       entityFinder = editorKit.getModelManager().getOWLEntityFinder();
-      dataFactory = editorKit.getOWLModelManager().getOWLDataFactory();
+      entityFactory = editorKit.getModelManager().getOWLEntityFactory();
    }
 
    @Override
@@ -48,22 +47,47 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver
    }
 
    @Override
-   public <T extends OWLEntity> T create(String shortName, final Class<T> entityType) throws EntityCreationException
+   public <T extends OWLEntity> T create(String entityName, final Class<T> entityType) throws EntityCreationException
    {
-      if (OWLClass.class.isAssignableFrom(entityType)) {
-         return entityType.cast(dataFactory.getOWLClass(shortName, prefixManager));
-      } else if (OWLObjectProperty.class.isAssignableFrom(entityType)) {
-         return entityType.cast(dataFactory.getOWLObjectProperty(shortName, prefixManager));
-      } else if (OWLDataProperty.class.isAssignableFrom(entityType)) {
-         return entityType.cast(dataFactory.getOWLDataProperty(shortName, prefixManager));
-      } else if (OWLNamedIndividual.class.isAssignableFrom(entityType)) {
-         return entityType.cast(dataFactory.getOWLNamedIndividual(shortName, prefixManager));
-      } else if (OWLAnnotationProperty.class.isAssignableFrom(entityType)) {
-         return entityType.cast(dataFactory.getOWLAnnotationProperty(shortName, prefixManager));
-      } else if (OWLDatatype.class.isAssignableFrom(entityType)) {
-         return entityType.cast(dataFactory.getOWLDatatype(shortName, prefixManager));
+      OWLEntity entity = entityFinder.getOWLEntity(entityName);
+      if (entity == null) {
+         try {
+            return entityFactory.createOWLEntity(entityType, getLocalName(entityName), getPrefix(entityName)).getOWLEntity();
+         } catch (OWLEntityCreationException e) {
+            throw new IllegalStateException("Programmer error - report this (with stack trace) to the Protege mailing list");
+         }
       }
-      String template = "Failed to create entity from input value '%s'";
-      throw new EntityCreationException(String.format(template, shortName));
+      return entityType.cast(entity);
+   }
+
+   private String getLocalName(String entityName)
+   {
+      int colonIndex = entityName.indexOf(':');
+      if (colonIndex >= 0) {
+          return entityName.substring(colonIndex + 1);
+      }
+      return entityName;
+   }
+
+   private IRI getPrefix(String entityName)
+   {
+      OWLOntology activeOntology = editorKit.getModelManager().getActiveOntology();
+      OWLOntologyManager manager = editorKit.getModelManager().getOWLOntologyManager();
+      OWLDocumentFormat format = manager.getOntologyFormat(activeOntology);
+      for (Namespaces ns : Namespaces.values()) {
+          if (entityName.startsWith(ns.name().toLowerCase() + ":")) {
+              return IRI.create(ns.toString());
+          }
+      }
+      int colonIndex = entityName.indexOf(':');
+      if (colonIndex > 0 && format != null && format.isPrefixOWLOntologyFormat()) {
+          PrefixDocumentFormat prefixes = format.asPrefixOWLOntologyFormat();
+          String prefixName = entityName.substring(0, colonIndex + 1);
+          String prefix = prefixes.getPrefix(prefixName);
+          if (prefix != null) {
+              return IRI.create(prefix);
+          }
+      }
+      return null;
    }
 }
