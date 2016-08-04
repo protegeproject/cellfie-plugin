@@ -185,14 +185,15 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    private void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn,
          String startRow, String endRow, String expression, String comment)
    {
-      Vector<String> row = new Vector<>();
-      row.add(0, sheetName);
-      row.add(1, startColumn);
-      row.add(2, endColumn);
-      row.add(3, startRow);
-      row.add(4, endRow);
-      row.add(5, expression);
-      row.add(6, comment);
+      Vector<Object> row = new Vector<>();
+      row.add(0, true);
+      row.add(1, sheetName);
+      row.add(2, startColumn);
+      row.add(3, endColumn);
+      row.add(4, startRow);
+      row.add(5, endRow);
+      row.add(6, expression);
+      row.add(7, comment);
 
       if (selectedRow != -1) { // user selected a row
          tableModel.removeRow(selectedRow);
@@ -203,18 +204,19 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    private void setPreferredColumnWidth()
    {
       final TableColumnModel columnModel = tblTransformationRules.getColumnModel();
-      columnModel.getColumn(0).setPreferredWidth(100);
+      columnModel.getColumn(0).setPreferredWidth(30);
       columnModel.getColumn(1).setPreferredWidth(100);
       columnModel.getColumn(2).setPreferredWidth(100);
       columnModel.getColumn(3).setPreferredWidth(100);
       columnModel.getColumn(4).setPreferredWidth(100);
-      columnModel.getColumn(5).setPreferredWidth(360);
-      columnModel.getColumn(6).setPreferredWidth(180);
+      columnModel.getColumn(5).setPreferredWidth(100);
+      columnModel.getColumn(6).setPreferredWidth(360);
+      columnModel.getColumn(7).setPreferredWidth(180);
    }
 
    private void setPreferredColumnHeight()
    {
-      int columnIndex = 5; // only for expression column
+      int columnIndex = 6; // only for expression column
       for (int row = 0; row < tblTransformationRules.getRowCount(); row++) {
          int height = 0; // min height;
          Object value = tblTransformationRules.getModel().getValueAt(row, columnIndex);
@@ -239,7 +241,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    {
       private static final long serialVersionUID = 1L;
 
-      private final String[] COLUMN_NAMES = { "Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
+      private final String[] COLUMN_NAMES = { "", "Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
             "Rule", "Comment" };
 
       private boolean hasUnsavedChanges = false;
@@ -248,7 +250,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       {
          super();
          for (TransformationRule rule : rules) {
-            Vector<Object> row = new Vector<Object>();
+            Vector<Object> row = new Vector<>();
+            row.add(true);
             row.add(rule.getSheetName());
             row.add(rule.getStartColumn());
             row.add(rule.getEndColumn());
@@ -276,12 +279,18 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       @Override
       public Class<?> getColumnClass(int columnIndex)
       {
+         if (columnIndex == 0) {
+            return Boolean.class;
+         }
          return String.class;
       }
 
       @Override
       public boolean isCellEditable(int rowIndex, int columnIndex)
       {
+         if (columnIndex == 0) {
+            return true;
+         }
          return false;
       }
 
@@ -289,18 +298,24 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       {
          List<TransformationRule> rules = new ArrayList<>();
          for (int row = 0; row < getRowCount(); row++) {
-            @SuppressWarnings("unchecked")
-            Vector<String> rowVector = (Vector<String>) getDataVector().elementAt(row);
-            String sheetName = rowVector.get(0);
-            String startColumn = rowVector.get(1);
-            String endColumn = rowVector.get(2);
-            String startRow = rowVector.get(3);
-            String endRow = rowVector.get(4);
-            String expression = rowVector.get(5);
-            String comment = rowVector.get(6);
-            rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
+            Vector<?> rowVector = (Vector<?>) getDataVector().elementAt(row);
+            if (isRuleSelected(rowVector)) {
+               String sheetName = String.valueOf(rowVector.get(1));
+               String startColumn = String.valueOf(rowVector.get(2));
+               String endColumn = String.valueOf(rowVector.get(3));
+               String startRow = String.valueOf(rowVector.get(4));
+               String endRow = String.valueOf(rowVector.get(5));
+               String expression = String.valueOf(rowVector.get(6));
+               String comment = String.valueOf(rowVector.get(7));
+               rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
+            }
          }
          return rules;
+      }
+
+      private boolean isRuleSelected(Vector<?> rowVector)
+      {
+         return ((Boolean) rowVector.get(0)) == true;
       }
 
       protected List<TransformationRule> getTransformationRulesAndSave()
@@ -378,9 +393,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          } else if (e.getClickCount() == 2) { // double-click
             TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
             editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
-            editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
-                  getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
-                  getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
+            editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
+                  getValueAt(selectedRow, 3), getValueAt(selectedRow, 4), getValueAt(selectedRow, 5),
+                  getValueAt(selectedRow, 6), getValueAt(selectedRow, 7));
             showMappingEditorDialog(editorPanel, selectedRow);
          }
       }
