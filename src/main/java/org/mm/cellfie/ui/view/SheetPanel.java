@@ -1,6 +1,8 @@
 package org.mm.cellfie.ui.view;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,6 +21,11 @@ public class SheetPanel extends JPanel
    private final Sheet sheet;
    private final SheetTableModel sheetModel;
 
+   private int startColumnIndex = -1;
+   private int startRowIndex = -1;
+   private int endColumnIndex = -1;
+   private int endRowIndex = -1;
+
    public SheetPanel(Sheet sheet)
    {
       this.sheet = sheet;
@@ -27,6 +34,25 @@ public class SheetPanel extends JPanel
       setLayout(new BorderLayout());
 
       SheetTable tblBaseSheet = new SheetTable(sheetModel);
+      tblBaseSheet.addMouseListener(new MouseAdapter() {
+         @Override
+         public void mouseReleased(MouseEvent e) {
+            int[] selectedRows = tblBaseSheet.getSelectedRows();
+            int[] selectedColumns = tblBaseSheet.getSelectedColumns();
+            if (selectedColumns.length != 1 || selectedRows.length != 1) {
+               startColumnIndex = selectedColumns[0];
+               startRowIndex = selectedRows[0];
+               endColumnIndex = selectedColumns[selectedColumns.length-1];
+               endRowIndex = selectedRows[selectedRows.length-1];
+            }
+            else {
+               startColumnIndex = -1;
+               startRowIndex = -1;
+               endColumnIndex = -1;
+               endRowIndex = -1;
+            }
+         }
+      });
       JScrollPane scrBaseSheet = new JScrollPane(tblBaseSheet);
 
       JTable tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
@@ -41,6 +67,11 @@ public class SheetPanel extends JPanel
    public String getSheetName()
    {
       return sheet.getSheetName();
+   }
+
+   public int[] getSelectionRange()
+   {
+      return new int[] {startColumnIndex, startRowIndex, endColumnIndex, endRowIndex};
    }
 
    class SheetTableModel extends AbstractTableModel

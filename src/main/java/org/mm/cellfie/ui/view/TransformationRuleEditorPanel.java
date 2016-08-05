@@ -29,7 +29,7 @@ public class TransformationRuleEditorPanel extends JPanel
 
    private JTextArea txtRule;
 
-   public TransformationRuleEditorPanel()
+   public TransformationRuleEditorPanel(List<String> sheetNames)
    {
       setLayout(new BorderLayout());
 
@@ -39,8 +39,7 @@ public class TransformationRuleEditorPanel extends JPanel
       add(pnlMain, BorderLayout.CENTER);
 
       JLabel lblSheetName = new JLabel("Sheet name:");
-      cbbSheetName = new JComboBox<>();
-      cbbSheetName.setModel(new DefaultComboBoxModel<>());
+      cbbSheetName = new JComboBox<>(new DefaultComboBoxModel<>(new Vector<>(sheetNames)));
 
       JLabel lblStartColumn = new JLabel("Start column:");
       txtStartColumn = new JTextField("");
@@ -80,9 +79,36 @@ public class TransformationRuleEditorPanel extends JPanel
       pnlMain.add(txtRule, BorderLayout.CENTER);
    }
 
-   public void setSheetNames(List<String> sheetNames)
-   {
-      cbbSheetName.setModel(new DefaultComboBoxModel<>(new Vector<>(sheetNames)));
+   public void setSheetName(String sheetName) {
+      cbbSheetName.setSelectedItem(sheetName);
+   }
+
+   public void setStartColumn(String columnName) {
+      if (columnName.isEmpty()) {
+         columnName = "A";
+      }
+      txtStartColumn.setText(columnName);
+   }
+
+   public void setStartRow(String rowNumber) {
+      if (rowNumber.isEmpty()) {
+         rowNumber = "1";
+      }
+      txtStartRow.setText(rowNumber);
+   }
+
+   public void setEndColumn(String columnName) {
+      if (columnName.isEmpty()) {
+         columnName = "+";
+      }
+      txtEndColumn.setText(columnName);
+   }
+
+   public void setEndRow(String rowNumber) {
+      if (rowNumber.isEmpty()) {
+         rowNumber = "+";
+      }
+      txtEndRow.setText(rowNumber);
    }
 
    public void fillFormFields(String sheetName, String startColumn, String endColumn, String startRow, String endRow,

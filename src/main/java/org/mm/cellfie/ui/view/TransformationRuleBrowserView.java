@@ -391,8 +391,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                lastSelectedRow = -1; // reset
             }
          } else if (e.getClickCount() == 2) { // double-click
-            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
-            editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
+            List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
+            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
             editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
                   getValueAt(selectedRow, 3), getValueAt(selectedRow, 4), getValueAt(selectedRow, 5),
                   getValueAt(selectedRow, 6), getValueAt(selectedRow, 7));
@@ -415,8 +415,13 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
-         editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
+         List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
+         TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
+         editorPanel.setSheetName(container.getActiveSheet().getName());
+         editorPanel.setStartColumn(container.getActiveSheet().getSelectionRange().getStartColumnName());
+         editorPanel.setStartRow(container.getActiveSheet().getSelectionRange().getStartRowNumber());
+         editorPanel.setEndColumn(container.getActiveSheet().getSelectionRange().getEndColumnName());
+         editorPanel.setEndRow(container.getActiveSheet().getSelectionRange().getEndRowNumber());
          showMappingEditorDialog(editorPanel, -1);
          fireTransformationRuleChange();
       }
@@ -430,11 +435,11 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          int selectedRow = tblTransformationRules.getSelectedRow();
          try {
             validateSelection(selectedRow);
-            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel();
-            editorPanel.setSheetNames(container.getActiveWorkbook().getSheetNames());
-            editorPanel.fillFormFields(getValueAt(selectedRow, 0), getValueAt(selectedRow, 1),
-                  getValueAt(selectedRow, 2), getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
-                  getValueAt(selectedRow, 5), getValueAt(selectedRow, 6));
+            List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
+            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
+            editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
+                  getValueAt(selectedRow, 3), getValueAt(selectedRow, 4), getValueAt(selectedRow, 5),
+                  getValueAt(selectedRow, 6), getValueAt(selectedRow, 7));
             showMappingEditorDialog(editorPanel, selectedRow);
          } catch (CellfieException ex) {
             getApplicationDialogManager().showMessageDialog(container, ex.getMessage());

@@ -237,6 +237,11 @@ public class WorkspacePanel extends JPanel
       return getApplicationModel().getTransformationRuleModel().getRules();
    }
 
+   public Sheet getActiveSheet()
+   {
+      return dataSourceView.getActiveSheet();
+   }
+
    /* package */ void updateTransformationRuleModel()
    {
       final List<TransformationRule> rules = getTransformationRuleBrowserView().getTransformationRules();

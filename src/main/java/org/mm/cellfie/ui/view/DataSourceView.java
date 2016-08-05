@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -13,6 +12,8 @@ import org.protege.editor.core.ui.util.ComponentFactory;
 public class DataSourceView extends JPanel implements ModelView
 {
    private static final long serialVersionUID = 1L;
+
+   private ViewTabbedPane tabSheetContainer;
 
    public DataSourceView(WorkspacePanel container)
    {
@@ -30,16 +31,23 @@ public class DataSourceView extends JPanel implements ModelView
       pnlWorkbook.setLayout(new BorderLayout());
       pnlWorkbook.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-      ViewTabbedPane tabSheetContainer = new ViewTabbedPane();
+      tabSheetContainer = new ViewTabbedPane();
       pnlWorkbook.add(tabSheetContainer, BorderLayout.CENTER);
       pnlContainer.add(pnlWorkbook, BorderLayout.CENTER);
 
-      for (Sheet sheet : container.getActiveWorkbook().getSheets()) {
+      for (org.apache.poi.ss.usermodel.Sheet sheet : container.getActiveWorkbook().getSheets()) {
          SheetPanel sheetPanel = new SheetPanel(sheet);
          tabSheetContainer.addTab(sheetPanel.getSheetName(), null, sheetPanel);
       }
-
       validate();
+   }
+
+   public Sheet getActiveSheet()
+   {
+      SheetPanel selectedSheetPanel = (SheetPanel) tabSheetContainer.getSelectedComponent();
+      Sheet sheet = new Sheet(selectedSheetPanel.getSheetName());
+      sheet.setSelectionRange(selectedSheetPanel.getSelectionRange());
+      return sheet;
    }
 
    @Override
