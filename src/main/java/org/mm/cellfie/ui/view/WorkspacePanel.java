@@ -29,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.mm.app.MMApplication;
@@ -289,19 +290,24 @@ public class WorkspacePanel extends JPanel
             int answer = dialogHelper.showConfirmDialog(null, "Confirm Exit", "Exit Cellfie?");
             switch (answer) {
                case JOptionPane.YES_OPTION:
-                  if (workspacePanel.close()) {
+                  if (workspacePanel.shouldClose()) {
                      dialog.setVisible(false);
                   }
             }
          }
       });
+      dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       dialog.addWindowListener(new WindowAdapter() // Closing Cellfie using close [x] button
       {
          @Override
          public void windowClosing(WindowEvent e)
          {
-            if (workspacePanel.close()) {
-               dialog.setVisible(false);
+            int answer = dialogHelper.showConfirmDialog(null, "Confirm Exit", "Exit Cellfie?");
+            switch (answer) {
+               case JOptionPane.YES_OPTION:
+                  if (workspacePanel.shouldClose()) {
+                     dialog.setVisible(false);
+                  }
             }
          }
       });
@@ -311,7 +317,7 @@ public class WorkspacePanel extends JPanel
       return dialog;
    }
 
-   protected boolean close()
+   protected boolean shouldClose()
    {
       return transformationRuleBrowserView.safeGuardChanges();
    }

@@ -612,8 +612,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    {
       boolean isSuccessful = true;
       if (tableModel.hasUnsavedChanges()) {
-         int answer = getApplicationDialogManager().showConfirmDialog(
-               container, "Closing Cellfie", "There are unsaved changes in your transformation rules. Do you want to save them?");
+         int answer = JOptionPane.showConfirmDialog(
+               container, "There are unsaved changes in your transformation rules. Do you want to save them?", 
+               "Closing Cellfie", JOptionPane.YES_NO_CANCEL_OPTION);
          switch (answer) {
             case JOptionPane.YES_OPTION:
                String filePath = container.getRuleFileLocation();
@@ -625,6 +626,10 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                if (isSuccessful) {
                   getApplicationDialogManager().showMessageDialog(container, "Transformation rules saved successfully");
                }
+               break;
+            case JOptionPane.CANCEL_OPTION:
+               isSuccessful = false; // avoid closing
+               break;
          }
       }
       return isSuccessful;
