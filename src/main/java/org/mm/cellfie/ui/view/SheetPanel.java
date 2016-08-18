@@ -1,6 +1,7 @@
 package org.mm.cellfie.ui.view;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -8,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,10 +23,14 @@ public class SheetPanel extends JPanel
    private final Sheet sheet;
    private final SheetTableModel sheetModel;
 
+   private final SheetTable tblBaseSheet;
+
    private int startColumnIndex = -1;
    private int startRowIndex = -1;
    private int endColumnIndex = -1;
    private int endRowIndex = -1;
+
+   private Point startMousePt;
 
    public SheetPanel(Sheet sheet)
    {
@@ -33,35 +39,100 @@ public class SheetPanel extends JPanel
 
       setLayout(new BorderLayout());
 
-      SheetTable tblBaseSheet = new SheetTable(sheetModel);
+      tblBaseSheet = new SheetTable(sheetModel);
+      tblBaseSheet.setCellSelectionEnabled(true);
       tblBaseSheet.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseReleased(MouseEvent e) {
-            int[] selectedRows = tblBaseSheet.getSelectedRows();
             int[] selectedColumns = tblBaseSheet.getSelectedColumns();
-            if (selectedColumns.length != 1 || selectedRows.length != 1) {
-               startColumnIndex = selectedColumns[0];
-               startRowIndex = selectedRows[0];
-               endColumnIndex = selectedColumns[selectedColumns.length-1];
-               endRowIndex = selectedRows[selectedRows.length-1];
+            int[] selectedRows = tblBaseSheet.getSelectedRows();
+            if (selectedColumns.length > 1 || selectedRows.length > 1) {
+               setSelectionRange(
+                     selectedColumns[0],
+                     selectedRows[0],
+                     selectedColumns[selectedColumns.length-1],
+                     selectedRows[selectedRows.length-1]);
             }
             else {
-               startColumnIndex = -1;
-               startRowIndex = -1;
-               endColumnIndex = -1;
-               endRowIndex = -1;
+               setSelectionRange(-1, -1, -1, -1);
             }
          }
       });
       JScrollPane scrBaseSheet = new JScrollPane(tblBaseSheet);
 
+      JTableHeader header = tblBaseSheet.getTableHeader();
+      header.setReorderingAllowed(false);
+      header.addMouseListener(new MouseAdapter() {
+         @Override
+         public void mousePressed(MouseEvent e) {
+            startMousePt = e.getPoint();
+            int col0 = header.columnAtPoint(startMousePt);
+            tblBaseSheet.setColumnSelectionInterval(col0, col0);
+            tblBaseSheet.setRowSelectionInterval(0, tblBaseSheet.getRowCount()-1); // 0-indexed
+         }
+         @Override
+         public void mouseReleased(MouseEvent e) {
+            int[] selectedColumns = tblBaseSheet.getSelectedColumns();
+            setSelectionRange(
+                  selectedColumns[0],
+                  -1,
+                  selectedColumns[selectedColumns.length-1],
+                  -1);
+         }
+      });
+      header.addMouseMotionListener(new MouseAdapter() {
+         @Override
+         public void mouseDragged(MouseEvent e) {
+            int col0 = header.columnAtPoint(startMousePt);
+            int col1 = header.columnAtPoint(e.getPoint());
+            tblBaseSheet.setColumnSelectionInterval(col0, col1);
+            tblBaseSheet.setRowSelectionInterval(0, tblBaseSheet.getRowCount()-1); // 0-indexed
+         }
+      });
+
       JTable tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
+      tblRowNumberSheet.addMouseListener(new MouseAdapter() {
+         @Override
+         public void mousePressed(MouseEvent e) {
+            startMousePt = e.getPoint();
+            int row0 = tblRowNumberSheet.rowAtPoint(startMousePt);
+            tblBaseSheet.setColumnSelectionInterval(0, tblBaseSheet.getColumnCount()-1); // 0-indexed
+            tblBaseSheet.setRowSelectionInterval(row0, row0);
+         }
+         @Override
+         public void mouseReleased(MouseEvent e) {
+            int[] selectedRows = tblBaseSheet.getSelectedRows();
+            setSelectionRange(
+                  -1,
+                  selectedRows[0],
+                  -1,
+                  selectedRows[selectedRows.length-1]);
+         }
+      });
+      tblRowNumberSheet.addMouseMotionListener(new MouseAdapter() {
+         @Override
+         public void mouseDragged(MouseEvent e) {
+            int row0 = tblRowNumberSheet.rowAtPoint(startMousePt);
+            int row1 = tblRowNumberSheet.rowAtPoint(e.getPoint());
+            tblBaseSheet.setColumnSelectionInterval(0, tblBaseSheet.getColumnCount()-1); // 0-indexed
+            tblBaseSheet.setRowSelectionInterval(row0, row1);
+         }
+      });
+      
       scrBaseSheet.setRowHeaderView(tblRowNumberSheet);
       scrBaseSheet.setCorner(JScrollPane.UPPER_LEFT_CORNER, tblRowNumberSheet.getTableHeader());
 
       add(BorderLayout.CENTER, scrBaseSheet);
 
       validate();
+   }
+
+   private void setSelectionRange(int startColumn, int startRow, int endColumn, int endRow)
+   {
+      startColumnIndex = startColumn;
+      startRowIndex = startRow;
+      endColumnIndex = endColumn;
+      endRowIndex = endRow;
    }
 
    public String getSheetName()

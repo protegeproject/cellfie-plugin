@@ -6,6 +6,7 @@ import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -24,16 +25,19 @@ public class SheetTable extends JTable
    {
       super(model);
 
+      setDefaultRenderer(String.class, new WorksheetCellRenderer());
+
       JTableHeader header = new HighlightTableHeader(getColumnModel());
       header.setDefaultRenderer(new ColumnHeaderRenderer());
       setTableHeader(header);
-
-      setDefaultRenderer(String.class, new WorksheetCellRenderer());
-
-      resizeColumnWidth();
-      setCellSelectionEnabled(true);
-      setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
       setGridColor(new Color(220, 220, 220));
+
+      setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+      setColumnSelectionAllowed(true);
+      setRowSelectionAllowed (false);
+//      setCellSelectionEnabled(true);
+      resizeColumnWidth();
+      setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
    }
 
    private void resizeColumnWidth()

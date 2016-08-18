@@ -38,7 +38,9 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
       setFocusable(false);
       setAutoCreateColumnsFromModel(false);
       setSelectionModel(main.getSelectionModel());
-      setCellSelectionEnabled(true);
+//      setCellSelectionEnabled(true);
+      setColumnSelectionAllowed(false);
+      setRowSelectionAllowed(true);
 
       TableColumn column = new TableColumn();
       column.setHeaderValue(" ");
