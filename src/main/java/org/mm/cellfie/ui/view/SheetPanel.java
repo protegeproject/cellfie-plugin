@@ -46,7 +46,7 @@ public class SheetPanel extends JPanel
          public void mouseReleased(MouseEvent e) {
             int[] selectedColumns = tblBaseSheet.getSelectedColumns();
             int[] selectedRows = tblBaseSheet.getSelectedRows();
-            if (selectedColumns.length > 1 || selectedRows.length > 1) {
+            if (selectedColumns.length > 0 || selectedRows.length > 0) {
                setSelectionRange(
                      selectedColumns[0],
                      selectedRows[0],
@@ -54,7 +54,7 @@ public class SheetPanel extends JPanel
                      selectedRows[selectedRows.length-1]);
             }
             else {
-               setSelectionRange(-1, -1, -1, -1);
+               setSelectionRange(0, 0, 0, -1); // A-A-1-+
             }
          }
       });
