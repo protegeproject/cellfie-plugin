@@ -73,23 +73,22 @@ public class GenerateAxiomsAction implements ActionListener
             if (rule.isActive()) {
                String sheetName = rule.getSheetName();
                Sheet sheet = getActiveWorkbook().getWorkbook().getSheet(sheetName);
-               int startColumn = SpreadSheetUtil.columnName2Number(rule.getStartColumn());
-               int startRow = SpreadSheetUtil.row2Number(rule.getStartRow());
-               int endColumn = rule.hasEndColumnWildcard() ? sheet.getRow(startRow).getLastCellNum() + 1
-                     : SpreadSheetUtil.columnName2Number(rule.getEndColumn());
-               int endRow = rule.hasEndRowWildcard() ? sheet.getLastRowNum() + 1
-                     : SpreadSheetUtil.row2Number(rule.getEndRow());
+               
+               int startColumnIndex = getStartColumnIndex(rule);
+               int startRowIndex = getStartRowIndex(rule);
+               int endColumnIndex = getEndColumnIndex(rule, sheet, startRowIndex);
+               int endRowIndex = getEndRowIndex(rule, sheet);
 
-               if (startColumn > endColumn) {
+               if (startColumnIndex > endColumnIndex) {
                   throw new CellfieException("Start column after finish column in rule " + rule);
                }
-               if (startRow > endRow) {
+               if (startRowIndex > endRowIndex) {
                   throw new CellfieException("Start row after finish row in rule " + rule);
                }
 
-               SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumn, endRow);
-               SpreadsheetLocation startLocation = new SpreadsheetLocation(sheetName, startColumn, startRow);
-               SpreadsheetLocation currentLocation = new SpreadsheetLocation(sheetName, startColumn, startRow);
+               SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumnIndex, endRowIndex);
+               SpreadsheetLocation startLocation = new SpreadsheetLocation(sheetName, startColumnIndex, startRowIndex);
+               SpreadsheetLocation currentLocation = new SpreadsheetLocation(sheetName, startColumnIndex, startRowIndex);
 
                getActiveWorkbook().setCurrentLocation(currentLocation);
                do {
@@ -110,6 +109,46 @@ public class GenerateAxiomsAction implements ActionListener
       } catch (Exception ex) {
          getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
       }
+   }
+
+   private int getStartColumnIndex(TransformationRule rule) throws Exception
+   {
+      String startColumn = rule.getStartColumn();
+      if (startColumn.isEmpty()) {
+         throw new CellfieException("Start column is not specified");
+      }
+      return SpreadSheetUtil.columnName2Number(startColumn);
+   }
+
+   private int getStartRowIndex(TransformationRule rule) throws Exception
+   {
+      String startRow = rule.getStartRow();
+      if (startRow.isEmpty()) {
+         throw new CellfieException("Start row is not specified");
+      }
+      return SpreadSheetUtil.rowLabel2Number(startRow);
+   }
+
+   private int getEndColumnIndex(TransformationRule rule, Sheet sheet, int startRowIndex) throws Exception
+   {
+      String endColumn = rule.getEndColumn();
+      if (endColumn.isEmpty()) {
+         throw new CellfieException("End column is not specified. (Hint: Use a wildcard '+' to indicate the last column)");
+      }
+      return rule.hasEndColumnWildcard()
+            ? sheet.getRow(startRowIndex).getLastCellNum() + 1
+            : SpreadSheetUtil.columnName2Number(endColumn);
+   }
+
+   private int getEndRowIndex(TransformationRule rule, Sheet sheet) throws Exception
+   {
+      String endRow = rule.getEndRow();
+      if (endRow.isEmpty()) {
+         throw new CellfieException("End row is not specified. (Hint: Use a wildcard '+' to indicate the last row)");
+      }
+      int endRowIndex = rule.hasEndRowWildcard() ? sheet.getLastRowNum() + 1
+            : SpreadSheetUtil.rowLabel2Number(endRow);
+      return endRowIndex;
    }
 
    private Set<OWLAxiom> toAxioms(Set<Rendering> results)
