@@ -634,7 +634,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    public void fireTransformationRuleChange()
    {
       if (tblTransformationRules.getRowCount() > 0) {
-         cmdSave.setEnabled(true);
+         if (container.getRuleFileLocation().isPresent()) {
+            cmdSave.setEnabled(true);
+         }
          cmdSaveAs.setEnabled(true);
          cmdGenerateAxioms.setEnabled(true);
       } else {
