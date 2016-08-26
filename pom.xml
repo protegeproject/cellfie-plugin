@@ -33,12 +33,12 @@
       <dependency>
          <groupId>edu.stanford.protege</groupId>
          <artifactId>protege-editor-owl</artifactId>
-         <version>5.0.0-RC1</version>
+         <version>5.0.0</version>
       </dependency>
       <dependency>
          <groupId>edu.stanford.protege</groupId>
          <artifactId>mapping-master</artifactId>
-         <version>1.5</version>
+         <version>1.6-SNAPSHOT</version>
       </dependency>
    </dependencies>
 
