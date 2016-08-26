@@ -254,7 +254,7 @@ public class GenerateAxiomsAction implements ActionListener
    {
       List<TransformationRule> rules = container.getTransformationRuleBrowserView().getTransformationRules();
       if (rules.isEmpty()) {
-         throw new CellfieException("No transformation rules were created");
+         throw new CellfieException("No transformation rules were selected");
       }
       return rules;
    }
