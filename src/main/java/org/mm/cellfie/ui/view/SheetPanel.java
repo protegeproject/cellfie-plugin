@@ -25,9 +25,9 @@ public class SheetPanel extends JPanel
 
    private final SheetTable tblBaseSheet;
 
-   private int startColumnIndex = -1;
-   private int startRowIndex = -1;
-   private int endColumnIndex = -1;
+   private int startColumnIndex = 0; // initial range selection A:A
+   private int startRowIndex = 0;
+   private int endColumnIndex = 0;
    private int endRowIndex = -1;
 
    private Point startMousePt;
