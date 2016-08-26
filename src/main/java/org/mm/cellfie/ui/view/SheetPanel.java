@@ -158,7 +158,11 @@ public class SheetPanel extends JPanel
 
       public int getRowCount()
       {
-         return sheet.getLastRowNum() + 1;
+         if (sheet.rowIterator().hasNext()) {
+            return sheet.getLastRowNum() + 1;
+         } else {
+            return 0; // is empty
+         }
       }
 
       public int getColumnCount()
