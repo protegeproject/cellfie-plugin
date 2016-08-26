@@ -18,6 +18,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -55,8 +56,6 @@ import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
-
-import com.google.common.base.Optional;
 
 /**
  * This is the main Mapping Master user interface. It contains a view of a
@@ -123,7 +122,7 @@ public class WorkspacePanel extends JPanel
 
    private String getTitle(OWLOntology ontology)
    {
-      Optional<IRI> ontologyID = ontology.getOntologyID().getOntologyIRI();
+      com.google.common.base.Optional<IRI> ontologyID = ontology.getOntologyID().getOntologyIRI();
       if (ontologyID.isPresent()) {
          IRI id = ontologyID.get();
          return String.format("%s (%s)", id.getRemainder().get(), id);
@@ -149,14 +148,13 @@ public class WorkspacePanel extends JPanel
    }
 
    /**
-    * Gets the directory location of the transformation rule file. This method returns <code>null</code>
-    * if the location hasn't been defined by the users.
+    * Gets the directory location of the transformation rule file.
     *
     * @return the file path location.
     */
-   public String getRuleFileLocation()
+   public Optional<String> getRuleFileLocation()
    {
-      return applicationFactory.getRuleFileLocation();
+      return Optional.ofNullable(applicationFactory.getRuleFileLocation());
    }
 
    public void setRuleFileLocation(String path)
@@ -196,7 +194,7 @@ public class WorkspacePanel extends JPanel
 
       String ruleString = rule.getRuleString();
       MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
-      java.util.Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
+      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          results.add(renderingResult.get());
       }
@@ -209,7 +207,7 @@ public class WorkspacePanel extends JPanel
 
       String ruleString = rule.getRuleString();
       MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
-      java.util.Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
+      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          logging.append(renderingResult.get().getRendering());
       }

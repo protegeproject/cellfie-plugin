@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -184,11 +185,11 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
 
    private String getTitle()
    {
-      String filename = container.getRuleFileLocation();
-      if (filename == null || filename.isEmpty()) {
+      Optional<String> fileLocation = container.getRuleFileLocation();
+      if (!fileLocation.isPresent()) {
          return String.format("Transformation Rules");
       }
-      return String.format("Transformation Rules (%s)", filename);
+      return String.format("Transformation Rules (%s)", fileLocation.get());
    }
 
    private void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn,
@@ -646,7 +647,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       @Override
       public void actionPerformed(ActionEvent e)
       {
-         doSave(container.getRuleFileLocation());
+         doSave(container.getRuleFileLocation().get());
       }
    }
 
@@ -702,11 +703,11 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                "Closing Cellfie", JOptionPane.YES_NO_CANCEL_OPTION);
          switch (answer) {
             case JOptionPane.YES_OPTION:
-               String filePath = container.getRuleFileLocation();
-               if (filePath == null) {
+               Optional<String> fileLocation = container.getRuleFileLocation();
+               if (!fileLocation.isPresent()) {
                   isSuccessful = doSelectFileAndSave();
                } else {
-                  isSuccessful = doSave(filePath);
+                  isSuccessful = doSave(fileLocation.get());
                }
                if (isSuccessful) {
                   getApplicationDialogManager().showMessageDialog(container, "Transformation rules saved successfully");
