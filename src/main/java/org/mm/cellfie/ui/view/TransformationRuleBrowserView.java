@@ -3,8 +3,10 @@ package org.mm.cellfie.ui.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -18,7 +20,10 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,12 +32,14 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
@@ -152,6 +159,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    {
       tableModel = new TransformationRulesTableModel(container.getActiveTransformationRules());
       tblTransformationRules.setModel(tableModel);
+      tblTransformationRules.getColumnModel().getColumn(0).setHeaderRenderer(
+            new CheckBoxHeaderRenderer(tblTransformationRules.getTableHeader()));
       setTableHeaderAlignment(SwingConstants.CENTER);
       setPreferredColumnWidth();
       setPreferredColumnHeight();
@@ -251,7 +260,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          super();
          for (TransformationRule rule : rules) {
             Vector<Object> row = new Vector<>();
-            row.add(true);
+            row.add(false);
             row.add(rule.getSheetName());
             row.add(rule.getStartColumn());
             row.add(rule.getEndColumn());
@@ -366,6 +375,77 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          setText((value == null) ? "" : value.toString());
          return this;
       }
+   }
+
+   /**
+    * Header renderer for having a check box
+    */
+   class CheckBoxHeaderRenderer extends JCheckBox implements TableCellRenderer
+   {
+      private static final long serialVersionUID = 403110192802482730L;
+
+      CheckBoxHeaderRenderer(JTableHeader header)
+      {
+         super();
+         setHorizontalAlignment(JLabel.CENTER);
+         setBorderPainted(true);
+         setSelected(false);
+         setOpaque(true);
+         header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+               setSelected(!isSelected());
+               int selectedColumn = header.columnAtPoint(e.getPoint());
+               if (selectedColumn == 0) {
+                  JTable table = header.getTable();
+                  int nrow = table.getRowCount();
+                  if (nrow > 0) {
+                     for (int i = 0; i < nrow; i++) {
+                        if (isSelected()) {
+                           table.setValueAt(true, i, 0);
+                        }
+                        else {
+                           table.setValueAt(false, i, 0);
+                        }
+                     }
+                  }
+               }
+            }
+         });
+      }
+
+      @Override
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col)
+      {
+         TableCellRenderer r = table.getTableHeader().getDefaultRenderer();
+         JLabel l = (JLabel) r.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+         l.setIcon(new ComponentIcon(this));
+         return l;
+      }
+
+      private class ComponentIcon implements Icon
+      {
+         private final JCheckBox check;
+
+         public ComponentIcon(JCheckBox check) {
+             this.check = check;
+         }
+
+         @Override
+         public int getIconWidth() {
+             return check.getPreferredSize().width;
+         }
+
+         @Override
+         public int getIconHeight() {
+             return check.getPreferredSize().height;
+         }
+
+         @Override
+         public void paintIcon(Component c, Graphics g, int x, int y) {
+             SwingUtilities.paintComponent(g, check, (Container) c, x, y, getIconWidth(), getIconHeight());
+         }
+     }
    }
 
    /**
