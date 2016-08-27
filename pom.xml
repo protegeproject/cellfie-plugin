@@ -75,6 +75,19 @@
                      gson,
                      mapping-master
                   </Embed-Dependency>
+                  <_exportcontents> <!-- required to avoid 'private references' warning -->
+                     org.mm.*,
+                     org.apache.poi.*,
+                     org.apache.xmlbeans.*,
+                     org.openxmlformats.*,
+                     com.microsoft.schemas.office.*,
+                     org.w3.x2000.x09.xmldsig,
+                     org.etsi.uri.x01903.v13,
+                     schemasMicrosoftComVml,
+                     schemasMicrosoftComOfficeOffice,
+                     schemasMicrosoftComOfficeExcel,
+                     repackage
+                  </_exportcontents>
                   <Import-Package>
                      org.protege.editor.core.*;version="5.0.0",
                      org.protege.editor.owl.*;version="5.0.0",
@@ -90,7 +103,7 @@
                      javax.*;resolution:=optional,
                      *
                   </Import-Package>
-                  <Include-Resource>plugin.xml, {maven-dependencies}</Include-Resource>
+                  <Include-Resource>plugin.xml, {maven-dependencies}, {maven-resources}</Include-Resource>
                </instructions>
                <executions>
                   <execution>
