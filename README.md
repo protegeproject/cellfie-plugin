@@ -7,7 +7,7 @@ A Protégé Desktop plugin for mapping spreadsheets to OWL ontologies.
 
 Installation
 ------------
-By default Cellfie comes together with Protégé installation bundle. Any new release of the plugin will be automatically updated using Protégé auto-update mechanism. 
+By default Cellfie comes together with Protégé installation bundle (starting with version 5.0.0). Any new release of the plugin will be automatically updated using Protégé auto-update mechanism. 
 
 User's Guide
 ------------
