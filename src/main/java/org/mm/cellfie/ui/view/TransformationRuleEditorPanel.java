@@ -85,7 +85,10 @@ public class TransformationRuleEditorPanel extends JPanel
       txtComment.addFocusListener(new FocusAdapter() {
          @Override
          public void focusGained(FocusEvent evt) {
-            SwingUtilities.invokeLater(() -> { txtComment.selectAll(); });
+            SwingUtilities.invokeLater(() -> {
+               txtComment.requestFocus();
+               txtComment.selectAll();
+            });
          }
       });
 
