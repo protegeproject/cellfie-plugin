@@ -2,6 +2,8 @@ package org.mm.cellfie.ui.view;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.List;
 import java.util.Vector;
 
@@ -12,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.mm.core.TransformationRule;
 
@@ -43,18 +46,48 @@ public class TransformationRuleEditorPanel extends JPanel
 
       JLabel lblStartColumn = new JLabel("Start column:");
       txtStartColumn = new JTextField("");
+      txtStartColumn.addFocusListener(new FocusAdapter() {
+         @Override
+         public void focusGained(FocusEvent evt) {
+            SwingUtilities.invokeLater(() -> { txtStartColumn.selectAll(); });
+         }
+      });
 
       JLabel lblEndColumn = new JLabel("End column:");
       txtEndColumn = new JTextField("");
+      txtEndColumn.addFocusListener(new FocusAdapter() {
+         @Override
+         public void focusGained(FocusEvent evt) {
+            SwingUtilities.invokeLater(() -> { txtEndColumn.selectAll(); });
+         }
+      });
 
       JLabel lblStartRow = new JLabel("Start row:");
       txtStartRow = new JTextField("");
+      txtStartRow.addFocusListener(new FocusAdapter() {
+         @Override
+         public void focusGained(FocusEvent evt) {
+            SwingUtilities.invokeLater(() -> { txtStartRow.selectAll(); });
+         }
+      });
 
       JLabel lblEndRow = new JLabel("End row:");
       txtEndRow = new JTextField("");
+      txtEndRow.addFocusListener(new FocusAdapter() {
+         @Override
+         public void focusGained(FocusEvent evt) {
+            SwingUtilities.invokeLater(() -> { txtEndRow.selectAll(); });
+         }
+      });
 
       JLabel lblComment = new JLabel("Comment:");
       txtComment = new JTextField("");
+      txtComment.addFocusListener(new FocusAdapter() {
+         @Override
+         public void focusGained(FocusEvent evt) {
+            SwingUtilities.invokeLater(() -> { txtComment.selectAll(); });
+         }
+      });
 
       JLabel lblRule = new JLabel("Rule:");
 
