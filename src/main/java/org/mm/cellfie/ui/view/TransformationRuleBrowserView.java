@@ -237,9 +237,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
-   public List<TransformationRule> getTransformationRules()
+   public List<TransformationRule> getSelectedRules()
    {
-      return tableModel.getTransformationRules();
+      return tableModel.getSelectedRules();
    }
 
    private DialogManager getApplicationDialogManager()
@@ -304,7 +304,24 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          return false;
       }
 
-      public List<TransformationRule> getTransformationRules()
+      public List<TransformationRule> getAllRules()
+      {
+         List<TransformationRule> rules = new ArrayList<>();
+         for (int row = 0; row < getRowCount(); row++) {
+            Vector<?> rowVector = (Vector<?>) getDataVector().elementAt(row);
+            String sheetName = String.valueOf(rowVector.get(1));
+            String startColumn = String.valueOf(rowVector.get(2));
+            String endColumn = String.valueOf(rowVector.get(3));
+            String startRow = String.valueOf(rowVector.get(4));
+            String endRow = String.valueOf(rowVector.get(5));
+            String expression = String.valueOf(rowVector.get(6));
+            String comment = String.valueOf(rowVector.get(7));
+            rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
+         }
+         return rules;
+      }
+
+      public List<TransformationRule> getSelectedRules()
       {
          List<TransformationRule> rules = new ArrayList<>();
          for (int row = 0; row < getRowCount(); row++) {
@@ -331,7 +348,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       protected List<TransformationRule> getTransformationRulesAndSave()
       {
          hasUnsavedChanges = false;
-         return getTransformationRules();
+         return getAllRules();
       }
 
       public boolean hasUnsavedChanges()

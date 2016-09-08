@@ -215,7 +215,7 @@ public class WorkspacePanel extends JPanel
 
    /* package */ void updateTransformationRuleModel()
    {
-      final List<TransformationRule> rules = getTransformationRuleBrowserView().getTransformationRules();
+      final List<TransformationRule> rules = getTransformationRuleBrowserView().getSelectedRules();
       TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
       getApplicationModel().getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
    }
