@@ -9,18 +9,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -41,7 +32,6 @@ import org.mm.core.OWLOntologySourceHook;
 import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSet;
 import org.mm.core.settings.ReferenceSettings;
-import org.mm.core.settings.ValueEncodingSetting;
 import org.mm.parser.ASTExpression;
 import org.mm.parser.MappingMasterParser;
 import org.mm.parser.ParseException;
@@ -71,8 +61,6 @@ public class WorkspacePanel extends JPanel
    private DialogManager dialogHelper;
    private DataSourceView dataSourceView;
    private TransformationRuleBrowserView transformationRuleBrowserView;
-
-   private RenderLogging renderLogging;
 
    private MMApplication application;
    private MMApplicationFactory applicationFactory = new MMApplicationFactory();
@@ -120,6 +108,17 @@ public class WorkspacePanel extends JPanel
       validate();
    }
 
+   /**
+    * Get the file location of the input ontology.
+    *
+    * @return the file path location
+    */
+   public String getOntologyFileLocation()
+   {
+      String iriString = ontology.getOWLOntologyManager().getOntologyDocumentIRI(ontology).toString();
+      return iriString.substring(iriString.indexOf(":")+1, iriString.length());
+   }
+
    private String getTitle(OWLOntology ontology)
    {
       com.google.common.base.Optional<IRI> ontologyID = ontology.getOntologyID().getOntologyIRI();
@@ -135,6 +134,11 @@ public class WorkspacePanel extends JPanel
       applicationFactory.setWorkbookFileLocation(path);
    }
 
+   /**
+    * Get the file location of the input worksheet.
+    *
+    * @return the file path location
+    */
    public String getWorkbookFileLocation()
    {
       return applicationFactory.getWorkbookFileLocation();
@@ -148,7 +152,7 @@ public class WorkspacePanel extends JPanel
    }
 
    /**
-    * Gets the directory location of the transformation rule file.
+    * Get the file location of the input transformation rule.
     *
     * @return the file path location.
     */
@@ -177,47 +181,16 @@ public class WorkspacePanel extends JPanel
       return application.getApplicationModel();
    }
 
-   public void initLogging()
-   {
-      renderLogging = new RenderLogging();
-      renderLogging.init();
-   }
-
-   public RenderLogging getRenderLogging()
-   {
-      return renderLogging;
-   }
-
    public void evaluate(TransformationRule rule, Renderer renderer, Set<Rendering> results) throws ParseException
    {
-      final ReferenceSettings referenceSettings = new ReferenceSettings();
-
       String ruleString = rule.getRuleString();
-      MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
+      MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(ruleString.getBytes()), new ReferenceSettings(), -1);
+      SimpleNode simpleNode = parser.expression();
+      MMExpressionNode ruleNode = new ExpressionNode((ASTExpression) simpleNode).getMMExpressionNode();
       Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          results.add(renderingResult.get());
       }
-   }
-
-   public void log(TransformationRule rule, Renderer renderer, RenderLogging logging) throws ParseException
-   {
-      final ReferenceSettings referenceSettings = new ReferenceSettings();
-      referenceSettings.setValueEncodingSetting(ValueEncodingSetting.RDFS_LABEL);
-
-      String ruleString = rule.getRuleString();
-      MMExpressionNode ruleNode = parseRule(ruleString, referenceSettings).getMMExpressionNode();
-      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
-      if (renderingResult.isPresent()) {
-         logging.append(renderingResult.get().getRendering());
-      }
-   }
-
-   private ExpressionNode parseRule(String ruleString, ReferenceSettings settings) throws ParseException
-   {
-      MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(ruleString.getBytes()), settings, -1);
-      SimpleNode simpleNode = parser.expression();
-      return new ExpressionNode((ASTExpression) simpleNode);
    }
 
    public OWLOntology getActiveOntology()
@@ -323,79 +296,5 @@ public class WorkspacePanel extends JPanel
    protected boolean shouldClose()
    {
       return transformationRuleBrowserView.safeGuardChanges();
-   }
-
-   class RenderLogging
-   {
-      private DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
-
-      private String logFileLocation;
-      private StringBuffer logMessage = new StringBuffer();
-      private File logFile;
-
-      private final Logger LOG = Logger.getLogger(RenderLogging.class.getName()); 
-
-      public void init()
-      {
-         clearLog();
-         
-         String ruleFilePath = applicationFactory.getRuleFileLocation();
-         if (ruleFilePath == null) {
-            logFileLocation = getDefaultLogFileLocation();
-         } else {
-            logFileLocation = getLogFileLocation(new File(ruleFilePath));
-         }
-         String timestamp = dateFormat.format(new Date());
-         String fileName = String.format("%s%s.log", logFileLocation, timestamp);
-         logFile = new File(fileName);
-         
-         LOG.info("Cellfie log file: " + fileName);
-      }
-
-      public RenderLogging append(String message)
-      {
-         logMessage.append(message);
-         return this;
-      }
-
-      public void save() throws FileNotFoundException
-      {
-         PrintWriter printer = new PrintWriter(logFile);
-         printer.print(flushLog());
-         printer.close();
-         clearLog();
-      }
-
-      public InputStreamReader load() throws FileNotFoundException
-      {
-         return new FileReader(logFile);
-      }
-
-      private String getLogFileLocation(File ruleFile)
-      {
-         String ruleFilePath = ruleFile.getParent();
-         String ruleFileName = ruleFile.getName().substring(0, ruleFile.getName().lastIndexOf("."));
-         return ruleFilePath + System.getProperty("file.separator") + ruleFileName + "_mmexec";
-      }
-
-      private String getDefaultLogFileLocation()
-      {
-         String tmpPath = System.getProperty("java.io.tmpdir");
-         if (tmpPath.endsWith(System.getProperty("file.separator"))) {
-            return tmpPath + "mmexec";
-         } else {
-            return tmpPath + System.getProperty("file.separator") + "mmexec";
-         }
-      }
-
-      private void clearLog()
-      {
-         logMessage.setLength(0);
-      }
-
-      private String flushLog()
-      {
-         return logMessage.toString();
-      }
    }
 }

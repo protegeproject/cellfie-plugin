@@ -24,7 +24,7 @@ class LogViewerPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
-   public LogViewerPanel(WorkspacePanel container)
+   public LogViewerPanel(String logMessage)
    {
       setPreferredSize(new Dimension(1020, 420));
       setLayout(new BorderLayout());
@@ -50,7 +50,7 @@ class LogViewerPanel extends JPanel
             }
          };
          txtLogMessage.setEditorKit(createHighlightEditorKit());
-         txtLogMessage.read(container.getRenderLogging().load(), null);
+         txtLogMessage.setText(logMessage);
          txtLogMessage.setEditable(false);
          add(new JScrollPane(txtLogMessage), BorderLayout.CENTER);
       } catch (Exception e) {

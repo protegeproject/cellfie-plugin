@@ -19,18 +19,19 @@ import javax.swing.border.EmptyBorder;
 
 import org.mm.cellfie.ui.list.OWLAxiomList;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
-import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class PreviewAxiomsPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
-   private WorkspacePanel container;
+   private final WorkspacePanel container;
+   private final String logMessage;
 
-   public PreviewAxiomsPanel(WorkspacePanel container, OWLEditorKit editorKit, Set<OWLAxiom> axioms)
+   public PreviewAxiomsPanel(WorkspacePanel container, Set<OWLAxiom> axioms, String logMessage)
    {
       this.container = container;
+      this.logMessage = logMessage;
 
       setLayout(new BorderLayout());
 
@@ -38,7 +39,7 @@ public class PreviewAxiomsPanel extends JPanel
       lblPreview.setText("Cellfie generates " + axioms.size() + " axioms:");
       add(lblPreview, BorderLayout.NORTH);
 
-      OWLAxiomList previewList = new OWLAxiomList(editorKit);
+      OWLAxiomList previewList = new OWLAxiomList(container.getEditorKit());
       previewList.setAxioms(axioms);
       add(new JScrollPane(previewList), BorderLayout.CENTER);
 
@@ -63,7 +64,7 @@ public class PreviewAxiomsPanel extends JPanel
       @Override
       public void mouseClicked(MouseEvent e)
       {
-         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewerPanel(container), JOptionPane.PLAIN_MESSAGE,
+         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewerPanel(logMessage), JOptionPane.PLAIN_MESSAGE,
                JOptionPane.DEFAULT_OPTION, null);
       }
    }
