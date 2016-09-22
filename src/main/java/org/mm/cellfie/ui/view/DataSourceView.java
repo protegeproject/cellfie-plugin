@@ -37,7 +37,7 @@ public class DataSourceView extends JPanel implements ModelView
 
       for (org.apache.poi.ss.usermodel.Sheet sheet : container.getActiveWorkbook().getSheets()) {
          SheetPanel sheetPanel = new SheetPanel(sheet);
-         tabSheetContainer.addTab(sheetPanel.getSheetName(), null, sheetPanel);
+         tabSheetContainer.addTab(sheet.getSheetName(), null, sheetPanel);
       }
       validate();
    }
