@@ -119,10 +119,14 @@ public class GenerateAxiomsAction implements ActionListener
 
    private void logExpression(TransformationRule rule, StringBuilder logBuilder)
    {
-      String ruleExpression = asComment(rule.getRuleString());
-      logBuilder.append("\n");
-      logBuilder.append(ruleExpression);
-      logBuilder.append("\n\n");
+       logBuilder.append("\n");
+       String additionalInformation = String.format("Cell range: (%s!%s%s:%s%s) Comment: \"%s\"",
+               rule.getSheetName(), rule.getStartColumn(), rule.getStartRow(), rule.getEndColumn(), rule.getEndRow(),
+               rule.getComment());
+       logBuilder.append(asComment(additionalInformation));
+       logBuilder.append("\n");
+       logBuilder.append(asComment(rule.getRuleString()));
+       logBuilder.append("\n\n");
    }
 
    private static String asComment(String text)
