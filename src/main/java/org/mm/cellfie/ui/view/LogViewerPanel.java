@@ -86,7 +86,7 @@ class LogViewerPanel extends JPanel
          super.insertString(offset, str, a);
          String content = getText(0, getLength());
 
-         Pattern singleLinecommentsPattern = Pattern.compile(TextRenderer.COMMENT_HEADER + ".*"); // comment symbol
+         Pattern singleLinecommentsPattern = Pattern.compile(TextRenderer.COMMENT_SYMBOL + ".*"); // comment symbol
          Matcher matcher = singleLinecommentsPattern.matcher(content);
          while (matcher.find()) {
             setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), green, false);
