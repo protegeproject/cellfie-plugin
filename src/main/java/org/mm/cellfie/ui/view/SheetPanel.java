@@ -47,6 +47,12 @@ public class SheetPanel extends JPanel {
 
    private Point startMousePt;
 
+   /**
+    * Constructs the UI panel for the given input {@code Sheet} object.
+    *
+    * @param sheet
+    *           The Apache POI sheet instance
+    */
    public SheetPanel(@Nonnull Sheet sheet) {
       this.sheet = checkNotNull(sheet);
       sheetModel = new SheetTableModel(sheet);
@@ -75,6 +81,11 @@ public class SheetPanel extends JPanel {
       validate();
    }
 
+   /**
+    * Returns the name of the sheet presented by this UI panel.
+    *
+    * @return The sheet name.
+    */
    public String getSheetName() {
       return sheet.getSheetName();
    }
@@ -86,10 +97,19 @@ public class SheetPanel extends JPanel {
       this.endRowIndex = endRowIndex;
    }
 
+   /**
+    * Returns the array of the cell selection from this UI panel. The array is composed by
+    * { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex }
+    *
+    * @return The selection array.
+    */
    public int[] getSelectionRange() {
       return new int[] { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex };
    }
 
+   /**
+    * The table model used to presenting the data from the Apache POI Sheet instance
+    */
    class SheetTableModel extends AbstractTableModel {
       private static final long serialVersionUID = 1L;
 
