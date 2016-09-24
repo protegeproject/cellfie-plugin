@@ -74,12 +74,12 @@ public class SheetPanel extends JPanel
       return sheet.getSheetName();
    }
 
-   private void setSelectionRange(int startColumn, int startRow, int endColumn, int endRow)
+   private void setSelectionRange(int startColumnIndex, int startRowIndex, int endColumnIndex, int endRowIndex)
    {
-      startColumnIndex = startColumn;
-      startRowIndex = startRow;
-      endColumnIndex = endColumn;
-      endRowIndex = endRow;
+      this.startColumnIndex = startColumnIndex;
+      this.startRowIndex = startRowIndex;
+      this.endColumnIndex = endColumnIndex;
+      this.endRowIndex = endRowIndex;
    }
 
    public int[] getSelectionRange()
