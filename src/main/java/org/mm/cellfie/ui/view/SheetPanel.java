@@ -24,11 +24,16 @@ public class SheetPanel extends JPanel
    private final SheetTableModel sheetModel;
 
    private final SheetTable tblBaseSheet;
+   private final JTableHeader header;
+   private final JTable tblRowNumberSheet;
 
    private int startColumnIndex = 0; // initial range selection A:A
    private int startRowIndex = 0;
    private int endColumnIndex = 0;
    private int endRowIndex = -1;
+
+   private boolean isSelectingRowHeaders = false;
+   private boolean isSelectingColumnHeaders = false;
 
    private Point startMousePt;
 
@@ -41,84 +46,18 @@ public class SheetPanel extends JPanel
 
       tblBaseSheet = new SheetTable(sheetModel);
       tblBaseSheet.setCellSelectionEnabled(true);
-      tblBaseSheet.addMouseListener(new MouseAdapter() {
-         @Override
-         public void mouseReleased(MouseEvent e) {
-            int[] selectedColumns = tblBaseSheet.getSelectedColumns();
-            int[] selectedRows = tblBaseSheet.getSelectedRows();
-            if (selectedColumns.length > 0 || selectedRows.length > 0) {
-               setSelectionRange(
-                     selectedColumns[0],
-                     selectedRows[0],
-                     selectedColumns[selectedColumns.length-1],
-                     selectedRows[selectedRows.length-1]);
-            }
-            else {
-               setSelectionRange(0, 0, 0, -1); // A-A-1-+
-            }
-         }
-      });
-      JScrollPane scrBaseSheet = new JScrollPane(tblBaseSheet);
+      tblBaseSheet.addMouseListener(new SelectCellRange());
 
-      JTableHeader header = tblBaseSheet.getTableHeader();
+      header = tblBaseSheet.getTableHeader();
       header.setReorderingAllowed(false);
-      header.addMouseListener(new MouseAdapter() {
-         @Override
-         public void mousePressed(MouseEvent e) {
-            startMousePt = e.getPoint();
-            int col0 = header.columnAtPoint(startMousePt);
-            tblBaseSheet.setColumnSelectionInterval(col0, col0);
-            tblBaseSheet.setRowSelectionInterval(0, tblBaseSheet.getRowCount()-1); // 0-indexed
-         }
-         @Override
-         public void mouseReleased(MouseEvent e) {
-            int[] selectedColumns = tblBaseSheet.getSelectedColumns();
-            setSelectionRange(
-                  selectedColumns[0],
-                  -1,
-                  selectedColumns[selectedColumns.length-1],
-                  -1);
-         }
-      });
-      header.addMouseMotionListener(new MouseAdapter() {
-         @Override
-         public void mouseDragged(MouseEvent e) {
-            int col0 = header.columnAtPoint(startMousePt);
-            int col1 = header.columnAtPoint(e.getPoint());
-            tblBaseSheet.setColumnSelectionInterval(col0, col1);
-            tblBaseSheet.setRowSelectionInterval(0, tblBaseSheet.getRowCount()-1); // 0-indexed
-         }
-      });
+      header.addMouseListener(new SelectSingleColumnHeader());
+      header.addMouseMotionListener(new SelectMultipleColumnHeaders());
 
-      JTable tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
-      tblRowNumberSheet.addMouseListener(new MouseAdapter() {
-         @Override
-         public void mousePressed(MouseEvent e) {
-            startMousePt = e.getPoint();
-            int row0 = tblRowNumberSheet.rowAtPoint(startMousePt);
-            tblBaseSheet.setColumnSelectionInterval(0, tblBaseSheet.getColumnCount()-1); // 0-indexed
-            tblBaseSheet.setRowSelectionInterval(row0, row0);
-         }
-         @Override
-         public void mouseReleased(MouseEvent e) {
-            int[] selectedRows = tblBaseSheet.getSelectedRows();
-            setSelectionRange(
-                  -1,
-                  selectedRows[0],
-                  -1,
-                  selectedRows[selectedRows.length-1]);
-         }
-      });
-      tblRowNumberSheet.addMouseMotionListener(new MouseAdapter() {
-         @Override
-         public void mouseDragged(MouseEvent e) {
-            int row0 = tblRowNumberSheet.rowAtPoint(startMousePt);
-            int row1 = tblRowNumberSheet.rowAtPoint(e.getPoint());
-            tblBaseSheet.setColumnSelectionInterval(0, tblBaseSheet.getColumnCount()-1); // 0-indexed
-            tblBaseSheet.setRowSelectionInterval(row0, row1);
-         }
-      });
-      
+      tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
+      tblRowNumberSheet.addMouseListener(new SelectSingleRowHeader());
+      tblRowNumberSheet.addMouseMotionListener(new SelectMultipleRowHeaders());
+
+      JScrollPane scrBaseSheet = new JScrollPane(tblBaseSheet);
       scrBaseSheet.setRowHeaderView(tblRowNumberSheet);
       scrBaseSheet.setCorner(JScrollPane.UPPER_LEFT_CORNER, tblRowNumberSheet.getTableHeader());
 
@@ -127,17 +66,17 @@ public class SheetPanel extends JPanel
       validate();
    }
 
+   public String getSheetName()
+   {
+      return sheet.getSheetName();
+   }
+
    private void setSelectionRange(int startColumn, int startRow, int endColumn, int endRow)
    {
       startColumnIndex = startColumn;
       startRowIndex = startRow;
       endColumnIndex = endColumn;
       endRowIndex = endRow;
-   }
-
-   public String getSheetName()
-   {
-      return sheet.getSheetName();
    }
 
    public int[] getSelectionRange()
@@ -218,5 +157,165 @@ public class SheetPanel extends JPanel
       {
          return (number == Math.floor(number) && !Double.isInfinite(number));
       }
+   }
+
+   /**
+    * Mouse adapter for selecting a cell range in the spreadsheet
+    */
+   class SelectCellRange extends MouseAdapter {
+      @Override
+      public void mouseReleased(MouseEvent e) {
+         if (isControlKeyPressed(e)) {
+            selectCellRangeOnKeyModifier(e);
+         }
+         else {
+            selectCellRangeOnMouseDragged();
+         }
+      }
+
+      private void selectCellRangeOnKeyModifier(MouseEvent e) {
+         Point deselectPoint = e.getPoint();
+         int[] selectedColumnRange = new int[] { startColumnIndex, endColumnIndex };
+         int[] selectedRowRange = new int[] { startRowIndex, endRowIndex };
+         recomputeColumnRangeSelection(deselectPoint, selectedColumnRange);
+         recomputeRowRangeSelection(deselectPoint, selectedRowRange);
+         setSelectionRange(selectedColumnRange[0], selectedRowRange[0], selectedColumnRange[1], selectedRowRange[1]);
+         drawCellSelection(selectedColumnRange[0], selectedRowRange[0], selectedColumnRange[1], selectedRowRange[1]);
+      }
+
+      private void selectCellRangeOnMouseDragged() {
+         int[] selectedColumns = tblBaseSheet.getSelectedColumns();
+         int[] selectedRows = tblBaseSheet.getSelectedRows();
+         if (selectedColumns.length > 1 || selectedRows.length > 1) {
+            setSelectionRange(selectedColumns[0], selectedRows[0],
+                  selectedColumns[selectedColumns.length-1],
+                  selectedRows[selectedRows.length-1]);
+         }
+         else {
+            setSelectionRange(0, 0, 0, -1); // A:A
+         }
+         resetSelectionType();
+      }
+
+      private void recomputeRowRangeSelection(Point deselectPoint, int[] selectedRowRange) {
+         if (isSelectingColumnHeaders) {
+            int deselectedRowIndex = tblBaseSheet.rowAtPoint(deselectPoint);
+            int selectedRowIndex = deselectedRowIndex + 1; // the new selection is the next row index
+            int maxRowIndex = tblBaseSheet.getRowCount() - 1; // 0-index
+            if (selectedRowIndex > maxRowIndex) {
+               selectedRowIndex = maxRowIndex;
+            }
+            selectedRowRange[0] = selectedRowIndex;
+         }
+      }
+
+      private void recomputeColumnRangeSelection(Point deselectPoint, int[] selectedColumnRange) {
+         if (isSelectingRowHeaders) {
+            int deselectedColumnIndex =  tblBaseSheet.columnAtPoint(deselectPoint);
+            int selectedColumnIndex = deselectedColumnIndex + 1; // the new selection is the next column index
+            int maxColumnIndex = tblBaseSheet.getColumnCount() - 1; // 0-index
+            if (selectedColumnIndex > maxColumnIndex) {
+               selectedColumnIndex = maxColumnIndex;
+            }
+            selectedColumnRange[0] = selectedColumnIndex;
+         }
+      }
+
+      private boolean isControlKeyPressed(MouseEvent e) {
+         if (System.getProperty("os.name").contains("Mac OS X")) {
+            return e.isMetaDown();
+         }
+         else {
+            return e.isControlDown();
+         }
+      }
+
+      private void resetSelectionType() {
+         isSelectingRowHeaders = false;
+         isSelectingColumnHeaders = false;
+      }
+   }
+
+   /**
+    * Mouse adapter for selecting a single column header in the spreadsheet.
+    * The selection causes all rows in that column will be highlighted.
+    */
+   class SelectSingleColumnHeader extends MouseAdapter {
+      @Override
+      public void mousePressed(MouseEvent e) {
+         startMousePt = e.getPoint(); // set the initial clicking
+         int columnIndexAtSelection = header.columnAtPoint(startMousePt);
+         drawCellSelection(columnIndexAtSelection, 0, columnIndexAtSelection, -1);
+      }
+      
+      @Override
+      public void mouseReleased(MouseEvent e) {
+         int[] selectedColumns = tblBaseSheet.getSelectedColumns();
+         setSelectionRange(selectedColumns[0], 0, selectedColumns[selectedColumns.length - 1], -1);
+      }
+   }
+
+   /**
+    * Mouse adapter for selecting multiple column headers in the spreadsheet.
+    * The selection causes all rows in those columns will be highlighted.
+    */
+   class SelectMultipleColumnHeaders extends MouseAdapter {
+      @Override
+      public void mouseDragged(MouseEvent e) {
+         int columnIndexAtInitialSelection = header.columnAtPoint(startMousePt);
+         int columnIndexAtCurrentSelection = header.columnAtPoint(e.getPoint());
+         drawCellSelection(columnIndexAtInitialSelection, 0, columnIndexAtCurrentSelection, -1);
+         markSelectionType();
+      }
+      
+      private void markSelectionType() {
+         isSelectingRowHeaders = false;
+         isSelectingColumnHeaders = true;
+      }
+   }
+
+   /**
+    * Mouse adapter for selecting a single row header in the spreadsheet.
+    * The selection causes all columns in that row will be highlighted.
+    */
+   class SelectSingleRowHeader extends MouseAdapter {
+      @Override
+      public void mousePressed(MouseEvent e) {
+         startMousePt = e.getPoint(); // set the initial clicking
+         int rowIndexAtSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
+         drawCellSelection(0, rowIndexAtSelection, -1, rowIndexAtSelection);
+      }
+      
+      @Override
+      public void mouseReleased(MouseEvent e) {
+         int[] selectedRows = tblBaseSheet.getSelectedRows();
+         setSelectionRange(0, selectedRows[0], -1, selectedRows[selectedRows.length - 1]);
+      }
+   }
+
+   /**
+    * Mouse adapter for selecting multiple row headers in the spreadsheet.
+    * The selection causes all rows in those rows will be highlighted.
+    */
+   class SelectMultipleRowHeaders extends MouseAdapter {
+      @Override
+      public void mouseDragged(MouseEvent e) {
+         int rowIndexAtInitialSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
+         int rowIndexAtCurrentSelection = tblRowNumberSheet.rowAtPoint(e.getPoint());
+         drawCellSelection(0, rowIndexAtInitialSelection, -1, rowIndexAtCurrentSelection);
+         markSelectionType();
+      }
+      
+      private void markSelectionType() {
+         isSelectingRowHeaders = true;
+         isSelectingColumnHeaders = false;
+      }
+   }
+
+   private void drawCellSelection(int startColumnIndex, int startRowIndex, int endColumnIndex, int endRowIndex) {
+      tblBaseSheet.setColumnSelectionInterval(startColumnIndex,
+            (endColumnIndex == -1 ? tblBaseSheet.getColumnCount()-1 : endColumnIndex));
+      tblBaseSheet.setRowSelectionInterval(startRowIndex,
+            (endRowIndex == -1 ? tblBaseSheet.getRowCount()-1 : endRowIndex));
    }
 }
