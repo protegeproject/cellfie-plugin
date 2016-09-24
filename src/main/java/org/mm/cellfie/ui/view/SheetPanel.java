@@ -20,6 +20,9 @@ public class SheetPanel extends JPanel
 {
    private static final long serialVersionUID = 1L;
 
+   private static final int START_INDEX = 0;
+   private static final int END_INDEX = -1;
+
    private final Sheet sheet;
    private final SheetTableModel sheetModel;
 
@@ -27,10 +30,10 @@ public class SheetPanel extends JPanel
    private final JTableHeader header;
    private final JTable tblRowNumberSheet;
 
-   private int startColumnIndex = 0; // initial range selection A:A
-   private int startRowIndex = 0;
-   private int endColumnIndex = 0;
-   private int endRowIndex = -1;
+   private int startColumnIndex = START_INDEX; // initial range selection A:A
+   private int startRowIndex = START_INDEX;
+   private int endColumnIndex = START_INDEX;
+   private int endRowIndex = END_INDEX;
 
    private boolean isSelectingRowHeaders = false;
    private boolean isSelectingColumnHeaders = false;
@@ -192,7 +195,7 @@ public class SheetPanel extends JPanel
                   selectedRows[selectedRows.length-1]);
          }
          else {
-            setSelectionRange(0, 0, 0, -1); // A:A
+            setSelectionRange(START_INDEX, START_INDEX, START_INDEX, END_INDEX); // A:A
          }
          resetSelectionType();
       }
@@ -245,13 +248,15 @@ public class SheetPanel extends JPanel
       public void mousePressed(MouseEvent e) {
          startMousePt = e.getPoint(); // set the initial clicking
          int columnIndexAtSelection = header.columnAtPoint(startMousePt);
-         drawCellSelection(columnIndexAtSelection, 0, columnIndexAtSelection, -1);
+         drawCellSelection(columnIndexAtSelection, START_INDEX, columnIndexAtSelection, END_INDEX);
       }
       
       @Override
       public void mouseReleased(MouseEvent e) {
          int[] selectedColumns = tblBaseSheet.getSelectedColumns();
-         setSelectionRange(selectedColumns[0], 0, selectedColumns[selectedColumns.length - 1], -1);
+         int startColumnIndex = selectedColumns[0];
+         int endColumnIndex = selectedColumns[selectedColumns.length - 1];
+         setSelectionRange(startColumnIndex, START_INDEX, endColumnIndex, END_INDEX);
       }
    }
 
@@ -264,7 +269,7 @@ public class SheetPanel extends JPanel
       public void mouseDragged(MouseEvent e) {
          int columnIndexAtInitialSelection = header.columnAtPoint(startMousePt);
          int columnIndexAtCurrentSelection = header.columnAtPoint(e.getPoint());
-         drawCellSelection(columnIndexAtInitialSelection, 0, columnIndexAtCurrentSelection, -1);
+         drawCellSelection(columnIndexAtInitialSelection, START_INDEX, columnIndexAtCurrentSelection, END_INDEX);
          markSelectionType();
       }
       
@@ -283,13 +288,15 @@ public class SheetPanel extends JPanel
       public void mousePressed(MouseEvent e) {
          startMousePt = e.getPoint(); // set the initial clicking
          int rowIndexAtSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
-         drawCellSelection(0, rowIndexAtSelection, -1, rowIndexAtSelection);
+         drawCellSelection(START_INDEX, rowIndexAtSelection, END_INDEX, rowIndexAtSelection);
       }
       
       @Override
       public void mouseReleased(MouseEvent e) {
          int[] selectedRows = tblBaseSheet.getSelectedRows();
-         setSelectionRange(0, selectedRows[0], -1, selectedRows[selectedRows.length - 1]);
+         int startRowIndex = selectedRows[0];
+         int endRowIndex = selectedRows[selectedRows.length - 1];
+         setSelectionRange(START_INDEX, startRowIndex, END_INDEX, endRowIndex);
       }
    }
 
@@ -302,7 +309,7 @@ public class SheetPanel extends JPanel
       public void mouseDragged(MouseEvent e) {
          int rowIndexAtInitialSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
          int rowIndexAtCurrentSelection = tblRowNumberSheet.rowAtPoint(e.getPoint());
-         drawCellSelection(0, rowIndexAtInitialSelection, -1, rowIndexAtCurrentSelection);
+         drawCellSelection(START_INDEX, rowIndexAtInitialSelection, END_INDEX, rowIndexAtCurrentSelection);
          markSelectionType();
       }
       
@@ -314,8 +321,8 @@ public class SheetPanel extends JPanel
 
    private void drawCellSelection(int startColumnIndex, int startRowIndex, int endColumnIndex, int endRowIndex) {
       tblBaseSheet.setColumnSelectionInterval(startColumnIndex,
-            (endColumnIndex == -1 ? tblBaseSheet.getColumnCount()-1 : endColumnIndex));
+            (endColumnIndex == END_INDEX ? tblBaseSheet.getColumnCount() - 1 : endColumnIndex));
       tblBaseSheet.setRowSelectionInterval(startRowIndex,
-            (endRowIndex == -1 ? tblBaseSheet.getRowCount()-1 : endRowIndex));
+            (endRowIndex == END_INDEX ? tblBaseSheet.getRowCount() - 1 : endRowIndex));
    }
 }
