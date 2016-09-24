@@ -1,10 +1,13 @@
 package org.mm.cellfie.ui.view;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.annotation.Nonnull;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -16,8 +19,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.ss.SpreadSheetUtil;
 
-public class SheetPanel extends JPanel
-{
+/**
+ * @author Josef Hardi <johardi@stanford.edu> <br>
+ * Stanford Center for Biomedical Informatics Research
+ */
+public class SheetPanel extends JPanel {
+
    private static final long serialVersionUID = 1L;
 
    private static final int START_INDEX = 0;
@@ -40,9 +47,8 @@ public class SheetPanel extends JPanel
 
    private Point startMousePt;
 
-   public SheetPanel(Sheet sheet)
-   {
-      this.sheet = sheet;
+   public SheetPanel(@Nonnull Sheet sheet) {
+      this.sheet = checkNotNull(sheet);
       sheetModel = new SheetTableModel(sheet);
 
       setLayout(new BorderLayout());
@@ -69,37 +75,31 @@ public class SheetPanel extends JPanel
       validate();
    }
 
-   public String getSheetName()
-   {
+   public String getSheetName() {
       return sheet.getSheetName();
    }
 
-   private void setSelectionRange(int startColumnIndex, int startRowIndex, int endColumnIndex, int endRowIndex)
-   {
+   private void setSelectionRange(int startColumnIndex, int startRowIndex, int endColumnIndex, int endRowIndex) {
       this.startColumnIndex = startColumnIndex;
       this.startRowIndex = startRowIndex;
       this.endColumnIndex = endColumnIndex;
       this.endRowIndex = endRowIndex;
    }
 
-   public int[] getSelectionRange()
-   {
-      return new int[] {startColumnIndex, startRowIndex, endColumnIndex, endRowIndex};
+   public int[] getSelectionRange() {
+      return new int[] { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex };
    }
 
-   class SheetTableModel extends AbstractTableModel
-   {
+   class SheetTableModel extends AbstractTableModel {
       private static final long serialVersionUID = 1L;
 
       private final Sheet sheet;
 
-      public SheetTableModel(Sheet sheet)
-      {
-         this.sheet = sheet;
+      public SheetTableModel(@Nonnull Sheet sheet) {
+         this.sheet = checkNotNull(sheet);
       }
 
-      public int getRowCount()
-      {
+      public int getRowCount() {
          if (sheet.rowIterator().hasNext()) {
             return sheet.getLastRowNum() + 1;
          } else {
@@ -107,8 +107,7 @@ public class SheetPanel extends JPanel
          }
       }
 
-      public int getColumnCount()
-      {
+      public int getColumnCount() {
          int maxCount = 0;
          for (int i = 0; i < getRowCount(); i++) {
             Row row = sheet.getRow(i);
@@ -122,13 +121,11 @@ public class SheetPanel extends JPanel
          return maxCount;
       }
 
-      public String getColumnName(int column)
-      {
+      public String getColumnName(int column) {
          return SpreadSheetUtil.columnNumber2Name(column + 1);
       }
 
-      public Object getValueAt(int row, int column)
-      {
+      public Object getValueAt(int row, int column) {
          try {
             Cell cell = sheet.getRow(row).getCell(column);
             switch (cell.getCellType()) {
@@ -156,8 +153,7 @@ public class SheetPanel extends JPanel
          }
       }
 
-      private boolean isInteger(double number)
-      {
+      private boolean isInteger(double number) {
          return (number == Math.floor(number) && !Double.isInfinite(number));
       }
    }
@@ -170,8 +166,7 @@ public class SheetPanel extends JPanel
       public void mouseReleased(MouseEvent e) {
          if (isControlKeyPressed(e)) {
             selectCellRangeOnKeyModifier(e);
-         }
-         else {
+         } else {
             selectCellRangeOnMouseDragged();
          }
       }
@@ -191,10 +186,9 @@ public class SheetPanel extends JPanel
          int[] selectedRows = tblBaseSheet.getSelectedRows();
          if (selectedColumns.length > 1 || selectedRows.length > 1) {
             setSelectionRange(selectedColumns[0], selectedRows[0],
-                  selectedColumns[selectedColumns.length-1],
-                  selectedRows[selectedRows.length-1]);
-         }
-         else {
+                  selectedColumns[selectedColumns.length - 1],
+                  selectedRows[selectedRows.length - 1]);
+         } else {
             setSelectionRange(START_INDEX, START_INDEX, START_INDEX, END_INDEX); // A:A
          }
          resetSelectionType();
@@ -214,7 +208,7 @@ public class SheetPanel extends JPanel
 
       private void recomputeColumnRangeSelection(Point deselectPoint, int[] selectedColumnRange) {
          if (isSelectingRowHeaders) {
-            int deselectedColumnIndex =  tblBaseSheet.columnAtPoint(deselectPoint);
+            int deselectedColumnIndex = tblBaseSheet.columnAtPoint(deselectPoint);
             int selectedColumnIndex = deselectedColumnIndex + 1; // the new selection is the next column index
             int maxColumnIndex = tblBaseSheet.getColumnCount() - 1; // 0-index
             if (selectedColumnIndex > maxColumnIndex) {
@@ -227,8 +221,7 @@ public class SheetPanel extends JPanel
       private boolean isControlKeyPressed(MouseEvent e) {
          if (System.getProperty("os.name").contains("Mac OS X")) {
             return e.isMetaDown();
-         }
-         else {
+         } else {
             return e.isControlDown();
          }
       }
@@ -240,8 +233,8 @@ public class SheetPanel extends JPanel
    }
 
    /**
-    * Mouse adapter for selecting a single column header in the spreadsheet.
-    * The selection causes all rows in that column will be highlighted.
+    * Mouse adapter for selecting a single column header in the spreadsheet. The
+    * selection causes all rows in that column will be highlighted.
     */
    class SelectSingleColumnHeader extends MouseAdapter {
       @Override
@@ -250,7 +243,7 @@ public class SheetPanel extends JPanel
          int columnIndexAtSelection = header.columnAtPoint(startMousePt);
          drawCellSelection(columnIndexAtSelection, START_INDEX, columnIndexAtSelection, END_INDEX);
       }
-      
+
       @Override
       public void mouseReleased(MouseEvent e) {
          int[] selectedColumns = tblBaseSheet.getSelectedColumns();
@@ -272,7 +265,7 @@ public class SheetPanel extends JPanel
          drawCellSelection(columnIndexAtInitialSelection, START_INDEX, columnIndexAtCurrentSelection, END_INDEX);
          markSelectionType();
       }
-      
+
       private void markSelectionType() {
          isSelectingRowHeaders = false;
          isSelectingColumnHeaders = true;
@@ -280,8 +273,8 @@ public class SheetPanel extends JPanel
    }
 
    /**
-    * Mouse adapter for selecting a single row header in the spreadsheet.
-    * The selection causes all columns in that row will be highlighted.
+    * Mouse adapter for selecting a single row header in the spreadsheet. The
+    * selection causes all columns in that row will be highlighted.
     */
    class SelectSingleRowHeader extends MouseAdapter {
       @Override
@@ -290,7 +283,7 @@ public class SheetPanel extends JPanel
          int rowIndexAtSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
          drawCellSelection(START_INDEX, rowIndexAtSelection, END_INDEX, rowIndexAtSelection);
       }
-      
+
       @Override
       public void mouseReleased(MouseEvent e) {
          int[] selectedRows = tblBaseSheet.getSelectedRows();
@@ -301,8 +294,8 @@ public class SheetPanel extends JPanel
    }
 
    /**
-    * Mouse adapter for selecting multiple row headers in the spreadsheet.
-    * The selection causes all rows in those rows will be highlighted.
+    * Mouse adapter for selecting multiple row headers in the spreadsheet. The
+    * selection causes all rows in those rows will be highlighted.
     */
    class SelectMultipleRowHeaders extends MouseAdapter {
       @Override
@@ -312,7 +305,7 @@ public class SheetPanel extends JPanel
          drawCellSelection(START_INDEX, rowIndexAtInitialSelection, END_INDEX, rowIndexAtCurrentSelection);
          markSelectionType();
       }
-      
+
       private void markSelectionType() {
          isSelectingRowHeaders = true;
          isSelectingColumnHeaders = false;
