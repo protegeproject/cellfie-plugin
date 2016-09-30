@@ -42,9 +42,6 @@ public class SheetPanel extends JPanel {
    private int endColumnIndex = START_INDEX;
    private int endRowIndex = END_INDEX;
 
-   private boolean isSelectingRowHeaders = false;
-   private boolean isSelectingColumnHeaders = false;
-
    private Point startMousePt;
 
    /**
@@ -184,21 +181,7 @@ public class SheetPanel extends JPanel {
    class SelectCellRange extends MouseAdapter {
       @Override
       public void mouseReleased(MouseEvent e) {
-         if (isControlKeyPressed(e)) {
-            selectCellRangeOnKeyModifier(e);
-         } else {
-            selectCellRangeOnMouseDragged();
-         }
-      }
-
-      private void selectCellRangeOnKeyModifier(MouseEvent e) {
-         Point deselectPoint = e.getPoint();
-         int[] selectedColumnRange = new int[] { startColumnIndex, endColumnIndex };
-         int[] selectedRowRange = new int[] { startRowIndex, endRowIndex };
-         recomputeColumnRangeSelection(deselectPoint, selectedColumnRange);
-         recomputeRowRangeSelection(deselectPoint, selectedRowRange);
-         setSelectionRange(selectedColumnRange[0], selectedRowRange[0], selectedColumnRange[1], selectedRowRange[1]);
-         drawCellSelection(selectedColumnRange[0], selectedRowRange[0], selectedColumnRange[1], selectedRowRange[1]);
+         selectCellRangeOnMouseDragged();
       }
 
       private void selectCellRangeOnMouseDragged() {
@@ -211,44 +194,6 @@ public class SheetPanel extends JPanel {
          } else {
             setSelectionRange(START_INDEX, START_INDEX, START_INDEX, END_INDEX); // A:A
          }
-         resetSelectionType();
-      }
-
-      private void recomputeRowRangeSelection(Point deselectPoint, int[] selectedRowRange) {
-         if (isSelectingColumnHeaders) {
-            int deselectedRowIndex = tblBaseSheet.rowAtPoint(deselectPoint);
-            int selectedRowIndex = deselectedRowIndex + 1; // the new selection is the next row index
-            int maxRowIndex = tblBaseSheet.getRowCount() - 1; // 0-index
-            if (selectedRowIndex > maxRowIndex) {
-               selectedRowIndex = maxRowIndex;
-            }
-            selectedRowRange[0] = selectedRowIndex;
-         }
-      }
-
-      private void recomputeColumnRangeSelection(Point deselectPoint, int[] selectedColumnRange) {
-         if (isSelectingRowHeaders) {
-            int deselectedColumnIndex = tblBaseSheet.columnAtPoint(deselectPoint);
-            int selectedColumnIndex = deselectedColumnIndex + 1; // the new selection is the next column index
-            int maxColumnIndex = tblBaseSheet.getColumnCount() - 1; // 0-index
-            if (selectedColumnIndex > maxColumnIndex) {
-               selectedColumnIndex = maxColumnIndex;
-            }
-            selectedColumnRange[0] = selectedColumnIndex;
-         }
-      }
-
-      private boolean isControlKeyPressed(MouseEvent e) {
-         if (System.getProperty("os.name").contains("Mac OS X")) {
-            return e.isMetaDown();
-         } else {
-            return e.isControlDown();
-         }
-      }
-
-      private void resetSelectionType() {
-         isSelectingRowHeaders = false;
-         isSelectingColumnHeaders = false;
       }
    }
 
@@ -283,12 +228,6 @@ public class SheetPanel extends JPanel {
          int columnIndexAtInitialSelection = header.columnAtPoint(startMousePt);
          int columnIndexAtCurrentSelection = header.columnAtPoint(e.getPoint());
          drawCellSelection(columnIndexAtInitialSelection, START_INDEX, columnIndexAtCurrentSelection, END_INDEX);
-         markSelectionType();
-      }
-
-      private void markSelectionType() {
-         isSelectingRowHeaders = false;
-         isSelectingColumnHeaders = true;
       }
    }
 
@@ -323,12 +262,6 @@ public class SheetPanel extends JPanel {
          int rowIndexAtInitialSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
          int rowIndexAtCurrentSelection = tblRowNumberSheet.rowAtPoint(e.getPoint());
          drawCellSelection(START_INDEX, rowIndexAtInitialSelection, END_INDEX, rowIndexAtCurrentSelection);
-         markSelectionType();
-      }
-
-      private void markSelectionType() {
-         isSelectingRowHeaders = true;
-         isSelectingColumnHeaders = false;
       }
    }
 
