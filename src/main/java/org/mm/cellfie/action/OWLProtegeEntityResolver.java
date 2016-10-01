@@ -29,9 +29,9 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver
    }
 
    @Override
-   public <T extends OWLEntity> T resolve(String shortName, final Class<T> entityType) throws EntityNotFoundException
+   public <T extends OWLEntity> T resolve(String renderingName, final Class<T> entityType) throws EntityNotFoundException
    {
-      OWLEntity entity = entityFinder.getOWLEntity(shortName);
+      OWLEntity entity = entityFinder.getOWLEntity(renderingName);
       if (entity != null) {
          try {
             T toReturn = entityType.cast(entity);
@@ -39,11 +39,11 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver
          }
          catch (ClassCastException e) {
             String template = "The expected entity '%s' does not have type: %s";
-            throw new EntityNotFoundException(String.format(template, shortName, entityType.getSimpleName()));
+            throw new EntityNotFoundException(String.format(template, renderingName, entityType.getSimpleName()));
          }
       }
       String template = "The expected entity '%s' does not exist in the ontology";
-      throw new EntityNotFoundException(String.format(template, shortName));
+      throw new EntityNotFoundException(String.format(template, renderingName));
    }
 
    @Override
@@ -52,42 +52,45 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver
       OWLEntity entity = entityFinder.getOWLEntity(entityName);
       if (entity == null) {
          try {
-            return entityFactory.createOWLEntity(entityType, getLocalName(entityName), getPrefix(entityName)).getOWLEntity();
+            String localName = getLocalName(entityName);
+            String prefix = getPrefix(entityName);
+            return entityFactory.createOWLEntity(entityType, localName, IRI.create(prefix)).getOWLEntity();
          } catch (OWLEntityCreationException e) {
-            throw new IllegalStateException("Programmer error - report this (with stack trace) to the Protege mailing list");
+            throw new EntityCreationException(e.getMessage());
          }
       }
       return entityType.cast(entity);
    }
 
-   private String getLocalName(String entityName)
+   private String getLocalName(String prefixedName)
    {
-      int colonIndex = entityName.indexOf(':');
+      int colonIndex = prefixedName.indexOf(':');
       if (colonIndex >= 0) {
-          return entityName.substring(colonIndex + 1);
+          return prefixedName.substring(colonIndex + 1);
       }
-      return entityName;
+      return prefixedName;
    }
 
-   private IRI getPrefix(String entityName)
+   private String getPrefix(String prefixedName) throws OWLEntityCreationException
    {
       OWLOntology activeOntology = editorKit.getModelManager().getActiveOntology();
       OWLOntologyManager manager = editorKit.getModelManager().getOWLOntologyManager();
       OWLDocumentFormat format = manager.getOntologyFormat(activeOntology);
       for (Namespaces ns : Namespaces.values()) {
-          if (entityName.startsWith(ns.name().toLowerCase() + ":")) {
-              return IRI.create(ns.toString());
+          if (prefixedName.startsWith(ns.name().toLowerCase() + ":")) {
+              return ns.toString();
           }
       }
-      int colonIndex = entityName.indexOf(':');
+      int colonIndex = prefixedName.indexOf(':');
       if (colonIndex > 0 && format != null && format.isPrefixOWLOntologyFormat()) {
           PrefixDocumentFormat prefixes = format.asPrefixOWLOntologyFormat();
-          String prefixName = entityName.substring(0, colonIndex + 1);
-          String prefix = prefixes.getPrefix(prefixName);
+          String prefixLabel = prefixedName.substring(0, colonIndex + 1);
+          String prefix = prefixes.getPrefix(prefixLabel);
           if (prefix != null) {
-              return IRI.create(prefix);
+              return prefix;
           }
       }
-      return null;
+      String message = String.format("Unable to get the prefix from '%s'" + prefixedName);
+      throw new OWLEntityCreationException(message);
    }
 }
