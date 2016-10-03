@@ -2,6 +2,8 @@ package org.mm.cellfie.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Optional;
+
 import javax.annotation.Nonnull;
 
 import org.mm.core.OWLEntityResolver;
@@ -24,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.vocab.Namespaces;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 public class OWLProtegeEntityResolver implements OWLEntityResolver {
 
@@ -38,25 +41,74 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
       entityFactory = modelManager.getOWLEntityFactory();
    }
 
+   /**
+    * Resolves the given entity name and returns the OWL entity object with the specified type.
+    * The method will scan the entity name in the active ontology and return the found object.
+    * If no entity was found, the method will check against a list of built-in entities before
+    * throwing a checked exception if still no entity was found.
+    *
+    * @param entityName
+    *          The entity name in short form or as a prefixed name string.
+    * @param entityType
+    *          The entity type following the OWLAPI class hierarchy. The types an be
+    *          one of these: {@link OWLClass}, {@link OWLDataProperty},
+    *          {@link OWLObjectProperty}. {@link OWLNamedIndividual} or
+    *          {@link OWLDatatype}.
+    * @return Returns an OWL entity object according to its type.
+    * @throws EntityNotFoundException If the entity name does not exist in the ontology.
+    */
    @Override
    public <T extends OWLEntity> T resolve(String entityName, final Class<T> entityType)
          throws EntityNotFoundException {
-      OWLEntity entity = entityFinder.getOWLEntity(entityName);
-      if (entity != null) {
-         try {
-            T toReturn = entityType.cast(entity);
-            return toReturn;
-         } catch (ClassCastException e) {
-            throw new EntityNotFoundException(
-                  String.format("The expected entity name '%s' does not have type %s",
-                  entityName, entityType.getSimpleName()));
-         }
+      T entity = null;
+      OWLEntity foundEntity = entityFinder.getOWLEntity(entityName);
+      if (foundEntity == null) {
+         entity = createNewForBuiltInEntity(entityName, entityType);
+      } else {
+         entity = entityType.cast(foundEntity);
       }
-      throw new EntityNotFoundException(
-            String.format("The expected entity name '%s' does not exist in the ontology",
-                  entityName));
+      if (entity == null) {
+         throw new EntityNotFoundException(
+               String.format("The expected entity name '%s' does not exist in the ontology",
+                     entityName));
+      }
+      return entity;
    }
 
+   private <T extends OWLEntity> T createNewForBuiltInEntity(String entityName, final Class<T> entityType) {
+      if (isPrefixedName(entityName)) {
+         IRI entityIri = expand(entityName);
+         if (OWLRDFVocabulary.BUILT_IN_VOCABULARY_IRIS.contains(entityIri)) {
+            try {
+               return createNew(entityName, entityType);
+            } catch (OWLEntityCreationException e) {
+               throw new IllegalArgumentException(e.getMessage());
+            }
+         }
+      }
+      return null;
+   }
+
+   private boolean isPrefixedName(String entityName) {
+      return entityName.indexOf(":") > 0;
+   }
+
+   /**
+    * Resolves the given entity name and returns the OWL entity object with the specified type.
+    * The method will scan the entity name in the active ontology and return the found object.
+    * If no entity was found, the method will check against a list of built-in entities before
+    * throwing a runtime exception if still no entity was found.
+    *
+    * @param entityName
+    *          The entity name in short form or as a prefixed name string.
+    * @param entityType
+    *          The entity type following the OWLAPI class hierarchy. The types an be
+    *          one of these: {@link OWLClass}, {@link OWLDataProperty},
+    *          {@link OWLObjectProperty}. {@link OWLNamedIndividual} or
+    *          {@link OWLDatatype}.
+    * @return Returns an OWL entity object according to its type.
+    * @throws EntityNotFoundException If the entity name does not exist in the ontology.
+    */
    @Override
    public <T extends OWLEntity> T resolveUnchecked(String entityName, final Class<T> entityType) {
       try {
@@ -86,20 +138,21 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
          throws EntityCreationException {
       OWLEntity entity = entityFinder.getOWLEntity(entityName);
       if (entity == null) {
-         return createNew(entityName, entityType);
+         try {
+            return createNew(entityName, entityType);
+         } catch (OWLEntityCreationException e) {
+            throw new EntityCreationException(e.getMessage());
+         }
       }
       return entityType.cast(entity);
    }
 
-   private <T extends OWLEntity> T createNew(String entityName, final Class<T> entityType) throws EntityCreationException {
-      try {
-         String localName = getLocalName(entityName);
-         String prefix = getPrefix(entityName);
-         IRI entityIri = IRI.create(prefix);
-         return entityFactory.createOWLEntity(entityType, localName, entityIri).getOWLEntity();
-      } catch (OWLEntityCreationException e) {
-         throw new EntityCreationException(e.getMessage());
-      }
+   private <T extends OWLEntity> T createNew(String entityName, final Class<T> entityType)
+         throws OWLEntityCreationException {
+      String localName = getLocalName(entityName);
+      Optional<IRI> prefix = getPrefix(entityName);
+      IRI baseIri = prefix.orElseGet(() -> null);
+      return entityFactory.createOWLEntity(entityType, localName, baseIri).getOWLEntity();
    }
 
    @Override
@@ -111,6 +164,16 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
       }
    }
 
+   private IRI expand(String entityName) {
+      String localName = getLocalName(entityName);
+      Optional<IRI> prefix = getPrefix(entityName);
+      if (prefix.isPresent()) {
+         String prefixString = prefix.get().toString();
+         return IRI.create(prefixString + localName);
+      }
+      throw new IllegalArgumentException("Missing required prefix");
+   }
+
    private String getLocalName(String prefixedName) {
       int colonIndex = prefixedName.indexOf(':');
       if (colonIndex >= 0) {
@@ -119,13 +182,13 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
       return prefixedName;
    }
 
-   private String getPrefix(String prefixedName) {
+   private Optional<IRI> getPrefix(String prefixedName) {
       OWLOntology activeOntology = modelManager.getActiveOntology();
       OWLOntologyManager manager = modelManager.getOWLOntologyManager();
       OWLDocumentFormat format = manager.getOntologyFormat(activeOntology);
       for (Namespaces ns : Namespaces.values()) {
           if (prefixedName.startsWith(ns.name().toLowerCase() + ":")) {
-              return ns.toString();
+              return Optional.of(IRI.create(ns.toString()));
           }
       }
       int colonIndex = prefixedName.indexOf(':');
@@ -134,10 +197,9 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
           String prefixLabel = prefixedName.substring(0, colonIndex + 1);
           String prefix = prefixes.getPrefix(prefixLabel);
           if (prefix != null) {
-              return prefix;
+              return Optional.of(IRI.create(prefix));
           }
       }
-      throw new IllegalArgumentException(
-            String.format("Unable to get the prefix from '%s'", prefixedName));
+      return Optional.empty();
    }
 }
