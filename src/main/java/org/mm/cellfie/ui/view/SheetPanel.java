@@ -187,7 +187,7 @@ public class SheetPanel extends JPanel {
       private void selectCellRangeOnMouseDragged() {
          int[] selectedColumns = tblBaseSheet.getSelectedColumns();
          int[] selectedRows = tblBaseSheet.getSelectedRows();
-         if (selectedColumns.length == 0 && selectedRows.length == 0) {
+         if (selectedColumns.length == 0 || selectedRows.length == 0) {
             setSelectionRange(START_INDEX, START_INDEX, START_INDEX, END_INDEX); // A:A
          } else {
             setSelectionRange(selectedColumns[0], selectedRows[0],
