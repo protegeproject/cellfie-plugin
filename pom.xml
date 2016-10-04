@@ -32,6 +32,11 @@
    <dependencies>
       <dependency>
          <groupId>edu.stanford.protege</groupId>
+         <artifactId>protege-editor-core</artifactId>
+         <version>5.0.0</version>
+      </dependency>
+      <dependency>
+         <groupId>edu.stanford.protege</groupId>
          <artifactId>protege-editor-owl</artifactId>
          <version>5.0.0</version>
       </dependency>
