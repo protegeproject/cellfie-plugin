@@ -181,10 +181,6 @@ public class SheetPanel extends JPanel {
    class SelectCellRange extends MouseAdapter {
       @Override
       public void mouseReleased(MouseEvent e) {
-         selectCellRangeOnMouseDragged();
-      }
-
-      private void selectCellRangeOnMouseDragged() {
          int[] selectedColumns = tblBaseSheet.getSelectedColumns();
          int[] selectedRows = tblBaseSheet.getSelectedRows();
          if (selectedColumns.length == 0 || selectedRows.length == 0) {
