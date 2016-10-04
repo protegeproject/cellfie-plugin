@@ -43,6 +43,7 @@ public class SheetPanel extends JPanel {
    private int endRowIndex = END_INDEX;
 
    private Point startMousePt;
+   private Point endMousePt;
 
    /**
     * Constructs the UI panel for the given input {@code Sheet} object.
@@ -62,12 +63,12 @@ public class SheetPanel extends JPanel {
 
       header = tblBaseSheet.getTableHeader();
       header.setReorderingAllowed(false);
-      header.addMouseListener(new SelectSingleColumnHeader());
-      header.addMouseMotionListener(new SelectMultipleColumnHeaders());
+      header.addMouseListener(new SelectColumnHeadersOnMouseClicked());
+      header.addMouseMotionListener(new SelectColumnHeadersOnMouseDragged());
 
       tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
-      tblRowNumberSheet.addMouseListener(new SelectSingleRowHeader());
-      tblRowNumberSheet.addMouseMotionListener(new SelectMultipleRowHeaders());
+      tblRowNumberSheet.addMouseListener(new SelectRowHeadersOnMouseClicked());
+      tblRowNumberSheet.addMouseMotionListener(new SelectRowHeadersOnMouseDragged());
 
       JScrollPane scrBaseSheet = new JScrollPane(tblBaseSheet);
       scrBaseSheet.setRowHeaderView(tblRowNumberSheet);
@@ -194,15 +195,16 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * Mouse adapter for selecting a single column header in the spreadsheet. The
-    * selection causes all rows in that column will be highlighted.
+    * Mouse adapter for selecting the column header in the spreadsheet using a mouse
+    * click or a mouse click with SHIFT key modifier.
     */
-   class SelectSingleColumnHeader extends MouseAdapter {
+   class SelectColumnHeadersOnMouseClicked extends MouseAdapter {
       @Override
       public void mousePressed(MouseEvent e) {
-         startMousePt = e.getPoint(); // set the initial clicking
-         int columnIndexAtSelection = header.columnAtPoint(startMousePt);
-         drawCellSelection(columnIndexAtSelection, START_INDEX, columnIndexAtSelection, END_INDEX);
+         setMouseClickingPoint(e);
+         int startColumnIndexAtSelection = header.columnAtPoint(startMousePt);
+         int endColumnIndexAtSelection = header.columnAtPoint(endMousePt);
+         drawCellSelection(startColumnIndexAtSelection, START_INDEX, endColumnIndexAtSelection, END_INDEX);
       }
 
       @Override
@@ -212,13 +214,24 @@ public class SheetPanel extends JPanel {
          int endColumnIndex = selectedColumns[selectedColumns.length - 1];
          setSelectionRange(startColumnIndex, START_INDEX, endColumnIndex, END_INDEX);
       }
+
+      private void setMouseClickingPoint(MouseEvent e) {
+         if (!isShiftKeyIsPressed(e)) {
+            startMousePt = e.getPoint(); // set the initial clicking point, skip if SHIFT key is pressed
+         }
+         endMousePt = e.getPoint();
+      }
+
+      private boolean isShiftKeyIsPressed(MouseEvent e) {
+         return e.isShiftDown();
+      }
    }
 
    /**
-    * Mouse adapter for selecting multiple column headers in the spreadsheet.
-    * The selection causes all rows in those columns will be highlighted.
+    * Mouse adapter for selecting multiple column headers in the spreadsheet using
+    * a mouse dragged gesture.
     */
-   class SelectMultipleColumnHeaders extends MouseAdapter {
+   class SelectColumnHeadersOnMouseDragged extends MouseAdapter {
       @Override
       public void mouseDragged(MouseEvent e) {
          int columnIndexAtInitialSelection = header.columnAtPoint(startMousePt);
@@ -228,15 +241,16 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * Mouse adapter for selecting a single row header in the spreadsheet. The
-    * selection causes all columns in that row will be highlighted.
+    * Mouse adapter for selecting the row header in the spreadsheet using a mouse
+    * click or a mouse click with SHIFT key modifier.
     */
-   class SelectSingleRowHeader extends MouseAdapter {
+   class SelectRowHeadersOnMouseClicked extends MouseAdapter {
       @Override
       public void mousePressed(MouseEvent e) {
-         startMousePt = e.getPoint(); // set the initial clicking
-         int rowIndexAtSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
-         drawCellSelection(START_INDEX, rowIndexAtSelection, END_INDEX, rowIndexAtSelection);
+         setMouseClickingPoint(e);
+         int startRowIndexAtSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
+         int endRowIndexAtSelection = tblRowNumberSheet.rowAtPoint(endMousePt);
+         drawCellSelection(START_INDEX, startRowIndexAtSelection, END_INDEX, endRowIndexAtSelection);
       }
 
       @Override
@@ -246,13 +260,24 @@ public class SheetPanel extends JPanel {
          int endRowIndex = selectedRows[selectedRows.length - 1];
          setSelectionRange(START_INDEX, startRowIndex, END_INDEX, endRowIndex);
       }
+
+      private void setMouseClickingPoint(MouseEvent e) {
+         if (!isShiftKeyIsPressed(e)) {
+            startMousePt = e.getPoint(); // set the initial clicking point, skip if SHIFT key is pressed
+         }
+         endMousePt = e.getPoint();
+      }
+
+      private boolean isShiftKeyIsPressed(MouseEvent e) {
+         return e.isShiftDown();
+      }
    }
 
    /**
-    * Mouse adapter for selecting multiple row headers in the spreadsheet. The
-    * selection causes all rows in those rows will be highlighted.
+    * Mouse adapter for selecting multiple row headers in the spreadsheet using
+    * a mouse dragged gesture.
     */
-   class SelectMultipleRowHeaders extends MouseAdapter {
+   class SelectRowHeadersOnMouseDragged extends MouseAdapter {
       @Override
       public void mouseDragged(MouseEvent e) {
          int rowIndexAtInitialSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
