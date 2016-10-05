@@ -6,7 +6,7 @@
       <name value="Create axioms from Excel workbook..." />
       <toolTip value="Generate OWL axioms from Excel spreadsheet" />
       <class value="org.mm.cellfie.action.CellfieAction" />
-      <path value="org.protege.editor.owl.menu.tools/SlotF-B"></path>
+      <path value="org.protege.editor.owl.menu.tools/SlotF-Z"></path>
       <editorKitId value="OWLEditorKit" />
    </extension>
 </plugin>
