@@ -276,14 +276,9 @@ public class WorkspacePanel extends JPanel
       dialog.addWindowListener(new WindowAdapter() // Closing Cellfie using close [x] button
       {
          @Override
-         public void windowClosing(WindowEvent e)
-         {
-            int answer = dialogHelper.showConfirmDialog(null, "Confirm Exit", "Exit Cellfie?");
-            switch (answer) {
-               case JOptionPane.YES_OPTION:
-                  if (workspacePanel.shouldClose()) {
-                     dialog.setVisible(false);
-                  }
+         public void windowClosing(WindowEvent e) {
+            if (workspacePanel.shouldClose()) {
+               dialog.setVisible(false);
             }
          }
       });
