@@ -94,7 +94,7 @@ public class CellfieAction extends ProtegeOWLAction
          for (String ext : fileExtension.split(",")) {
             extensions.add(ext.trim());
          }
-         return UIUtil.openFile(new JDialog(), title, fileDescription, extensions);
+         return UIUtil.openFile(parent, title, fileDescription, extensions);
       }
 
       @Override
@@ -103,7 +103,7 @@ public class CellfieAction extends ProtegeOWLAction
       {
          Set<String> extensions = new HashSet<>();
          extensions.add(fileExtension);
-         return UIUtil.saveFile(new JDialog(), title, fileDescription, extensions, null);
+         return UIUtil.saveFile(parent, title, fileDescription, extensions, null);
       }
    }
 }

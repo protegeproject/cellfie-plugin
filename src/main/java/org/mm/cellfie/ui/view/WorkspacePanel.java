@@ -263,7 +263,7 @@ public class WorkspacePanel extends JPanel
          @Override
          public void actionPerformed(ActionEvent e)
          {
-            int answer = dialogHelper.showConfirmDialog(null, "Confirm Exit", "Exit Cellfie?");
+            int answer = dialogHelper.showConfirmDialog(dialog, "Confirm Exit", "Exit Cellfie?");
             switch (answer) {
                case JOptionPane.YES_OPTION:
                   if (workspacePanel.shouldClose()) {
