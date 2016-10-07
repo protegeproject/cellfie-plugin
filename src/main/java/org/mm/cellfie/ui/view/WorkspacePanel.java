@@ -46,6 +46,7 @@ import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyID;
 
 /**
  * This is the main Mapping Master user interface. It contains a view of a
@@ -121,10 +122,15 @@ public class WorkspacePanel extends JPanel
 
    private String getTitle(OWLOntology ontology)
    {
-      com.google.common.base.Optional<IRI> ontologyID = ontology.getOntologyID().getOntologyIRI();
-      if (ontologyID.isPresent()) {
-         IRI id = ontologyID.get();
-         return String.format("%s (%s)", id.getRemainder().get(), id);
+      OWLOntologyID ontologyId = ontology.getOntologyID();
+      if (ontologyId.getOntologyIRI().isPresent()) {
+         IRI ontologyIri = ontologyId.getOntologyIRI().get();
+         com.google.common.base.Optional<String> ontologyShortName = ontologyIri.getRemainder();
+         if (ontologyShortName.isPresent()) {
+            return String.format("%s (%s)", ontologyShortName.get(), ontologyIri);
+         } else {
+            return String.format("%s", ontologyIri);
+         }
       }
       return "N/A";
    }
