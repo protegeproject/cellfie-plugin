@@ -46,7 +46,7 @@ import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.util.OntologyIRIShortFormProvider;
 
 /**
  * This is the main Mapping Master user interface. It contains a view of a
@@ -122,17 +122,28 @@ public class WorkspacePanel extends JPanel
 
    private String getTitle(OWLOntology ontology)
    {
-      OWLOntologyID ontologyId = ontology.getOntologyID();
-      if (ontologyId.getOntologyIRI().isPresent()) {
-         IRI ontologyIri = ontologyId.getOntologyIRI().get();
-         com.google.common.base.Optional<String> ontologyShortName = ontologyIri.getRemainder();
-         if (ontologyShortName.isPresent()) {
-            return String.format("%s (%s)", ontologyShortName.get(), ontologyIri);
-         } else {
-            return String.format("%s", ontologyIri);
-         }
+      if (ontology.getOntologyID().isAnonymous()) {
+         return ontology.getOntologyID().toString();
       }
-      return "N/A";
+      final com.google.common.base.Optional<IRI> iri = ontology.getOntologyID().getDefaultDocumentIRI();
+      return getOntologyLabelText(iri);
+   }
+
+   private String getOntologyLabelText(com.google.common.base.Optional<IRI> iri)
+   {
+      StringBuilder sb = new StringBuilder();
+      if (iri.isPresent()) {
+         String shortForm = new OntologyIRIShortFormProvider().getShortForm(iri.get());
+         sb.append(shortForm);
+      } else {
+         sb.append("Anonymous ontology");
+      }
+      sb.append(" (");
+      if (iri.isPresent()) {
+         sb.append(iri.get().toString());
+      }
+      sb.append(")");
+      return sb.toString();
    }
 
    private void loadWorkbookDocument(String path)
