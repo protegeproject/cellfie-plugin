@@ -21,7 +21,7 @@ public class DataSourceView extends JPanel implements ModelView {
 
    private ViewTabbedPane tabSheetContainer;
 
-   public DataSourceView(WorkspacePanel container) {
+   public DataSourceView(CellfieWorkspace container) {
       setLayout(new BorderLayout());
       setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 

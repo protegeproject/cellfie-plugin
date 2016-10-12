@@ -54,10 +54,10 @@ public class GenerateAxiomsAction implements ActionListener {
    private static final int ADD_TO_NEW_ONTOLOGY = 1;
    private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
-   private final WorkspacePanel container;
+   private final CellfieWorkspace container;
    private final OWLModelManager modelManager;
 
-   public GenerateAxiomsAction(WorkspacePanel container) {
+   public GenerateAxiomsAction(CellfieWorkspace container) {
       this.container = container;
       modelManager = container.getEditorKit().getModelManager();
    }

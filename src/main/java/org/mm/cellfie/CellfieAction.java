@@ -8,7 +8,7 @@ import java.io.File;
 import javax.swing.JDialog;
 
 import org.mm.cellfie.ui.DialogUtils;
-import org.mm.cellfie.ui.WorkspacePanel;
+import org.mm.cellfie.ui.CellfieWorkspace;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLWorkspace;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
@@ -54,7 +54,7 @@ public class CellfieAction extends ProtegeOWLAction {
    private void showCellfieDialog(String workbookPath) {
       final OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
       final OWLWorkspace editorWindow = editorKit.getOWLWorkspace();
-      JDialog cellfieDialog = WorkspacePanel.createDialog(currentOntology, workbookPath, editorKit);
+      JDialog cellfieDialog = CellfieWorkspace.createDialog(currentOntology, workbookPath, editorKit);
       cellfieDialog.setLocationRelativeTo(editorWindow);
       cellfieDialog.setVisible(true);
    }

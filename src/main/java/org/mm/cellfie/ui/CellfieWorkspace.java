@@ -57,7 +57,7 @@ import org.semanticweb.owlapi.util.OntologyIRIShortFormProvider;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class WorkspacePanel extends JPanel {
+public class CellfieWorkspace extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class WorkspacePanel extends JPanel {
    private MMApplication application;
    private MMApplicationFactory applicationFactory = new MMApplicationFactory();
 
-   public WorkspacePanel(@Nonnull OWLOntology ontology, @Nonnull String workbookFilePath,
+   public CellfieWorkspace(@Nonnull OWLOntology ontology, @Nonnull String workbookFilePath,
          @Nonnull OWLEditorKit editorKit) {
       this.ontology = checkNotNull(ontology);
       this.editorKit = checkNotNull(editorKit);
@@ -252,7 +252,7 @@ public class WorkspacePanel extends JPanel {
    public static JDialog createDialog(OWLOntology ontology, String workbookPath,
          OWLEditorKit editorKit) {
       final JDialog dialog = new JDialog(null, "Cellfie", Dialog.ModalityType.MODELESS);
-      final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit);
+      final CellfieWorkspace workspacePanel = new CellfieWorkspace(ontology, workbookPath, editorKit);
       workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
             .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
 

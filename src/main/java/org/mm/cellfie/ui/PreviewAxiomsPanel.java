@@ -28,10 +28,10 @@ public class PreviewAxiomsPanel extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
-   private final WorkspacePanel container;
+   private final CellfieWorkspace container;
    private final String logMessage;
 
-   public PreviewAxiomsPanel(WorkspacePanel container, Set<OWLAxiom> axioms, String logMessage) {
+   public PreviewAxiomsPanel(CellfieWorkspace container, Set<OWLAxiom> axioms, String logMessage) {
       this.container = container;
       this.logMessage = logMessage;
 
