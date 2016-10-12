@@ -31,13 +31,13 @@ public class PreviewedAxioms extends MList {
    }
 
    public void setAxioms(Set<OWLAxiom> axiomSet) {
-      Vector<AxiomListItem> items = new Vector<>();
+      Vector<PreviewedAxioms.Item> items = new Vector<>();
       for (OWLAxiom ax : axiomSet) {
-         items.add(new AxiomListItem(ax));
+         items.add(new Item(ax));
       }
-      Collections.sort(items, new Comparator<AxiomListItem>() {
+      Collections.sort(items, new Comparator<PreviewedAxioms.Item>() {
          @Override
-         public int compare(AxiomListItem o1, AxiomListItem o2) {
+         public int compare(PreviewedAxioms.Item o1, PreviewedAxioms.Item o2) {
             return o1.axiom.compareTo(o2.axiom);
          }
       });
@@ -45,7 +45,7 @@ public class PreviewedAxioms extends MList {
       setFixedCellHeight(24);
    }
 
-   private class AxiomListItemRenderer implements ListCellRenderer<AxiomListItem> {
+   private class AxiomListItemRenderer implements ListCellRenderer<PreviewedAxioms.Item> {
 
       private OWLCellRenderer renderer;
 
@@ -54,8 +54,8 @@ public class PreviewedAxioms extends MList {
       }
 
       @Override
-      public Component getListCellRendererComponent(JList<? extends AxiomListItem> list,
-            AxiomListItem item, int index, boolean isSelected, boolean cellHasFocus) {
+      public Component getListCellRendererComponent(JList<? extends PreviewedAxioms.Item> list,
+            PreviewedAxioms.Item item, int index, boolean isSelected, boolean cellHasFocus) {
          renderer.setHighlightKeywords(true);
          renderer.setWrap(false);
          return renderer.getListCellRendererComponent(list, item.axiom, index, isSelected,
@@ -63,11 +63,11 @@ public class PreviewedAxioms extends MList {
       }
    }
 
-   private class AxiomListItem implements MListItem {
+   public class Item implements MListItem {
 
       private OWLAxiom axiom;
 
-      public AxiomListItem(OWLAxiom axiom) {
+      public Item(OWLAxiom axiom) {
          this.axiom = axiom;
       }
 
