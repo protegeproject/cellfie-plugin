@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -46,7 +46,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import org.mm.cellfie.ui.exception.CellfieException;
+import org.mm.cellfie.exception.CellfieException;
 import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSetFactory;
 import org.mm.ui.DialogManager;
@@ -54,8 +54,12 @@ import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 
-public class TransformationRuleBrowserView extends JPanel implements ModelView
-{
+/**
+ * @author Josef Hardi <josef.hardi@stanford.edu> <br>
+ *         Stanford Center for Biomedical Informatics Research
+ */
+public class TransformationRuleBrowserView extends JPanel implements ModelView {
+
    private static final long serialVersionUID = 1L;
 
    private WorkspacePanel container;
@@ -71,11 +75,10 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
 
    private JTable tblTransformationRules;
    private CheckBoxHeaderRenderer tblHeaderRenderer;
-   
+
    private TransformationRulesTableModel tableModel;
 
-   public TransformationRuleBrowserView(WorkspacePanel container)
-   {
+   public TransformationRuleBrowserView(WorkspacePanel container) {
       this.container = container;
 
       setLayout(new BorderLayout());
@@ -90,17 +93,29 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       tblTransformationRules.setGridColor(new Color(220, 220, 220));
       tblTransformationRules.setDefaultRenderer(String.class, new MultiLineCellRenderer());
       tblTransformationRules.addMouseListener(new MappingExpressionSelectionListener());
-      tblTransformationRules.getInputMap(JTable.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), "ADD_RULE");
+
+      tblTransformationRules.getInputMap(JTable.WHEN_IN_FOCUSED_WINDOW)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), "ADD_RULE");
       tblTransformationRules.getActionMap().put("ADD_RULE", new AddRuleAction());
-      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "EDIT_RULE");
+
+      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "EDIT_RULE");
       tblTransformationRules.getActionMap().put("EDIT_RULE", new EditRuleAction());
-      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_RULE");
-      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "DELETE_RULE");
+
+      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_RULE");
+      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "DELETE_RULE");
       tblTransformationRules.getActionMap().put("DELETE_RULE", new DeleteRuleAction());
-      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK), "SELECT_ALL_RULES");
-      tblTransformationRules.getInputMap(JTable.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK), "SELECT_ALL_RULES");
+
+      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK), "SELECT_ALL_RULES");
+      tblTransformationRules.getInputMap(JTable.WHEN_IN_FOCUSED_WINDOW)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK), "SELECT_ALL_RULES");
       tblTransformationRules.getActionMap().put("SELECT_ALL_RULES", new SelectAllRulesAction());
-      tblTransformationRules.getInputMap(JTable.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK), "DESELECT_ALL_RULES");
+
+      tblTransformationRules.getInputMap(JTable.WHEN_IN_FOCUSED_WINDOW)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK), "DESELECT_ALL_RULES");
       tblTransformationRules.getActionMap().put("DESELECT_ALL_RULES", new DeselectAllRulesAction());
 
       tblTransformationRules.setColumnModel(new TransformationRulesColumnModel());
@@ -171,8 +186,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    }
 
    @Override
-   public void update()
-   {
+   public void update() {
       tableModel = new TransformationRulesTableModel(container.getActiveTransformationRules());
       tblTransformationRules.setModel(tableModel);
       tblTransformationRules.getColumnModel().getColumn(0).setHeaderRenderer(tblHeaderRenderer);
@@ -182,23 +196,20 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       updateBorderUI();
    }
 
-   private void setTableHeaderAlignment(int alignment)
-   {
-      ((DefaultTableCellRenderer) tblTransformationRules.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
+   private void setTableHeaderAlignment(int alignment) {
+      ((DefaultTableCellRenderer) tblTransformationRules.getTableHeader().getDefaultRenderer())
+            .setHorizontalAlignment(alignment);
    }
 
-   private void enableSaveButton()
-   {
+   private void enableSaveButton() {
       cmdSave.setEnabled(true);
    }
 
-   private void updateBorderUI()
-   {
+   private void updateBorderUI() {
       pnlContainer.setBorder(ComponentFactory.createTitledBorder(getTitle()));
    }
 
-   private String getTitle()
-   {
+   private String getTitle() {
       Optional<String> fileLocation = container.getRuleFileLocation();
       if (!fileLocation.isPresent()) {
          return String.format("Transformation Rules");
@@ -206,9 +217,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       return String.format("Transformation Rules (%s)", fileLocation.get());
    }
 
-   private void updateTableModel(int selectedRow, String sheetName, String startColumn, String endColumn,
-         String startRow, String endRow, String expression, String comment)
-   {
+   private void updateTableModel(int selectedRow, String sheetName, String startColumn,
+         String endColumn, String startRow, String endRow, String expression, String comment) {
       Vector<Object> row = new Vector<>();
       row.add(0, (selectedRow != -1 ? tableModel.getValueAt(selectedRow, 0) : true));
       row.add(1, sheetName);
@@ -223,19 +233,17 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          tableModel.removeRow(selectedRow);
          tableModel.insertRow(selectedRow, row);
          tblTransformationRules.setRowSelectionInterval(selectedRow, selectedRow);
-      }
-      else {
+      } else {
          tableModel.addRow(row);
          int rowCount = tableModel.getRowCount();
-         tblTransformationRules.setRowSelectionInterval(rowCount-1, rowCount-1);
+         tblTransformationRules.setRowSelectionInterval(rowCount - 1, rowCount - 1);
          if (rowCount == 1) {
             tblHeaderRenderer.checkSelectAllCheckBox();
          }
       }
    }
 
-   private void setPreferredColumnWidth()
-   {
+   private void setPreferredColumnWidth() {
       final TableColumnModel columnModel = tblTransformationRules.getColumnModel();
       columnModel.getColumn(0).setPreferredWidth(30);
       columnModel.getColumn(1).setPreferredWidth(100);
@@ -254,31 +262,29 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       columnModel.getColumn(5).setMaxWidth(120);
    }
 
-   private void setPreferredColumnHeight()
-   {
+   private void setPreferredColumnHeight() {
       int columnIndex = 6; // only for expression column
       for (int row = 0; row < tblTransformationRules.getRowCount(); row++) {
          int height = 0; // min height;
          Object value = tblTransformationRules.getModel().getValueAt(row, columnIndex);
          TableCellRenderer renderer = tblTransformationRules.getDefaultRenderer(String.class);
-         Component comp = renderer.getTableCellRendererComponent(tblTransformationRules, value, false, false, row, columnIndex);
+         Component comp = renderer.getTableCellRendererComponent(tblTransformationRules, value,
+               false, false, row, columnIndex);
          height = Math.max(comp.getPreferredSize().height, height);
          tblTransformationRules.setRowHeight(row, height);
       }
    }
 
-   public List<TransformationRule> getSelectedRules()
-   {
+   public List<TransformationRule> getSelectedRules() {
       return tableModel.getSelectedRules();
    }
 
-   private DialogManager getApplicationDialogManager()
-   {
+   private DialogManager getApplicationDialogManager() {
       return container.getApplicationDialogManager();
    }
 
-   class TransformationRulesColumnModel extends DefaultTableColumnModel
-   {
+   private class TransformationRulesColumnModel extends DefaultTableColumnModel {
+
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -289,18 +295,17 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          }
       }
    }
-   
-   class TransformationRulesTableModel extends DefaultTableModel implements TableModelListener
-   {
+
+   private class TransformationRulesTableModel extends DefaultTableModel implements TableModelListener {
+
       private static final long serialVersionUID = 1L;
 
-      private final String[] COLUMN_NAMES = { "", "Sheet Name", "Start Column", "End Column", "Start Row", "End Row",
-            "Rule", "Comment" };
+      private final String[] COLUMN_NAMES = { "", "Sheet Name", "Start Column", "End Column",
+            "Start Row", "End Row", "Rule", "Comment" };
 
       private boolean hasUnsavedChanges = false;
 
-      public TransformationRulesTableModel(final List<TransformationRule> rules)
-      {
+      public TransformationRulesTableModel(final List<TransformationRule> rules) {
          super();
          for (TransformationRule rule : rules) {
             Vector<Object> row = new Vector<>();
@@ -318,20 +323,17 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
 
       @Override
-      public String getColumnName(int column) // 0-based
-      {
+      public String getColumnName(int column) {
          return COLUMN_NAMES[column];
       }
 
       @Override
-      public int getColumnCount()
-      {
+      public int getColumnCount() {
          return COLUMN_NAMES.length;
       }
 
       @Override
-      public Class<?> getColumnClass(int columnIndex)
-      {
+      public Class<?> getColumnClass(int columnIndex) {
          if (columnIndex == 0) {
             return Boolean.class;
          }
@@ -339,18 +341,14 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
 
       @Override
-      public boolean isCellEditable(int rowIndex, int columnIndex)
-      {
+      public boolean isCellEditable(int rowIndex, int columnIndex) {
          if (columnIndex == 0) {
             return true;
          }
          return false;
       }
-      
-      
 
-      public List<TransformationRule> getAllRules()
-      {
+      public List<TransformationRule> getAllRules() {
          List<TransformationRule> rules = new ArrayList<>();
          for (int row = 0; row < getRowCount(); row++) {
             Vector<?> rowVector = (Vector<?>) getDataVector().elementAt(row);
@@ -361,13 +359,13 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
             String endRow = String.valueOf(rowVector.get(5));
             String expression = String.valueOf(rowVector.get(6));
             String comment = String.valueOf(rowVector.get(7));
-            rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
+            rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow,
+                  comment, expression));
          }
          return rules;
       }
 
-      public List<TransformationRule> getSelectedRules()
-      {
+      public List<TransformationRule> getSelectedRules() {
          List<TransformationRule> rules = new ArrayList<>();
          for (int row = 0; row < getRowCount(); row++) {
             Vector<?> rowVector = (Vector<?>) getDataVector().elementAt(row);
@@ -379,41 +377,37 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                String endRow = String.valueOf(rowVector.get(5));
                String expression = String.valueOf(rowVector.get(6));
                String comment = String.valueOf(rowVector.get(7));
-               rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression));
+               rules.add(new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow,
+                     comment, expression));
             }
          }
          return rules;
       }
 
-      private boolean isRuleSelected(Vector<?> rowVector)
-      {
+      private boolean isRuleSelected(Vector<?> rowVector) {
          return ((Boolean) rowVector.get(0)) == true;
       }
 
-      protected List<TransformationRule> getTransformationRulesAndSave()
-      {
+      protected List<TransformationRule> getTransformationRulesAndSave() {
          hasUnsavedChanges = false;
          return getAllRules();
       }
 
-      public boolean hasUnsavedChanges()
-      {
+      public boolean hasUnsavedChanges() {
          return hasUnsavedChanges;
       }
 
       @Override
-      public void tableChanged(TableModelEvent e)
-      {
+      public void tableChanged(TableModelEvent e) {
          int row = e.getFirstRow();
          int column = e.getColumn();
          if (column == 0) {
-            if ((Boolean)getValueAt(row, column) == false) {
+            if ((Boolean) getValueAt(row, column) == false) {
                tblHeaderRenderer.uncheckSelectAllCheckBox();
-            }
-            else {
+            } else {
                boolean allChecked = true;
-               for (int i=0; i<getRowCount(); i++) {
-                  if ((Boolean)getValueAt(i, column) == false) {
+               for (int i = 0; i < getRowCount(); i++) {
+                  if ((Boolean) getValueAt(i, column) == false) {
                      allChecked = false;
                      break;
                   }
@@ -422,10 +416,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                   tblHeaderRenderer.checkSelectAllCheckBox();
                }
             }
-         }
-         else {
+         } else {
             if (row >= 0) {
-                hasUnsavedChanges = true;
+               hasUnsavedChanges = true;
             }
          }
       }
@@ -434,13 +427,11 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    /**
     * To allow cells in the mapping browser table to have multi-lines.
     */
-   class MultiLineCellRenderer extends JTextArea implements TableCellRenderer
-   {
+   class MultiLineCellRenderer extends JTextArea implements TableCellRenderer {
       private static final long serialVersionUID = 1L;
 
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-            int row, int column)
-      {
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+            boolean hasFocus, int row, int column) {
          if (isSelected) {
             setForeground(table.getSelectionForeground());
             setBackground(table.getSelectionBackground());
@@ -466,12 +457,10 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
    /**
     * Header renderer for having a check box
     */
-   class CheckBoxHeaderRenderer extends JCheckBox implements TableCellRenderer
-   {
+   class CheckBoxHeaderRenderer extends JCheckBox implements TableCellRenderer {
       private static final long serialVersionUID = 403110192802482730L;
 
-      CheckBoxHeaderRenderer(JTableHeader header)
-      {
+      CheckBoxHeaderRenderer(JTableHeader header) {
          super();
          setHorizontalAlignment(JLabel.CENTER);
          setBorderPainted(true);
@@ -492,35 +481,36 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
 
       @Override
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col)
-      {
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+            boolean hasFocus, int row, int col) {
          TableCellRenderer r = table.getTableHeader().getDefaultRenderer();
-         JLabel l = (JLabel) r.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+         JLabel l = (JLabel) r.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+               row, col);
          l.setIcon(new ComponentIcon(this));
          return l;
       }
 
-      private class ComponentIcon implements Icon
-      {
+      private class ComponentIcon implements Icon {
          private final JCheckBox check;
 
          public ComponentIcon(JCheckBox check) {
-             this.check = check;
+            this.check = check;
          }
 
          @Override
          public int getIconWidth() {
-             return check.getPreferredSize().width;
+            return check.getPreferredSize().width;
          }
 
          @Override
          public int getIconHeight() {
-             return check.getPreferredSize().height;
+            return check.getPreferredSize().height;
          }
 
          @Override
          public void paintIcon(Component c, Graphics g, int x, int y) {
-             SwingUtilities.paintComponent(g, check, (Container) c, x, y, getIconWidth(), getIconHeight());
+            SwingUtilities.paintComponent(g, check, (Container) c, x, y, getIconWidth(),
+                  getIconHeight());
          }
       }
 
@@ -528,38 +518,35 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
          this.setSelected(true);
          TransformationRuleBrowserView.this.updateUI();
       }
-      
+
       public void uncheckSelectAllCheckBox() {
          this.setSelected(false);
          TransformationRuleBrowserView.this.updateUI();
       }
    }
-   
+
    public void setCheckBoxForAllRules(JTable table, boolean isSelected) {
       int nrow = table.getRowCount();
       if (nrow > 0) {
          for (int i = 0; i < nrow; i++) {
             if (isSelected) {
                table.setValueAt(true, i, 0);
-            }
-            else {
+            } else {
                table.setValueAt(false, i, 0);
             }
          }
       }
    }
-    
 
    /**
-    * To allow user editing immediately the transformation rules by double-clicking the row.
+    * To allow user editing immediately the transformation rules by
+    * double-clicking the row.
     */
-   class MappingExpressionSelectionListener extends MouseAdapter
-   {
+   private class MappingExpressionSelectionListener extends MouseAdapter {
       private int lastSelectedRow = -1;
 
       @Override
-      public void mouseClicked(MouseEvent e)
-      {
+      public void mouseClicked(MouseEvent e) {
          int selectedRow = tblTransformationRules.getSelectedRow();
          if (e.getClickCount() == 1) { // single click
             if (selectedRow != lastSelectedRow) {
@@ -574,10 +561,12 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
             }
          } else if (e.getClickCount() == 2) { // double-click
             List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
-            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
+            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(
+                  sheetNames);
             editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
-                  getValueAt(selectedRow, 3), getValueAt(selectedRow, 4), getValueAt(selectedRow, 5),
-                  getValueAt(selectedRow, 6), getValueAt(selectedRow, 7));
+                  getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
+                  getValueAt(selectedRow, 5), getValueAt(selectedRow, 6),
+                  getValueAt(selectedRow, 7));
             showMappingEditorDialog(editorPanel, selectedRow);
          }
       }
@@ -587,62 +576,53 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
     * Action listener implementations for command buttons and keys
     */
 
-   class AddRuleAction extends AbstractAction
-   {
+   private class AddRuleAction extends AbstractAction {
       private static final long serialVersionUID = 1L;
-      
+
       @Override
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
          addTransformationRule();
          fireTransformationRuleChange();
       }
    }
 
-   class AddButtonActionListener implements ActionListener
-   {
+   private class AddButtonActionListener implements ActionListener {
       @Override
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
          addTransformationRule();
          fireTransformationRuleChange();
       }
    }
 
-   public void addTransformationRule()
-   {
+   public void addTransformationRule() {
       List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
       TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
       editorPanel.setSheetName(container.getActiveSheet().getName());
-      editorPanel.setStartColumn(container.getActiveSheet().getSelectionRange().getStartColumnName());
+      editorPanel
+            .setStartColumn(container.getActiveSheet().getSelectionRange().getStartColumnName());
       editorPanel.setStartRow(container.getActiveSheet().getSelectionRange().getStartRowNumber());
       editorPanel.setEndColumn(container.getActiveSheet().getSelectionRange().getEndColumnName());
       editorPanel.setEndRow(container.getActiveSheet().getSelectionRange().getEndRowNumber());
       showMappingEditorDialog(editorPanel, -1);
    }
 
-   class EditRuleAction extends AbstractAction
-   {
+   private class EditRuleAction extends AbstractAction {
       private static final long serialVersionUID = 1L;
-      
+
       @Override
-      public void actionPerformed(ActionEvent e)
-      {
-         editTransformationRule();
-      }
-   }
-   
-   class EditButtonActionListener implements ActionListener
-   {
-      @Override
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
          editTransformationRule();
       }
    }
 
-   public void editTransformationRule()
-   {
+   private class EditButtonActionListener implements ActionListener {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         editTransformationRule();
+      }
+   }
+
+   public void editTransformationRule() {
       int selectedRow = tblTransformationRules.getSelectedRow();
       try {
          validateSelection(selectedRow);
@@ -657,15 +637,14 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
-   private String getValueAt(int row, int column)
-   {
+   private String getValueAt(int row, int column) {
       return (String) tableModel.getValueAt(row, column);
    }
-   
-   private void showMappingEditorDialog(TransformationRuleEditorPanel editorPanel, int selectedRow)
-   {
-      int answer = JOptionPaneEx.showConfirmDialog(
-            container, "Transformation Rule Editor", editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null);
+
+   private void showMappingEditorDialog(TransformationRuleEditorPanel editorPanel,
+         int selectedRow) {
+      int answer = JOptionPaneEx.showConfirmDialog(container, "Transformation Rule Editor",
+            editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null);
       switch (answer) {
          case JOptionPane.OK_OPTION :
             TransformationRule userInput = editorPanel.getUserInput();
@@ -678,29 +657,24 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
-   class DeleteRuleAction extends AbstractAction
-   {
+   private class DeleteRuleAction extends AbstractAction {
       private static final long serialVersionUID = 1L;
-      
+
       @Override
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
          removeTransformationRule();
          fireTransformationRuleChange();
       }
    }
 
-   class DeleteButtonActionListener implements ActionListener
-   {
-      public void actionPerformed(ActionEvent e)
-      {
+   private class DeleteButtonActionListener implements ActionListener {
+      public void actionPerformed(ActionEvent e) {
          removeTransformationRule();
          fireTransformationRuleChange();
       }
    }
 
-   private void removeTransformationRule()
-   {
+   private void removeTransformationRule() {
       int selectedRow = tblTransformationRules.getSelectedRow();
       try {
          validateSelection(selectedRow);
@@ -718,8 +692,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
-   private void resolveNextRowSelection(int selectedRow)
-   {
+   private void resolveNextRowSelection(int selectedRow) {
       try {
          // Select the previous row if there is no next row
          int previousRow = selectedRow - 1;
@@ -732,37 +705,31 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
-   class SelectAllRulesAction extends AbstractAction
-   {
+   private class SelectAllRulesAction extends AbstractAction {
       private static final long serialVersionUID = 1L;
-      
-      public void actionPerformed(ActionEvent e)
-      {
-        tblHeaderRenderer.checkSelectAllCheckBox();
-        setCheckBoxForAllRules(tblTransformationRules, true);
+
+      public void actionPerformed(ActionEvent e) {
+         tblHeaderRenderer.checkSelectAllCheckBox();
+         setCheckBoxForAllRules(tblTransformationRules, true);
       }
    }
 
-   class DeselectAllRulesAction extends AbstractAction
-   {
+   private class DeselectAllRulesAction extends AbstractAction {
       private static final long serialVersionUID = 1L;
-      
-      public void actionPerformed(ActionEvent e)
-      {
-        tblHeaderRenderer.uncheckSelectAllCheckBox();
-        setCheckBoxForAllRules(tblTransformationRules, false);
+
+      public void actionPerformed(ActionEvent e) {
+         tblHeaderRenderer.uncheckSelectAllCheckBox();
+         setCheckBoxForAllRules(tblTransformationRules, false);
       }
    }
-   
-   class OpenMappingAction implements ActionListener
-   {
+
+   private class OpenMappingAction implements ActionListener {
       @Override
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
          safeGuardChanges();
          try {
-            File file = getApplicationDialogManager().showOpenFileChooser(
-                  container, "Open Transformation Rule File", "json", "Transformation Rule File (.json)");
+            File file = getApplicationDialogManager().showOpenFileChooser(container,
+                  "Open Transformation Rule File", "json", "Transformation Rule File (.json)");
             if (file != null) {
                String filePath = file.getAbsolutePath();
                container.loadTransformationRuleDocument(filePath);
@@ -770,21 +737,20 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                fireTransformationRuleChange();
             }
          } catch (Exception ex) {
-            getApplicationDialogManager().showErrorMessageDialog(container, "Error opening file: " + ex.getMessage());
+            getApplicationDialogManager().showErrorMessageDialog(container,
+                  "Error opening file: " + ex.getMessage());
             ex.printStackTrace();
          }
       }
    }
 
-   private void validateSelection(int selectedRow) throws CellfieException
-   {
+   private void validateSelection(int selectedRow) throws CellfieException {
       if (selectedRow == -1) {
          throw new CellfieException("No transformation rule was selected");
       }
    }
 
-   public void fireTransformationRuleChange()
-   {
+   public void fireTransformationRuleChange() {
       if (tblTransformationRules.getRowCount() > 0) {
          if (container.getRuleFileLocation().isPresent()) {
             cmdSave.setEnabled(true);
@@ -796,20 +762,16 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
-   class SaveMappingAction implements ActionListener
-   {
+   private class SaveMappingAction implements ActionListener {
       @Override
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
          doSave(container.getRuleFileLocation().get());
       }
    }
 
-   class SaveAsMappingAction implements ActionListener
-   {
+   private class SaveAsMappingAction implements ActionListener {
       @Override
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
          if (doSelectFileAndSave()) {
             enableSaveButton();
             updateBorderUI();
@@ -817,23 +779,24 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       }
    }
 
-   public boolean doSave(String filePath)
-   {
+   public boolean doSave(String filePath) {
       boolean isSuccessful = true;
       try {
-         TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath, tableModel.getTransformationRulesAndSave());
+         TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath,
+               tableModel.getTransformationRulesAndSave());
          container.updateTransformationRuleModel();
       } catch (IOException e) {
          isSuccessful = false;
-         getApplicationDialogManager().showErrorMessageDialog(container, "Error saving file: " + e.getMessage());
+         getApplicationDialogManager().showErrorMessageDialog(container,
+               "Error saving file: " + e.getMessage());
       }
       return isSuccessful;
    }
 
-   public boolean doSelectFileAndSave()
-   {
+   public boolean doSelectFileAndSave() {
       boolean isSuccessful = true;
-      File file = getApplicationDialogManager().showSaveFileChooser(container, "Save As", "json", "Transformation Rule File (.json)", true);
+      File file = getApplicationDialogManager().showSaveFileChooser(container, "Save As", "json",
+            "Transformation Rule File (.json)", true);
       if (file != null) {
          String filePath = file.getAbsolutePath();
          String ext = ".json";
@@ -848,15 +811,14 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
       return isSuccessful;
    }
 
-   public boolean safeGuardChanges()
-   {
+   public boolean safeGuardChanges() {
       boolean isSuccessful = true;
       if (tableModel.hasUnsavedChanges()) {
-         int answer = JOptionPane.showConfirmDialog(
-               container, "There are unsaved changes in your transformation rules. Do you want to save them?", 
+         int answer = JOptionPane.showConfirmDialog(container,
+               "There are unsaved changes in your transformation rules. Do you want to save them?",
                "Closing Cellfie", JOptionPane.YES_NO_CANCEL_OPTION);
          switch (answer) {
-            case JOptionPane.YES_OPTION:
+            case JOptionPane.YES_OPTION :
                Optional<String> fileLocation = container.getRuleFileLocation();
                if (!fileLocation.isPresent()) {
                   isSuccessful = doSelectFileAndSave();
@@ -864,46 +826,15 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView
                   isSuccessful = doSave(fileLocation.get());
                }
                if (isSuccessful) {
-                  getApplicationDialogManager().showMessageDialog(container, "Transformation rules saved successfully");
+                  getApplicationDialogManager().showMessageDialog(container,
+                        "Transformation rules saved successfully");
                }
                break;
-            case JOptionPane.CANCEL_OPTION:
+            case JOptionPane.CANCEL_OPTION :
                isSuccessful = false; // avoid closing
                break;
          }
       }
       return isSuccessful;
-   }
-
-   /**
-    * A helper class for creating mapping editor command buttons.
-    */
-   class SaveOption implements Comparable<SaveOption>
-   {
-      private int option;
-      private String title;
-
-      public SaveOption(int option, String title)
-      {
-         this.option = option;
-         this.title = title;
-      }
-
-      public int get()
-      {
-         return option;
-      }
-
-      @Override
-      public String toString()
-      {
-         return title;
-      }
-
-      @Override
-      public int compareTo(SaveOption o)
-      {
-         return option - o.option;
-      }
    }
 }

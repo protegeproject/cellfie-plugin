@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
 
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
@@ -23,14 +23,14 @@ import javax.swing.table.TableColumn;
  *
  *  Original source code: http://www.camick.com/java/source/RowNumberTable.java
  */
-public class RowNumberWrapper extends JTable implements ChangeListener, PropertyChangeListener, TableModelListener
-{
+public class RowNumberWrapper extends JTable
+      implements ChangeListener, PropertyChangeListener, TableModelListener {
+
    private static final long serialVersionUID = 1L;
 
    private JTable main;
 
-   public RowNumberWrapper(JTable table)
-   {
+   public RowNumberWrapper(JTable table) {
       main = table;
       main.addPropertyChangeListener(this);
       main.getModel().addTableModelListener(this);
@@ -38,7 +38,7 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
       setFocusable(false);
       setAutoCreateColumnsFromModel(false);
       setSelectionModel(main.getSelectionModel());
-//      setCellSelectionEnabled(true);
+      // setCellSelectionEnabled(true);
       setColumnSelectionAllowed(false);
       setRowSelectionAllowed(true);
 
@@ -52,14 +52,10 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
    }
 
    @Override
-   public void addNotify()
-   {
+   public void addNotify() {
       super.addNotify();
-
       Component c = getParent();
-
       // Keep scrolling of the row table in sync with the main table.
-
       if (c instanceof JViewport) {
          JViewport viewport = (JViewport) c;
          viewport.addChangeListener(this);
@@ -70,20 +66,16 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
     * Delegate method to main table
     */
    @Override
-   public int getRowCount()
-   {
+   public int getRowCount() {
       return main.getRowCount();
    }
 
    @Override
-   public int getRowHeight(int row)
-   {
+   public int getRowHeight(int row) {
       int rowHeight = main.getRowHeight(row);
-
       if (rowHeight != super.getRowHeight(row)) {
          super.setRowHeight(row, rowHeight);
       }
-
       return rowHeight;
    }
 
@@ -92,8 +84,7 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
     * value of the cell.
     */
    @Override
-   public Object getValueAt(int row, int column)
-   {
+   public Object getValueAt(int row, int column) {
       return Integer.toString(row + 1);
    }
 
@@ -101,8 +92,7 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
     * Don't edit data in the main TableModel by mistake
     */
    @Override
-   public boolean isCellEditable(int row, int column)
-   {
+   public boolean isCellEditable(int row, int column) {
       return false;
    }
 
@@ -110,33 +100,26 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
     * Do nothing since the table ignores the model
     */
    @Override
-   public void setValueAt(Object value, int row, int column)
-   {
+   public void setValueAt(Object value, int row, int column) {
       // NO-OP
    }
 
    @Override
-   public void stateChanged(ChangeEvent e)
-   {
+   public void stateChanged(ChangeEvent e) {
       // Keep the scrolling of the row table in sync with main table
-
       JViewport viewport = (JViewport) e.getSource();
       JScrollPane scrollPane = (JScrollPane) viewport.getParent();
       scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
    }
 
-   public void propertyChange(PropertyChangeEvent e)
-   {
+   public void propertyChange(PropertyChangeEvent e) {
       // Keep the row table in sync with the main table
-
       if ("selectionModel".equals(e.getPropertyName())) {
          setSelectionModel(main.getSelectionModel());
       }
-
       if ("rowHeight".equals(e.getPropertyName())) {
          repaint();
       }
-
       if ("model".equals(e.getPropertyName())) {
          main.getModel().addTableModelListener(this);
          revalidate();
@@ -144,27 +127,24 @@ public class RowNumberWrapper extends JTable implements ChangeListener, Property
    }
 
    @Override
-   public void tableChanged(TableModelEvent e)
-   {
+   public void tableChanged(TableModelEvent e) {
       revalidate();
    }
 
    /*
     * Attempt to mimic the table header renderer
     */
-   private static class RowNumberRenderer extends DefaultTableCellRenderer
-   {
+   private static class RowNumberRenderer extends DefaultTableCellRenderer {
+
       private static final long serialVersionUID = 1L;
 
-      public RowNumberRenderer()
-      {
+      public RowNumberRenderer() {
          setHorizontalAlignment(JLabel.CENTER);
       }
 
       @Override
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-            int row, int column)
-      {
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+            boolean hasFocus, int row, int column) {
          if (table.isRowSelected(row)) {
             setForeground(UIManager.getColor("Table.selectionForeground"));
             setBackground(UIManager.getColor("controlShadow"));

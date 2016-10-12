@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.list;
+package org.mm.cellfie.ui;
 
 import java.awt.Component;
 import java.util.Collections;
@@ -15,29 +15,29 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-public class OWLAxiomList extends MList
-{
+/**
+ * @author Josef Hardi <josef.hardi@stanford.edu> <br>
+ *         Stanford Center for Biomedical Informatics Research
+ */
+public class OWLAxiomList extends MList {
+
    private static final long serialVersionUID = 1L;
 
    private OWLEditorKit editorKit;
 
-   public OWLAxiomList(OWLEditorKit editorKit)
-   {
+   public OWLAxiomList(OWLEditorKit editorKit) {
       this.editorKit = editorKit;
       setCellRenderer(new AxiomListItemRenderer());
    }
 
-   public void setAxioms(Set<OWLAxiom> axiomSet)
-   {
-      Vector<AxiomListItem> items = new Vector<AxiomListItem>();
+   public void setAxioms(Set<OWLAxiom> axiomSet) {
+      Vector<AxiomListItem> items = new Vector<>();
       for (OWLAxiom ax : axiomSet) {
          items.add(new AxiomListItem(ax));
       }
-      Collections.sort(items, new Comparator<AxiomListItem>()
-      {
+      Collections.sort(items, new Comparator<AxiomListItem>() {
          @Override
-         public int compare(AxiomListItem o1, AxiomListItem o2)
-         {
+         public int compare(AxiomListItem o1, AxiomListItem o2) {
             return o1.axiom.compareTo(o2.axiom);
          }
       });
@@ -45,55 +45,49 @@ public class OWLAxiomList extends MList
       setFixedCellHeight(24);
    }
 
-   private class AxiomListItemRenderer implements ListCellRenderer<AxiomListItem>
-   {
+   private class AxiomListItemRenderer implements ListCellRenderer<AxiomListItem> {
+
       private OWLCellRenderer renderer;
 
-      public AxiomListItemRenderer()
-      {
+      public AxiomListItemRenderer() {
          renderer = new OWLCellRenderer(editorKit);
       }
 
-      public Component getListCellRendererComponent(JList<? extends AxiomListItem> list, AxiomListItem item, int index,
-            boolean isSelected, boolean cellHasFocus)
-      {
+      @Override
+      public Component getListCellRendererComponent(JList<? extends AxiomListItem> list,
+            AxiomListItem item, int index, boolean isSelected, boolean cellHasFocus) {
          renderer.setHighlightKeywords(true);
          renderer.setWrap(false);
-         return renderer.getListCellRendererComponent(list, item.axiom, index, isSelected, cellHasFocus);
+         return renderer.getListCellRendererComponent(list, item.axiom, index, isSelected,
+               cellHasFocus);
       }
    }
 
-   private class AxiomListItem implements MListItem
-   {
+   private class AxiomListItem implements MListItem {
+
       private OWLAxiom axiom;
 
-      public AxiomListItem(OWLAxiom axiom)
-      {
+      public AxiomListItem(OWLAxiom axiom) {
          this.axiom = axiom;
       }
 
-      public boolean isEditable()
-      {
+      public boolean isEditable() {
          return false;
       }
 
-      public void handleEdit()
-      {
+      public void handleEdit() {
          // NO-OP
       }
 
-      public boolean isDeleteable()
-      {
+      public boolean isDeleteable() {
          return false;
       }
 
-      public boolean handleDelete()
-      {
+      public boolean handleDelete() {
          return false;
       }
 
-      public String getTooltip()
-      {
+      public String getTooltip() {
          return "";
       }
    }

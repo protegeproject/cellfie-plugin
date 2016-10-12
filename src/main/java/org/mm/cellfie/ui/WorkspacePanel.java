@@ -1,4 +1,6 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -27,7 +30,7 @@ import javax.swing.border.EmptyBorder;
 import org.mm.app.MMApplication;
 import org.mm.app.MMApplicationFactory;
 import org.mm.app.MMApplicationModel;
-import org.mm.cellfie.action.OWLProtegeOntology;
+import org.mm.cellfie.OWLProtegeOntology;
 import org.mm.core.OWLOntologySourceHook;
 import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSet;
@@ -51,26 +54,29 @@ import org.semanticweb.owlapi.util.OntologyIRIShortFormProvider;
 /**
  * This is the main Mapping Master user interface. It contains a view of a
  * spreadsheet and a control area to edit and execute Mapping Master rules.
+ *
+ * @author Josef Hardi <josef.hardi@stanford.edu> <br>
+ *         Stanford Center for Biomedical Informatics Research
  */
-public class WorkspacePanel extends JPanel
-{
+public class WorkspacePanel extends JPanel {
+
    private static final long serialVersionUID = 1L;
 
-   private OWLOntology ontology;
-   private OWLEditorKit editorKit;
+   private final OWLOntology ontology;
+   private final OWLEditorKit editorKit;
+   private final DialogManager dialogHelper;
 
-   private DialogManager dialogHelper;
    private DataSourceView dataSourceView;
    private TransformationRuleBrowserView transformationRuleBrowserView;
 
    private MMApplication application;
    private MMApplicationFactory applicationFactory = new MMApplicationFactory();
 
-   public WorkspacePanel(OWLOntology ontology, String workbookFilePath, OWLEditorKit editorKit, DialogManager dialogHelper)
-   {
-      this.ontology = ontology;
-      this.editorKit = editorKit;
-      this.dialogHelper = dialogHelper;
+   public WorkspacePanel(@Nonnull OWLOntology ontology, @Nonnull String workbookFilePath,
+         @Nonnull OWLEditorKit editorKit, @Nonnull DialogManager dialogHelper) {
+      this.ontology = checkNotNull(ontology);
+      this.editorKit = checkNotNull(editorKit);
+      this.dialogHelper = checkNotNull(dialogHelper);
 
       setLayout(new BorderLayout());
 
@@ -91,7 +97,8 @@ public class WorkspacePanel extends JPanel
       add(splitPane, BorderLayout.CENTER);
 
       loadWorkbookDocument(workbookFilePath);
-//      loadTransformationRuleDocument(ruleFilePath) // XXX In case the UI will allow users to input rule file in advance
+      // loadTransformationRuleDocument(ruleFilePath)
+      // XXX In case the UI will allow users to input rule file in advance
       setupApplication();
 
       /*
@@ -114,14 +121,12 @@ public class WorkspacePanel extends JPanel
     *
     * @return the file path location
     */
-   public String getOntologyFileLocation()
-   {
+   public String getOntologyFileLocation() {
       String iriString = ontology.getOWLOntologyManager().getOntologyDocumentIRI(ontology).toString();
-      return iriString.substring(iriString.indexOf(":")+1, iriString.length());
+      return iriString.substring(iriString.indexOf(":") + 1, iriString.length());
    }
 
-   private String getTitle(OWLOntology ontology)
-   {
+   private String getTitle(OWLOntology ontology) {
       if (ontology.getOntologyID().isAnonymous()) {
          return ontology.getOntologyID().toString();
       }
@@ -129,8 +134,7 @@ public class WorkspacePanel extends JPanel
       return getOntologyLabelText(iri);
    }
 
-   private String getOntologyLabelText(com.google.common.base.Optional<IRI> iri)
-   {
+   private String getOntologyLabelText(com.google.common.base.Optional<IRI> iri) {
       StringBuilder sb = new StringBuilder();
       if (iri.isPresent()) {
          String shortForm = new OntologyIRIShortFormProvider().getShortForm(iri.get());
@@ -146,8 +150,7 @@ public class WorkspacePanel extends JPanel
       return sb.toString();
    }
 
-   private void loadWorkbookDocument(String path)
-   {
+   private void loadWorkbookDocument(String path) {
       applicationFactory.setWorkbookFileLocation(path);
    }
 
@@ -156,13 +159,11 @@ public class WorkspacePanel extends JPanel
     *
     * @return the file path location
     */
-   public String getWorkbookFileLocation()
-   {
+   public String getWorkbookFileLocation() {
       return applicationFactory.getWorkbookFileLocation();
    }
 
-   public void loadTransformationRuleDocument(String path)
-   {
+   public void loadTransformationRuleDocument(String path) {
       setRuleFileLocation(path);
       setupApplication();
       transformationRuleBrowserView.update();
@@ -173,18 +174,15 @@ public class WorkspacePanel extends JPanel
     *
     * @return the file path location.
     */
-   public Optional<String> getRuleFileLocation()
-   {
+   public Optional<String> getRuleFileLocation() {
       return Optional.ofNullable(applicationFactory.getRuleFileLocation());
    }
 
-   public void setRuleFileLocation(String path)
-   {
+   public void setRuleFileLocation(String path) {
       applicationFactory.setRuleFileLocation(path);
    }
 
-   private void setupApplication()
-   {
+   private void setupApplication() {
       try {
          OWLOntologySourceHook ontologySourceHook = new OWLProtegeOntology(getEditorKit());
          application = applicationFactory.createApplication(ontologySourceHook);
@@ -193,96 +191,86 @@ public class WorkspacePanel extends JPanel
       }
    }
 
-   private MMApplicationModel getApplicationModel()
-   {
+   private MMApplicationModel getApplicationModel() {
       return application.getApplicationModel();
    }
 
-   public void evaluate(TransformationRule rule, Renderer renderer, Set<Rendering> results) throws ParseException
-   {
+   public void evaluate(TransformationRule rule, Renderer renderer, Set<Rendering> results)
+         throws ParseException {
       String ruleString = rule.getRuleString();
-      MappingMasterParser parser = new MappingMasterParser(new ByteArrayInputStream(ruleString.getBytes()), new ReferenceSettings(), -1);
+      MappingMasterParser parser = new MappingMasterParser(
+            new ByteArrayInputStream(ruleString.getBytes()), new ReferenceSettings(), -1);
       SimpleNode simpleNode = parser.expression();
-      MMExpressionNode ruleNode = new ExpressionNode((ASTExpression) simpleNode).getMMExpressionNode();
+      MMExpressionNode ruleNode = new ExpressionNode((ASTExpression) simpleNode)
+            .getMMExpressionNode();
       Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
       if (renderingResult.isPresent()) {
          results.add(renderingResult.get());
       }
    }
 
-   public OWLOntology getActiveOntology()
-   {
+   public OWLOntology getActiveOntology() {
       return ontology;
    }
 
-   public SpreadSheetDataSource getActiveWorkbook()
-   {
+   public SpreadSheetDataSource getActiveWorkbook() {
       return getApplicationModel().getDataSourceModel().getDataSource();
    }
 
-   public List<TransformationRule> getActiveTransformationRules()
-   {
+   public List<TransformationRule> getActiveTransformationRules() {
       return getApplicationModel().getTransformationRuleModel().getRules();
    }
 
-   public Sheet getActiveSheet()
-   {
+   public Sheet getActiveSheet() {
       return dataSourceView.getActiveSheet();
    }
 
-   /* package */ void updateTransformationRuleModel()
-   {
+   /* package */ void updateTransformationRuleModel() {
       final List<TransformationRule> rules = getTransformationRuleBrowserView().getSelectedRules();
       TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
       getApplicationModel().getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
    }
 
-   public Renderer getDefaultRenderer()
-   {
+   public Renderer getDefaultRenderer() {
       return getApplicationModel().getDefaultRenderer();
    }
 
-   public Renderer getLogRenderer()
-   {
+   public Renderer getLogRenderer() {
       return getApplicationModel().getLogRenderer();
    }
 
-   public OWLEditorKit getEditorKit()
-   {
+   public OWLEditorKit getEditorKit() {
       return editorKit;
    }
 
-   public DialogManager getApplicationDialogManager()
-   {
+   public DialogManager getApplicationDialogManager() {
       return dialogHelper;
    }
 
-   public DataSourceView getDataSourceView()
-   {
+   public DataSourceView getDataSourceView() {
       return dataSourceView;
    }
 
-   public TransformationRuleBrowserView getTransformationRuleBrowserView()
-   {
+   public TransformationRuleBrowserView getTransformationRuleBrowserView() {
       return transformationRuleBrowserView;
    }
 
-   public static JDialog createDialog(OWLOntology ontology, String workbookPath, OWLEditorKit editorKit, DialogManager dialogHelper)
-   {
+   public static JDialog createDialog(OWLOntology ontology, String workbookPath,
+         OWLEditorKit editorKit, DialogManager dialogHelper) {
       final JDialog dialog = new JDialog(null, "Cellfie", Dialog.ModalityType.MODELESS);
-      
-      final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit, dialogHelper);
-      workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
-      workspacePanel.getActionMap().put("CLOSE_DIALOG", new AbstractAction() // Closing Cellfie using ESC key
-      {
+      final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit,
+            dialogHelper);
+      workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
+
+      // Closing Cellfie using ESC key
+      workspacePanel.getActionMap().put("CLOSE_DIALOG", new AbstractAction() {
          private static final long serialVersionUID = 1L;
-         
          @Override
-         public void actionPerformed(ActionEvent e)
-         {
+         public void actionPerformed(ActionEvent e) {
             int answer = dialogHelper.showConfirmDialog(dialog, "Confirm Exit", "Exit Cellfie?");
             switch (answer) {
-               case JOptionPane.YES_OPTION:
+               case JOptionPane.YES_OPTION :
                   if (workspacePanel.shouldClose()) {
                      dialog.setVisible(false);
                   }
@@ -290,8 +278,9 @@ public class WorkspacePanel extends JPanel
          }
       });
       dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-      dialog.addWindowListener(new WindowAdapter() // Closing Cellfie using close [x] button
-      {
+
+      // Closing Cellfie using close [x] button 
+      dialog.addWindowListener(new WindowAdapter() {
          @Override
          public void windowClosing(WindowEvent e) {
             if (workspacePanel.shouldClose()) {
@@ -305,8 +294,7 @@ public class WorkspacePanel extends JPanel
       return dialog;
    }
 
-   protected boolean shouldClose()
-   {
+   protected boolean shouldClose() {
       return transformationRuleBrowserView.safeGuardChanges();
    }
 }

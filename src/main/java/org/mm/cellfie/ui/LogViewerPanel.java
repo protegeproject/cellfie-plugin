@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -20,29 +20,29 @@ import javax.swing.text.StyledEditorKit;
 
 import org.mm.renderer.text.TextRenderer;
 
-class LogViewerPanel extends JPanel
-{
+/**
+ * @author Josef Hardi <josef.hardi@stanford.edu> <br>
+ *         Stanford Center for Biomedical Informatics Research
+ */
+class LogViewerPanel extends JPanel {
+
    private static final long serialVersionUID = 1L;
 
-   public LogViewerPanel(String logMessage)
-   {
+   public LogViewerPanel(String logMessage) {
       setPreferredSize(new Dimension(1020, 420));
       setLayout(new BorderLayout());
       try {
          // To force the horizontal scrolling
-         JTextPane txtLogMessage = new JTextPane()
-         {
+         JTextPane txtLogMessage = new JTextPane() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public boolean getScrollableTracksViewportWidth()
-            {
+            public boolean getScrollableTracksViewportWidth() {
                return (getSize().width < getParent().getSize().width);
             }
 
             @Override
-            public void setSize(Dimension d)
-            {
+            public void setSize(Dimension d) {
                if (d.width < getParent().getSize().width) {
                   d.width = getParent().getSize().width;
                }
@@ -58,35 +58,31 @@ class LogViewerPanel extends JPanel
       }
    }
 
-   public EditorKit createHighlightEditorKit()
-   {
-      EditorKit editorKit = new StyledEditorKit()
-      {
+   public EditorKit createHighlightEditorKit() {
+      EditorKit editorKit = new StyledEditorKit() {
          private static final long serialVersionUID = 1L;
 
          @Override
-         public Document createDefaultDocument()
-         {
+         public Document createDefaultDocument() {
             return new CommentHighlightDocument();
          }
       };
       return editorKit;
    }
 
-   class CommentHighlightDocument extends DefaultStyledDocument
-   {
+   private class CommentHighlightDocument extends DefaultStyledDocument {
+
       private static final long serialVersionUID = 1L;
 
       final StyleContext c = StyleContext.getDefaultStyleContext();
-      final AttributeSet green = c.addAttribute(c.getEmptySet(), StyleConstants.Foreground, new Color(0, 100, 0));
+      final AttributeSet green = c.addAttribute(c.getEmptySet(), StyleConstants.Foreground,
+            new Color(0, 100, 0));
 
       @Override
-      public void insertString(int offset, String str, AttributeSet a) throws BadLocationException
-      {
+      public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
          super.insertString(offset, str, a);
          String content = getText(0, getLength());
-
-         Pattern singleLinecommentsPattern = Pattern.compile(TextRenderer.COMMENT_SYMBOL + ".*"); // comment symbol
+         Pattern singleLinecommentsPattern = Pattern.compile(TextRenderer.COMMENT_SYMBOL + ".*");
          Matcher matcher = singleLinecommentsPattern.matcher(content);
          while (matcher.find()) {
             setCharacterAttributes(matcher.start(), matcher.end() - matcher.start(), green, false);

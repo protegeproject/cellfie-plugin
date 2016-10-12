@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -18,8 +18,12 @@ import javax.swing.SwingUtilities;
 
 import org.mm.core.TransformationRule;
 
-public class TransformationRuleEditorPanel extends JPanel
-{
+/**
+ * @author Josef Hardi <josef.hardi@stanford.edu> <br>
+ *         Stanford Center for Biomedical Informatics Research
+ */
+public class TransformationRuleEditorPanel extends JPanel {
+
    private static final long serialVersionUID = 1L;
 
    private JComboBox<String> cbbSheetName;
@@ -32,8 +36,7 @@ public class TransformationRuleEditorPanel extends JPanel
 
    private JTextArea txtRule;
 
-   public TransformationRuleEditorPanel(List<String> sheetNames)
-   {
+   public TransformationRuleEditorPanel(List<String> sheetNames) {
       setLayout(new BorderLayout());
 
       JPanel pnlMain = new JPanel(new BorderLayout());
@@ -49,7 +52,9 @@ public class TransformationRuleEditorPanel extends JPanel
       txtStartColumn.addFocusListener(new FocusAdapter() {
          @Override
          public void focusGained(FocusEvent evt) {
-            SwingUtilities.invokeLater(() -> { txtStartColumn.selectAll(); });
+            SwingUtilities.invokeLater(() -> {
+               txtStartColumn.selectAll();
+            });
          }
       });
 
@@ -58,7 +63,9 @@ public class TransformationRuleEditorPanel extends JPanel
       txtEndColumn.addFocusListener(new FocusAdapter() {
          @Override
          public void focusGained(FocusEvent evt) {
-            SwingUtilities.invokeLater(() -> { txtEndColumn.selectAll(); });
+            SwingUtilities.invokeLater(() -> {
+               txtEndColumn.selectAll();
+            });
          }
       });
 
@@ -67,7 +74,9 @@ public class TransformationRuleEditorPanel extends JPanel
       txtStartRow.addFocusListener(new FocusAdapter() {
          @Override
          public void focusGained(FocusEvent evt) {
-            SwingUtilities.invokeLater(() -> { txtStartRow.selectAll(); });
+            SwingUtilities.invokeLater(() -> {
+               txtStartRow.selectAll();
+            });
          }
       });
 
@@ -76,7 +85,9 @@ public class TransformationRuleEditorPanel extends JPanel
       txtEndRow.addFocusListener(new FocusAdapter() {
          @Override
          public void focusGained(FocusEvent evt) {
-            SwingUtilities.invokeLater(() -> { txtEndRow.selectAll(); });
+            SwingUtilities.invokeLater(() -> {
+               txtEndRow.selectAll();
+            });
          }
       });
 
@@ -147,25 +158,21 @@ public class TransformationRuleEditorPanel extends JPanel
       txtEndRow.setText(rowNumber);
    }
 
-   public void fillFormFields(String sheetName, String startColumn, String endColumn, String startRow, String endRow,
-         String rule, String comment)
-   {
+   public void fillFormFields(String sheetName, String startColumn, String endColumn,
+         String startRow, String endRow, String rule, String comment) {
       cbbSheetName.setSelectedItem(sheetName);
-
       txtStartColumn.setText(startColumn);
       txtEndColumn.setText(endColumn);
       txtStartRow.setText(startRow);
       txtEndRow.setText(endRow);
-
       txtComment.setText(comment);
       txtRule.setText(rule);
    }
 
-   public TransformationRule getUserInput()
-   {
+   public TransformationRule getUserInput() {
       return new TransformationRule((String) cbbSheetName.getSelectedItem(),
-            txtStartColumn.getText().trim().toUpperCase(), txtEndColumn.getText().trim().toUpperCase(),
-            txtStartRow.getText().trim(), txtEndRow.getText().trim(), txtComment.getText().trim(),
-            txtRule.getText().trim());
+            txtStartColumn.getText().trim().toUpperCase(),
+            txtEndColumn.getText().trim().toUpperCase(), txtStartRow.getText().trim(),
+            txtEndRow.getText().trim(), txtComment.getText().trim(), txtRule.getText().trim());
    }
 }

@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -17,12 +17,15 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-public class SheetTable extends JTable
-{
+/**
+ * @author Josef Hardi <josef.hardi@stanford.edu> <br>
+ *         Stanford Center for Biomedical Informatics Research
+ */
+public class SheetTable extends JTable {
+
    private static final long serialVersionUID = 1L;
 
-   public SheetTable(TableModel model)
-   {
+   public SheetTable(TableModel model) {
       super(model);
 
       setDefaultRenderer(String.class, new WorksheetCellRenderer());
@@ -34,14 +37,13 @@ public class SheetTable extends JTable
 
       setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
       setColumnSelectionAllowed(true);
-      setRowSelectionAllowed (false);
-//      setCellSelectionEnabled(true);
+      setRowSelectionAllowed(false);
+      // setCellSelectionEnabled(true);
       resizeColumnWidth();
       setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
    }
 
-   private void resizeColumnWidth()
-   {
+   private void resizeColumnWidth() {
       final TableColumnModel columnModel = getColumnModel();
       for (int column = 0; column < getColumnCount(); column++) {
          int width = 50; // Min width
@@ -54,18 +56,16 @@ public class SheetTable extends JTable
       }
    }
 
-   public static class HighlightTableHeader extends JTableHeader
-   {
+   private static class HighlightTableHeader extends JTableHeader {
+
       private static final long serialVersionUID = 1L;
 
-      public HighlightTableHeader(TableColumnModel model)
-      {
+      public HighlightTableHeader(TableColumnModel model) {
          super(model);
       }
 
       @Override
-      public void columnSelectionChanged(ListSelectionEvent e)
-      {
+      public void columnSelectionChanged(ListSelectionEvent e) {
          repaint();
       }
    }
@@ -73,19 +73,17 @@ public class SheetTable extends JTable
    /*
     * Custom cell renderer for the table header
     */
-   public class ColumnHeaderRenderer extends DefaultTableCellRenderer
-   {
+   private class ColumnHeaderRenderer extends DefaultTableCellRenderer {
+
       private static final long serialVersionUID = 1L;
 
-      public ColumnHeaderRenderer()
-      {
+      public ColumnHeaderRenderer() {
          setHorizontalAlignment(JLabel.CENTER);
       }
 
       @Override
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focused,
-            int row, int column)
-      {
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean selected,
+            boolean focused, int row, int column) {
          super.getTableCellRendererComponent(table, value, selected, focused, row, column);
          if (table.isColumnSelected(column)) {
             setForeground(UIManager.getColor("Table.selectionForeground"));
@@ -102,13 +100,12 @@ public class SheetTable extends JTable
    /*
     * Custom cell renderer for the table sheet
     */
-   public class WorksheetCellRenderer extends DefaultTableCellRenderer
-   {
+   private class WorksheetCellRenderer extends DefaultTableCellRenderer {
+
       private static final long serialVersionUID = 1L;
 
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-            final int row, int column)
-      {
+      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+            boolean hasFocus, final int row, int column) {
          JLabel cell = (JLabel) (this);
          if (hasFocus) {
             setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
@@ -117,7 +114,6 @@ public class SheetTable extends JTable
             setBackground(table.getBackground());
             setBorder(null);
          }
-
          if (isSelected) {
             setBackground(table.getSelectionBackground());
             setBorder(null);
@@ -125,11 +121,10 @@ public class SheetTable extends JTable
             setBackground(table.getBackground());
             setBorder(null);
          }
-
          if (cell != null) {
-            cell.setBorder(new CompoundBorder(new EmptyBorder(new Insets(1, 4, 1, 4)), cell.getBorder()));
+            cell.setBorder(
+                  new CompoundBorder(new EmptyBorder(new Insets(1, 4, 1, 4)), cell.getBorder()));
          }
-
          this.setOpaque(true);
          setText((String) value);
          return this;

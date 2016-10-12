@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -21,7 +21,7 @@ import org.mm.ss.SpreadSheetUtil;
 
 /**
  * @author Josef Hardi <johardi@stanford.edu> <br>
- * Stanford Center for Biomedical Informatics Research
+ *         Stanford Center for Biomedical Informatics Research
  */
 public class SheetPanel extends JPanel {
 
@@ -88,7 +88,8 @@ public class SheetPanel extends JPanel {
       return sheet.getSheetName();
    }
 
-   private void setSelectionRange(int startColumnIndex, int startRowIndex, int endColumnIndex, int endRowIndex) {
+   private void setSelectionRange(int startColumnIndex, int startRowIndex, int endColumnIndex,
+         int endRowIndex) {
       this.startColumnIndex = startColumnIndex;
       this.startRowIndex = startRowIndex;
       this.endColumnIndex = endColumnIndex;
@@ -96,8 +97,9 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * Returns the array of the cell selection from this UI panel. The array is composed by
-    * { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex }
+    * Returns the array of the cell selection from this UI panel. The array is
+    * composed by { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex
+    * }
     *
     * @return The selection array.
     */
@@ -106,9 +108,11 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * The table model used to presenting the data from the Apache POI Sheet instance
+    * The table model used to presenting the data from the Apache POI Sheet
+    * instance
     */
-   class SheetTableModel extends AbstractTableModel {
+   private class SheetTableModel extends AbstractTableModel {
+
       private static final long serialVersionUID = 1L;
 
       private final Sheet sheet;
@@ -117,6 +121,7 @@ public class SheetPanel extends JPanel {
          this.sheet = checkNotNull(sheet);
       }
 
+      @Override
       public int getRowCount() {
          if (sheet.rowIterator().hasNext()) {
             return sheet.getLastRowNum() + 1;
@@ -125,6 +130,7 @@ public class SheetPanel extends JPanel {
          }
       }
 
+      @Override
       public int getColumnCount() {
          int maxCount = 0;
          for (int i = 0; i < getRowCount(); i++) {
@@ -139,10 +145,12 @@ public class SheetPanel extends JPanel {
          return maxCount;
       }
 
+      @Override
       public String getColumnName(int column) {
          return SpreadSheetUtil.columnNumber2Name(column + 1);
       }
 
+      @Override
       public Object getValueAt(int row, int column) {
          try {
             Cell cell = sheet.getRow(row).getCell(column);
@@ -179,7 +187,7 @@ public class SheetPanel extends JPanel {
    /**
     * Mouse adapter for selecting a cell range in the spreadsheet
     */
-   class SelectCellRange extends MouseAdapter {
+   private class SelectCellRange extends MouseAdapter {
       @Override
       public void mouseReleased(MouseEvent e) {
          int[] selectedColumns = tblBaseSheet.getSelectedColumns();
@@ -195,16 +203,20 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * Mouse adapter for selecting the column header in the spreadsheet using a mouse
-    * click or a mouse click with SHIFT key modifier.
+    * Mouse adapter for selecting the column header in the spreadsheet using a
+    * mouse click or a mouse click with SHIFT key modifier.
     */
-   class SelectColumnHeadersOnMouseClicked extends MouseAdapter {
+   private class SelectColumnHeadersOnMouseClicked extends MouseAdapter {
       @Override
       public void mousePressed(MouseEvent e) {
          setMouseClickingPoint(e);
          int startColumnIndexAtSelection = header.columnAtPoint(startMousePt);
          int endColumnIndexAtSelection = header.columnAtPoint(endMousePt);
-         drawCellSelection(startColumnIndexAtSelection, START_INDEX, endColumnIndexAtSelection, END_INDEX);
+         drawCellSelection(
+               startColumnIndexAtSelection,
+               START_INDEX,
+               endColumnIndexAtSelection,
+               END_INDEX);
       }
 
       @Override
@@ -216,8 +228,9 @@ public class SheetPanel extends JPanel {
       }
 
       private void setMouseClickingPoint(MouseEvent e) {
+         // set the initial clicking point, but ignore if SHIFT key is pressed
          if (!isShiftKeyIsPressed(e)) {
-            startMousePt = e.getPoint(); // set the initial clicking point, skip if SHIFT key is pressed
+            startMousePt = e.getPoint();
          }
          endMousePt = e.getPoint();
       }
@@ -228,29 +241,37 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * Mouse adapter for selecting multiple column headers in the spreadsheet using
-    * a mouse dragged gesture.
+    * Mouse adapter for selecting multiple column headers in the spreadsheet
+    * using a mouse dragged gesture.
     */
-   class SelectColumnHeadersOnMouseDragged extends MouseAdapter {
+   private class SelectColumnHeadersOnMouseDragged extends MouseAdapter {
       @Override
       public void mouseDragged(MouseEvent e) {
          int columnIndexAtInitialSelection = header.columnAtPoint(startMousePt);
          int columnIndexAtCurrentSelection = header.columnAtPoint(e.getPoint());
-         drawCellSelection(columnIndexAtInitialSelection, START_INDEX, columnIndexAtCurrentSelection, END_INDEX);
+         drawCellSelection(
+               columnIndexAtInitialSelection,
+               START_INDEX,
+               columnIndexAtCurrentSelection,
+               END_INDEX);
       }
    }
 
    /**
-    * Mouse adapter for selecting the row header in the spreadsheet using a mouse
-    * click or a mouse click with SHIFT key modifier.
+    * Mouse adapter for selecting the row header in the spreadsheet using a
+    * mouse click or a mouse click with SHIFT key modifier.
     */
-   class SelectRowHeadersOnMouseClicked extends MouseAdapter {
+   private class SelectRowHeadersOnMouseClicked extends MouseAdapter {
       @Override
       public void mousePressed(MouseEvent e) {
          setMouseClickingPoint(e);
          int startRowIndexAtSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
          int endRowIndexAtSelection = tblRowNumberSheet.rowAtPoint(endMousePt);
-         drawCellSelection(START_INDEX, startRowIndexAtSelection, END_INDEX, endRowIndexAtSelection);
+         drawCellSelection(
+               START_INDEX,
+               startRowIndexAtSelection,
+               END_INDEX,
+               endRowIndexAtSelection);
       }
 
       @Override
@@ -262,8 +283,9 @@ public class SheetPanel extends JPanel {
       }
 
       private void setMouseClickingPoint(MouseEvent e) {
+         // set the initial clicking point, but ignore if SHIFT key is pressed
          if (!isShiftKeyIsPressed(e)) {
-            startMousePt = e.getPoint(); // set the initial clicking point, skip if SHIFT key is pressed
+            startMousePt = e.getPoint();
          }
          endMousePt = e.getPoint();
       }
@@ -277,16 +299,21 @@ public class SheetPanel extends JPanel {
     * Mouse adapter for selecting multiple row headers in the spreadsheet using
     * a mouse dragged gesture.
     */
-   class SelectRowHeadersOnMouseDragged extends MouseAdapter {
+   private class SelectRowHeadersOnMouseDragged extends MouseAdapter {
       @Override
       public void mouseDragged(MouseEvent e) {
          int rowIndexAtInitialSelection = tblRowNumberSheet.rowAtPoint(startMousePt);
          int rowIndexAtCurrentSelection = tblRowNumberSheet.rowAtPoint(e.getPoint());
-         drawCellSelection(START_INDEX, rowIndexAtInitialSelection, END_INDEX, rowIndexAtCurrentSelection);
+         drawCellSelection(
+               START_INDEX,
+               rowIndexAtInitialSelection,
+               END_INDEX,
+               rowIndexAtCurrentSelection);
       }
    }
 
-   private void drawCellSelection(int startColumnIndex, int startRowIndex, int endColumnIndex, int endRowIndex) {
+   private void drawCellSelection(int startColumnIndex, int startRowIndex, int endColumnIndex,
+         int endRowIndex) {
       tblBaseSheet.setColumnSelectionInterval(startColumnIndex,
             (endColumnIndex == END_INDEX ? tblBaseSheet.getColumnCount() - 1 : endColumnIndex));
       tblBaseSheet.setRowSelectionInterval(startRowIndex,

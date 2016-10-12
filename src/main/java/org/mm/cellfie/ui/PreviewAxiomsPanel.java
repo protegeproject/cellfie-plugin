@@ -1,4 +1,4 @@
-package org.mm.cellfie.ui.view;
+package org.mm.cellfie.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,19 +17,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import org.mm.cellfie.ui.list.OWLAxiomList;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-public class PreviewAxiomsPanel extends JPanel
-{
+/**
+ * @author Josef Hardi <josef.hardi@stanford.edu> <br>
+ *         Stanford Center for Biomedical Informatics Research
+ */
+public class PreviewAxiomsPanel extends JPanel {
+
    private static final long serialVersionUID = 1L;
 
    private final WorkspacePanel container;
    private final String logMessage;
 
-   public PreviewAxiomsPanel(WorkspacePanel container, Set<OWLAxiom> axioms, String logMessage)
-   {
+   public PreviewAxiomsPanel(WorkspacePanel container, Set<OWLAxiom> axioms, String logMessage) {
       this.container = container;
       this.logMessage = logMessage;
 
@@ -59,13 +61,11 @@ public class PreviewAxiomsPanel extends JPanel
       pnlViewLog.add(lblViewLog);
    }
 
-   class ViewLogAction extends MouseAdapter
-   {
+   class ViewLogAction extends MouseAdapter {
       @Override
-      public void mouseClicked(MouseEvent e)
-      {
-         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewerPanel(logMessage), JOptionPane.PLAIN_MESSAGE,
-               JOptionPane.DEFAULT_OPTION, null);
+      public void mouseClicked(MouseEvent e) {
+         JOptionPaneEx.showConfirmDialog(container, "Log Viewer", new LogViewerPanel(logMessage),
+               JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null);
       }
    }
 }
