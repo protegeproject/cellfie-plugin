@@ -19,13 +19,13 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class OWLAxiomList extends MList {
+public class PreviewedAxioms extends MList {
 
    private static final long serialVersionUID = 1L;
 
    private OWLEditorKit editorKit;
 
-   public OWLAxiomList(OWLEditorKit editorKit) {
+   public PreviewedAxioms(OWLEditorKit editorKit) {
       this.editorKit = editorKit;
       setCellRenderer(new AxiomListItemRenderer());
    }

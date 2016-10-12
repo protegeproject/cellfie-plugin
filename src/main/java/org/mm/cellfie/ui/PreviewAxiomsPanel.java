@@ -41,7 +41,7 @@ public class PreviewAxiomsPanel extends JPanel {
       lblPreview.setText("Cellfie generates " + axioms.size() + " axioms:");
       add(lblPreview, BorderLayout.NORTH);
 
-      OWLAxiomList previewList = new OWLAxiomList(container.getEditorKit());
+      PreviewedAxioms previewList = new PreviewedAxioms(container.getEditorKit());
       previewList.setAxioms(axioms);
       add(new JScrollPane(previewList), BorderLayout.CENTER);
 
