@@ -1,11 +1,14 @@
 package org.mm.cellfie.ui;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Component;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.annotation.Nonnull;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
@@ -63,30 +66,43 @@ public class PreviewedAxioms extends MList {
       }
    }
 
+   /**
+    * Represents each OWL axiom object in the previewed axioms MList.
+    */
    public class Item implements MListItem {
 
-      private OWLAxiom axiom;
+      private final OWLAxiom axiom;
 
-      public Item(OWLAxiom axiom) {
+      public Item(@Nonnull OWLAxiom axiom) {
+         checkNotNull(axiom);
          this.axiom = axiom;
       }
 
+      public OWLAxiom getObject() {
+         return axiom;
+      }
+
+      @Override
       public boolean isEditable() {
          return false;
       }
 
+      @Override
       public void handleEdit() {
          // NO-OP
       }
 
+      @Override
       public boolean isDeleteable() {
          return false;
       }
 
+      @Override
       public boolean handleDelete() {
          return false;
       }
 
+      @Override
       public String getTooltip() {
          return "";
       }
