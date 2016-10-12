@@ -31,7 +31,6 @@ import org.mm.rendering.owlapi.OWLRendering;
 import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
-import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
@@ -119,7 +118,8 @@ public class GenerateAxiomsAction implements ActionListener {
          // Show the preview dialog to users to see all the generated axioms
          showAxiomPreviewDialog(toAxioms(results), logMessage);
       } catch (Exception ex) {
-         getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+         DialogUtils.showErrorDialog(container, ex.getMessage());
+         // TODO: Add logger
       }
    }
 
@@ -318,10 +318,6 @@ public class GenerateAxiomsAction implements ActionListener {
          throw new CellfieException("No transformation rules were selected");
       }
       return rules;
-   }
-
-   private DialogManager getApplicationDialogManager() {
-      return container.getApplicationDialogManager();
    }
 
    private void logEvaluation(TransformationRule rule, StringBuilder logBuilder)

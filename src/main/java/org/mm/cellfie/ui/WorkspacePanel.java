@@ -44,7 +44,6 @@ import org.mm.parser.node.MMExpressionNode;
 import org.mm.renderer.Renderer;
 import org.mm.rendering.Rendering;
 import org.mm.ss.SpreadSheetDataSource;
-import org.mm.ui.DialogManager;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
@@ -64,7 +63,6 @@ public class WorkspacePanel extends JPanel {
 
    private final OWLOntology ontology;
    private final OWLEditorKit editorKit;
-   private final DialogManager dialogHelper;
 
    private DataSourceView dataSourceView;
    private TransformationRuleBrowserView transformationRuleBrowserView;
@@ -73,10 +71,9 @@ public class WorkspacePanel extends JPanel {
    private MMApplicationFactory applicationFactory = new MMApplicationFactory();
 
    public WorkspacePanel(@Nonnull OWLOntology ontology, @Nonnull String workbookFilePath,
-         @Nonnull OWLEditorKit editorKit, @Nonnull DialogManager dialogHelper) {
+         @Nonnull OWLEditorKit editorKit) {
       this.ontology = checkNotNull(ontology);
       this.editorKit = checkNotNull(editorKit);
-      this.dialogHelper = checkNotNull(dialogHelper);
 
       setLayout(new BorderLayout());
 
@@ -187,7 +184,8 @@ public class WorkspacePanel extends JPanel {
          OWLOntologySourceHook ontologySourceHook = new OWLProtegeOntology(getEditorKit());
          application = applicationFactory.createApplication(ontologySourceHook);
       } catch (Exception e) {
-         dialogHelper.showErrorMessageDialog(this, "Initialization error: " + e.getMessage());
+         DialogUtils.showErrorDialog(this, "Unable to start Cellfie Workspace (see log for details");
+         // TODO: Add logger
       }
    }
 
@@ -243,10 +241,6 @@ public class WorkspacePanel extends JPanel {
       return editorKit;
    }
 
-   public DialogManager getApplicationDialogManager() {
-      return dialogHelper;
-   }
-
    public DataSourceView getDataSourceView() {
       return dataSourceView;
    }
@@ -256,10 +250,9 @@ public class WorkspacePanel extends JPanel {
    }
 
    public static JDialog createDialog(OWLOntology ontology, String workbookPath,
-         OWLEditorKit editorKit, DialogManager dialogHelper) {
+         OWLEditorKit editorKit) {
       final JDialog dialog = new JDialog(null, "Cellfie", Dialog.ModalityType.MODELESS);
-      final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit,
-            dialogHelper);
+      final WorkspacePanel workspacePanel = new WorkspacePanel(ontology, workbookPath, editorKit);
       workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
             .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
 
@@ -268,7 +261,7 @@ public class WorkspacePanel extends JPanel {
          private static final long serialVersionUID = 1L;
          @Override
          public void actionPerformed(ActionEvent e) {
-            int answer = dialogHelper.showConfirmDialog(dialog, "Confirm Exit", "Exit Cellfie?");
+            int answer = DialogUtils.showConfirmDialog(dialog, "Exit Cellfie?");
             switch (answer) {
                case JOptionPane.YES_OPTION :
                   if (workspacePanel.shouldClose()) {

@@ -1,5 +1,7 @@
 package org.mm.cellfie.ui;
 
+import static java.lang.String.format;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -49,10 +51,8 @@ import javax.swing.table.TableColumnModel;
 import org.mm.cellfie.exception.CellfieException;
 import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSetFactory;
-import org.mm.ui.DialogManager;
 import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.util.ComponentFactory;
-import org.protege.editor.core.ui.util.JOptionPaneEx;
 
 /**
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
@@ -277,10 +277,6 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    public List<TransformationRule> getSelectedRules() {
       return tableModel.getSelectedRules();
-   }
-
-   private DialogManager getApplicationDialogManager() {
-      return container.getApplicationDialogManager();
    }
 
    private class TransformationRulesColumnModel extends DefaultTableColumnModel {
@@ -633,7 +629,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
                getValueAt(selectedRow, 6), getValueAt(selectedRow, 7));
          showMappingEditorDialog(editorPanel, selectedRow);
       } catch (CellfieException ex) {
-         getApplicationDialogManager().showMessageDialog(container, ex.getMessage());
+         DialogUtils.showInfoDialog(container, ex.getMessage());
+         // TODO: Add logger
       }
    }
 
@@ -643,8 +640,11 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    private void showMappingEditorDialog(TransformationRuleEditorPanel editorPanel,
          int selectedRow) {
-      int answer = JOptionPaneEx.showConfirmDialog(container, "Transformation Rule Editor",
-            editorPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null);
+      int answer = DialogUtils.showDialog(container,
+            "Transformation Rule Editor",
+            editorPanel,
+            JOptionPane.PLAIN_MESSAGE,
+            JOptionPane.OK_CANCEL_OPTION);
       switch (answer) {
          case JOptionPane.OK_OPTION :
             TransformationRule userInput = editorPanel.getUserInput();
@@ -678,7 +678,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
       int selectedRow = tblTransformationRules.getSelectedRow();
       try {
          validateSelection(selectedRow);
-         int answer = getApplicationDialogManager().showConfirmDialog(container, "Confirm Delete",
+         int answer = DialogUtils.showConfirmDialog(container,
                "Do you really want to delete the selected transformation rule?");
          switch (answer) {
             case JOptionPane.YES_OPTION :
@@ -686,7 +686,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
                tblTransformationRules.setRowSelectionInterval(selectedRow, selectedRow);
          }
       } catch (CellfieException ex) {
-         getApplicationDialogManager().showErrorMessageDialog(container, ex.getMessage());
+         DialogUtils.showErrorDialog(container, ex.getMessage());
+         // TODO: Add logger
       } catch (IllegalArgumentException ex) {
          resolveNextRowSelection(selectedRow);
       }
@@ -727,19 +728,19 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
       @Override
       public void actionPerformed(ActionEvent e) {
          safeGuardChanges();
-         try {
-            File file = getApplicationDialogManager().showOpenFileChooser(container,
-                  "Open Transformation Rule File", "json", "Transformation Rule File (.json)");
-            if (file != null) {
-               String filePath = file.getAbsolutePath();
+         File file = DialogUtils.showOpenFileChooser(container,
+               "Mapping Master Transformation Rules (.json)",
+               "json");
+         if (file != null) {
+            String filePath = file.getAbsolutePath();
+            try {
                container.loadTransformationRuleDocument(filePath);
-               new SelectAllRulesAction().actionPerformed(null);
+               new SelectAllRulesAction().actionPerformed(null); // XXX: Fix why null?
                fireTransformationRuleChange();
+            } catch (Exception ex) {
+               DialogUtils.showErrorDialog(container, format("Error opening file ", filePath));
+               // TODO: Add logger
             }
-         } catch (Exception ex) {
-            getApplicationDialogManager().showErrorMessageDialog(container,
-                  "Error opening file: " + ex.getMessage());
-            ex.printStackTrace();
          }
       }
    }
@@ -787,18 +788,19 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
          container.updateTransformationRuleModel();
       } catch (IOException e) {
          isSuccessful = false;
-         getApplicationDialogManager().showErrorMessageDialog(container,
-               "Error saving file: " + e.getMessage());
+         DialogUtils.showErrorDialog(container, format("Error saving file ", filePath));
+         // TODO: Add logger
       }
       return isSuccessful;
    }
 
    public boolean doSelectFileAndSave() {
       boolean isSuccessful = true;
-      File file = getApplicationDialogManager().showSaveFileChooser(container, "Save As", "json",
-            "Transformation Rule File (.json)", true);
-      if (file != null) {
-         String filePath = file.getAbsolutePath();
+      File transformationRuleFile = DialogUtils.showSaveFileChooser(container,
+            "Mapping Master Transformation Rule (.json)",
+            "json");
+      if (transformationRuleFile != null) {
+         String filePath = transformationRuleFile.getAbsolutePath();
          String ext = ".json";
          if (!filePath.endsWith(ext)) {
             filePath = filePath + ext;
@@ -814,9 +816,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
    public boolean safeGuardChanges() {
       boolean isSuccessful = true;
       if (tableModel.hasUnsavedChanges()) {
-         int answer = JOptionPane.showConfirmDialog(container,
-               "There are unsaved changes in your transformation rules. Do you want to save them?",
-               "Closing Cellfie", JOptionPane.YES_NO_CANCEL_OPTION);
+         int answer = DialogUtils.showConfirmWithCancelDialog(container,
+               "There are unsaved changes in your transformation rules."
+               + "Do you want to save them?");
          switch (answer) {
             case JOptionPane.YES_OPTION :
                Optional<String> fileLocation = container.getRuleFileLocation();
@@ -826,8 +828,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
                   isSuccessful = doSave(fileLocation.get());
                }
                if (isSuccessful) {
-                  getApplicationDialogManager().showMessageDialog(container,
-                        "Transformation rules saved successfully");
+                  DialogUtils.showInfoDialog(container, "Transformation rules saved successfully");
                }
                break;
             case JOptionPane.CANCEL_OPTION :

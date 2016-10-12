@@ -1,17 +1,14 @@
 package org.mm.cellfie;
 
-import java.awt.Component;
+import static java.lang.String.format;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 
+import org.mm.cellfie.ui.DialogUtils;
 import org.mm.cellfie.ui.WorkspacePanel;
-import org.mm.ui.DialogManager;
-import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLWorkspace;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
@@ -29,26 +26,27 @@ public class CellfieAction extends ProtegeOWLAction {
 
    private static final Logger logger = LoggerFactory.getLogger(CellfieAction.class);
 
-   private DialogManager dialogManager;
    private OWLEditorKit editorKit;
 
    @Override
    public void initialise() throws Exception {
-      dialogManager = new ProtegeDialogManager();
       editorKit = getOWLEditorKit();
    }
 
    @Override
    public void actionPerformed(ActionEvent event) {
-      File file = dialogManager.showOpenFileChooser(null, "Open Excel Workbook", "xlsx, xls",
-            "Excel Workbook (.xlsx, .xls)");
-      if (file != null) {
-         String filename = file.getAbsolutePath();
+      final OWLWorkspace protegeWorkspace = editorKit.getOWLWorkspace();
+      File workbookFile = DialogUtils.showOpenFileChooser(protegeWorkspace,
+            "Open Excel Workbook",
+            "Excel Workbook (.xlsx, .xls)",
+            "xlsx", "xls");
+      if (workbookFile != null) {
+         String workbookFilePath = workbookFile.getAbsolutePath();
          try {
-            showCellfieDialog(filename);
+            showCellfieDialog(workbookFilePath);
          } catch (Exception e) {
-            dialogManager.showErrorMessageDialog(null, "Error opening file " + filename);
             logger.error(e.getMessage(), e);
+            DialogUtils.showErrorDialog(protegeWorkspace, format("Error opening file %s", workbookFilePath));
          }
       }
    }
@@ -56,8 +54,7 @@ public class CellfieAction extends ProtegeOWLAction {
    private void showCellfieDialog(String workbookPath) {
       final OWLOntology currentOntology = getOWLModelManager().getActiveOntology();
       final OWLWorkspace editorWindow = editorKit.getOWLWorkspace();
-      JDialog cellfieDialog = WorkspacePanel.createDialog(currentOntology, workbookPath, editorKit,
-            dialogManager);
+      JDialog cellfieDialog = WorkspacePanel.createDialog(currentOntology, workbookPath, editorKit);
       cellfieDialog.setLocationRelativeTo(editorWindow);
       cellfieDialog.setVisible(true);
    }
@@ -65,45 +62,5 @@ public class CellfieAction extends ProtegeOWLAction {
    @Override
    public void dispose() throws Exception {
       // NO-OP
-   }
-
-   private class ProtegeDialogManager implements DialogManager {
-      @Override
-      public int showConfirmDialog(Component parent, String title, String message) {
-         return JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION);
-      }
-
-      @Override
-      public String showInputDialog(Component parent, String message) {
-         return JOptionPane.showInputDialog(parent, message, "Input", JOptionPane.OK_CANCEL_OPTION);
-      }
-
-      @Override
-      public void showMessageDialog(Component parent, String message) {
-         JOptionPane.showMessageDialog(parent, message, "Message", JOptionPane.INFORMATION_MESSAGE);
-      }
-
-      @Override
-      public void showErrorMessageDialog(Component parent, String message) {
-         JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
-      }
-
-      @Override
-      public File showOpenFileChooser(Component parent, String title, String fileExtension,
-            String fileDescription) {
-         Set<String> extensions = new HashSet<>();
-         for (String ext : fileExtension.split(",")) {
-            extensions.add(ext.trim());
-         }
-         return UIUtil.openFile(parent, title, fileDescription, extensions);
-      }
-
-      @Override
-      public File showSaveFileChooser(Component parent, String title, String fileExtension,
-            String fileDescription, boolean overwrite) {
-         Set<String> extensions = new HashSet<>();
-         extensions.add(fileExtension);
-         return UIUtil.saveFile(parent, title, fileDescription, extensions, null);
-      }
    }
 }
