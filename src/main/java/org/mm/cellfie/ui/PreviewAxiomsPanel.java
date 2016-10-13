@@ -38,7 +38,7 @@ public class PreviewAxiomsPanel extends JPanel {
    private static final long serialVersionUID = 1L;
 
    private final JLabel previewSummaryLabel;
-   private final PreviewedAxioms previewedList;
+   private final PreviewAxiomList previewedList;
 
    private String logMessage;
 
@@ -52,7 +52,7 @@ public class PreviewAxiomsPanel extends JPanel {
       previewSummaryLabel = new JLabel();
       add(previewSummaryLabel, BorderLayout.NORTH);
 
-      previewedList = new PreviewedAxioms(editorKit);
+      previewedList = new PreviewAxiomList(editorKit);
       add(new JScrollPane(previewedList), BorderLayout.CENTER);
 
       JPanel pnlViewLog = new JPanel();

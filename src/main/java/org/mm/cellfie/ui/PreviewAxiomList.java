@@ -19,11 +19,11 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class PreviewedAxioms extends MList {
+public class PreviewAxiomList extends MList {
 
    private static final long serialVersionUID = 1L;
 
-   public PreviewedAxioms(@Nonnull OWLEditorKit editorKit) {
+   public PreviewAxiomList(@Nonnull OWLEditorKit editorKit) {
       checkNotNull(editorKit);
       setCellRenderer(new PreviewAxiomsRenderer(editorKit));
       setFixedCellHeight(24);
@@ -32,14 +32,14 @@ public class PreviewedAxioms extends MList {
    @SuppressWarnings("unchecked")
    public void addAxioms(@Nonnull Set<OWLAxiom> axioms) {
       checkNotNull(axioms);
-      final Vector<PreviewedAxioms.Item> items = copyAndSort(axioms);
+      final Vector<PreviewAxiomList.Item> items = copyAndSort(axioms);
       setListData(items);
    }
 
-   private Vector<PreviewedAxioms.Item> copyAndSort(Set<OWLAxiom> axioms) {
-      Vector<PreviewedAxioms.Item> listItems = new Vector<>();
+   private Vector<PreviewAxiomList.Item> copyAndSort(Set<OWLAxiom> axioms) {
+      Vector<PreviewAxiomList.Item> listItems = new Vector<>();
       for (OWLAxiom axiom : axioms) {
-         listItems.add(new PreviewedAxioms.Item(axiom));
+         listItems.add(new PreviewAxiomList.Item(axiom));
       }
       Collections.sort(listItems, (o1, o2) -> {
          return o1.getObject().compareTo(o2.getObject());
