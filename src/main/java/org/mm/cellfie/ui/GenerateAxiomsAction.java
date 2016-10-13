@@ -59,13 +59,13 @@ public class GenerateAxiomsAction implements ActionListener {
    private static final int ADD_TO_NEW_ONTOLOGY = 1;
    private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
-   private final CellfieWorkspace container;
+   private final CellfieWorkspace cellfieWorkspace;
    private final OWLEditorKit editorKit;
 
-   public GenerateAxiomsAction(@Nonnull CellfieWorkspace container, @Nonnull OWLEditorKit editorKit) {
-      checkNotNull(container);
+   public GenerateAxiomsAction(@Nonnull CellfieWorkspace cellfieWorkspace, @Nonnull OWLEditorKit editorKit) {
+      checkNotNull(cellfieWorkspace);
       checkNotNull(editorKit);
-      this.container = container;
+      this.cellfieWorkspace = cellfieWorkspace;
       this.editorKit = editorKit;
    }
 
@@ -125,7 +125,7 @@ public class GenerateAxiomsAction implements ActionListener {
          // Show the preview dialog to users to see all the generated axioms
          showAxiomPreviewDialog(toAxioms(results), logMessage);
       } catch (Exception ex) {
-         DialogUtils.showErrorDialog(container, ex.getMessage());
+         DialogUtils.showErrorDialog(cellfieWorkspace, ex.getMessage());
          // TODO: Add logger
       }
    }
@@ -152,7 +152,7 @@ public class GenerateAxiomsAction implements ActionListener {
 
    private File getLoggingFile() {
       String rootDir = getDefaultRootDirectory();
-      Optional<String> ruleFilePath = container.getRuleFileLocation();
+      Optional<String> ruleFilePath = cellfieWorkspace.getRuleFileLocation();
       if (ruleFilePath.isPresent()) {
          rootDir = new File(ruleFilePath.get()).getParent();
       }
@@ -166,13 +166,13 @@ public class GenerateAxiomsAction implements ActionListener {
       StringBuilder sb = new StringBuilder();
       sb.append("Date: ").append(LogWriter.getTimestamp());
       sb.append("\n");
-      sb.append("Ontology source: ").append(container.getOntologyFileLocation());
+      sb.append("Ontology source: ").append(cellfieWorkspace.getOntologyFileLocation());
       sb.append("\n");
-      sb.append("Worksheet source: ").append(container.getWorkbookFileLocation());
+      sb.append("Worksheet source: ").append(cellfieWorkspace.getWorkbookFileLocation());
       sb.append("\n");
       sb.append("Transformation rules: ")
-            .append(container.getRuleFileLocation().isPresent()
-                  ? container.getRuleFileLocation().get() : "N/A");
+            .append(cellfieWorkspace.getRuleFileLocation().isPresent()
+                  ? cellfieWorkspace.getRuleFileLocation().get() : "N/A");
       sb.append("\n");
       return sb.toString();
    }
@@ -236,8 +236,8 @@ public class GenerateAxiomsAction implements ActionListener {
             new ImportOption(ADD_TO_NEW_ONTOLOGY, "Add to a new ontology"),
             new ImportOption(ADD_TO_CURRENT_ONTOLOGY, "Add to current ontology") };
       try {
-         OWLOntology currentOntology = container.getActiveOntology();
-         int answer = JOptionPaneEx.showConfirmDialog(container, "Generated Axioms",
+         OWLOntology currentOntology = cellfieWorkspace.getActiveOntology();
+         int answer = JOptionPaneEx.showConfirmDialog(cellfieWorkspace, "Generated Axioms",
                createPreviewAxiomsPanel(axioms, logMessage), JOptionPane.PLAIN_MESSAGE,
                JOptionPane.DEFAULT_OPTION, null, options, options[1]);
          switch (answer) {
@@ -288,13 +288,13 @@ public class GenerateAxiomsAction implements ActionListener {
    }
 
    private JPanel createPreviewAxiomsPanel(Set<OWLAxiom> generatedAxioms, String executionLog) {
-      PreviewAxiomsPanel previewPanel = new PreviewAxiomsPanel(container, editorKit);
+      PreviewAxiomsPanel previewPanel = new PreviewAxiomsPanel(cellfieWorkspace, editorKit);
       previewPanel.setContent(generatedAxioms, executionLog);
       return previewPanel;
    }
 
    private void evaluate(TransformationRule rule, Set<Rendering> results) throws ParseException {
-      container.evaluate(rule, container.getDefaultRenderer(), results);
+      cellfieWorkspace.evaluate(rule, cellfieWorkspace.getDefaultRenderer(), results);
    }
 
    private SpreadsheetLocation incrementLocation(SpreadsheetLocation current,
@@ -313,7 +313,7 @@ public class GenerateAxiomsAction implements ActionListener {
    }
 
    private SpreadSheetDataSource getActiveWorkbook() throws CellfieException {
-      SpreadSheetDataSource dataSource = container.getActiveWorkbook();
+      SpreadSheetDataSource dataSource = cellfieWorkspace.getActiveWorkbook();
       if (dataSource == null) {
          throw new CellfieException("No workbook was loaded");
       }
@@ -321,7 +321,7 @@ public class GenerateAxiomsAction implements ActionListener {
    }
 
    private List<TransformationRule> getUserRules() throws CellfieException {
-      List<TransformationRule> rules = container.getTransformationRuleBrowserView()
+      List<TransformationRule> rules = cellfieWorkspace.getTransformationRuleBrowserView()
             .getSelectedRules();
       if (rules.isEmpty()) {
          throw new CellfieException("No transformation rules were selected");
@@ -336,7 +336,7 @@ public class GenerateAxiomsAction implements ActionListener {
             new ByteArrayInputStream(ruleString.getBytes()), getReferenceSettings(), -1);
       MMExpressionNode ruleNode = new ExpressionNode((ASTExpression) parser.expression())
             .getMMExpressionNode();
-      Optional<? extends Rendering> renderingResult = container.getLogRenderer().render(ruleNode);
+      Optional<? extends Rendering> renderingResult = cellfieWorkspace.getLogRenderer().render(ruleNode);
       if (renderingResult.isPresent()) {
          logBuilder.append(renderingResult.get().getRendering());
       }

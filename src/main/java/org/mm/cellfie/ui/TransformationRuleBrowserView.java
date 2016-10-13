@@ -65,7 +65,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    private static final long serialVersionUID = 1L;
 
-   private final CellfieWorkspace container;
+   private final CellfieWorkspace cellfieWorkspace;
 
    private JPanel pnlContainer;
 
@@ -81,10 +81,10 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    private TransformationRulesTableModel tableModel;
 
-   public TransformationRuleBrowserView(@Nonnull CellfieWorkspace container, @Nonnull OWLEditorKit editorKit) {
-      checkNotNull(container);
+   public TransformationRuleBrowserView(@Nonnull CellfieWorkspace cellfieWorkspace, @Nonnull OWLEditorKit editorKit) {
+      checkNotNull(cellfieWorkspace);
       checkNotNull(editorKit);
-      this.container = container;
+      this.cellfieWorkspace = cellfieWorkspace;
 
       setLayout(new BorderLayout());
       setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -182,7 +182,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
       cmdGenerateAxioms = new JButton("Generate Axioms");
       cmdGenerateAxioms.setPreferredSize(new Dimension(152, 22));
-      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(container, editorKit));
+      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(cellfieWorkspace, editorKit));
       cmdGenerateAxioms.setEnabled(false);
       pnlGenerateAxioms.add(cmdGenerateAxioms);
 
@@ -192,7 +192,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    @Override
    public void update() {
-      tableModel = new TransformationRulesTableModel(container.getActiveTransformationRules());
+      tableModel = new TransformationRulesTableModel(cellfieWorkspace.getActiveTransformationRules());
       tblTransformationRules.setModel(tableModel);
       tblTransformationRules.getColumnModel().getColumn(0).setHeaderRenderer(tblHeaderRenderer);
       setTableHeaderAlignment(SwingConstants.CENTER);
@@ -215,7 +215,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
    }
 
    private String getTitle() {
-      Optional<String> fileLocation = container.getRuleFileLocation();
+      Optional<String> fileLocation = cellfieWorkspace.getRuleFileLocation();
       if (!fileLocation.isPresent()) {
          return String.format("Transformation Rules");
       }
@@ -561,7 +561,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
                lastSelectedRow = -1; // reset
             }
          } else if (e.getClickCount() == 2) { // double-click
-            List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
+            List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
             TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(
                   sheetNames);
             editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
@@ -596,8 +596,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
    }
 
    public void addTransformationRule() {
-      List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
-      final CellRange selectedCellRange = container.getDataSourceView().getSelectedCellRange();
+      List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
+      final CellRange selectedCellRange = cellfieWorkspace.getDataSourceView().getSelectedCellRange();
       TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
       editorPanel.setSheetName(selectedCellRange.getSheetName());
       editorPanel.setStartColumn(selectedCellRange.getStartColumnName());
@@ -627,14 +627,14 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
       int selectedRow = tblTransformationRules.getSelectedRow();
       try {
          validateSelection(selectedRow);
-         List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
+         List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
          TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
          editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
                getValueAt(selectedRow, 3), getValueAt(selectedRow, 4), getValueAt(selectedRow, 5),
                getValueAt(selectedRow, 6), getValueAt(selectedRow, 7));
          showMappingEditorDialog(editorPanel, selectedRow);
       } catch (CellfieException ex) {
-         DialogUtils.showInfoDialog(container, ex.getMessage());
+         DialogUtils.showInfoDialog(cellfieWorkspace, ex.getMessage());
          // TODO: Add logger
       }
    }
@@ -645,7 +645,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    private void showMappingEditorDialog(TransformationRuleEditorPanel editorPanel,
          int selectedRow) {
-      int answer = DialogUtils.showDialog(container,
+      int answer = DialogUtils.showDialog(cellfieWorkspace,
             "Transformation Rule Editor",
             editorPanel,
             JOptionPane.PLAIN_MESSAGE,
@@ -683,7 +683,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
       int selectedRow = tblTransformationRules.getSelectedRow();
       try {
          validateSelection(selectedRow);
-         int answer = DialogUtils.showConfirmDialog(container,
+         int answer = DialogUtils.showConfirmDialog(cellfieWorkspace,
                "Do you really want to delete the selected transformation rule?");
          switch (answer) {
             case JOptionPane.YES_OPTION :
@@ -691,7 +691,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
                tblTransformationRules.setRowSelectionInterval(selectedRow, selectedRow);
          }
       } catch (CellfieException ex) {
-         DialogUtils.showErrorDialog(container, ex.getMessage());
+         DialogUtils.showErrorDialog(cellfieWorkspace, ex.getMessage());
          // TODO: Add logger
       } catch (IllegalArgumentException ex) {
          resolveNextRowSelection(selectedRow);
@@ -733,17 +733,17 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
       @Override
       public void actionPerformed(ActionEvent e) {
          safeGuardChanges();
-         File file = DialogUtils.showOpenFileChooser(container,
+         File file = DialogUtils.showOpenFileChooser(cellfieWorkspace,
                "Mapping Master Transformation Rules (.json)",
                "json");
          if (file != null) {
             String filePath = file.getAbsolutePath();
             try {
-               container.loadTransformationRuleDocument(filePath);
+               cellfieWorkspace.loadTransformationRuleDocument(filePath);
                new SelectAllRulesAction().actionPerformed(null); // XXX: Fix why null?
                fireTransformationRuleChange();
             } catch (Exception ex) {
-               DialogUtils.showErrorDialog(container, format("Error opening file ", filePath));
+               DialogUtils.showErrorDialog(cellfieWorkspace, format("Error opening file ", filePath));
                // TODO: Add logger
             }
          }
@@ -758,7 +758,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    public void fireTransformationRuleChange() {
       if (tblTransformationRules.getRowCount() > 0) {
-         if (container.getRuleFileLocation().isPresent()) {
+         if (cellfieWorkspace.getRuleFileLocation().isPresent()) {
             cmdSave.setEnabled(true);
          }
          cmdSaveAs.setEnabled(true);
@@ -771,7 +771,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
    private class SaveMappingAction implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent e) {
-         doSave(container.getRuleFileLocation().get());
+         doSave(cellfieWorkspace.getRuleFileLocation().get());
       }
    }
 
@@ -790,10 +790,10 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
       try {
          TransformationRuleSetFactory.saveTransformationRulesToDocument(filePath,
                tableModel.getTransformationRulesAndSave());
-         container.updateTransformationRuleModel();
+         cellfieWorkspace.updateTransformationRuleModel();
       } catch (IOException e) {
          isSuccessful = false;
-         DialogUtils.showErrorDialog(container, format("Error saving file ", filePath));
+         DialogUtils.showErrorDialog(cellfieWorkspace, format("Error saving file ", filePath));
          // TODO: Add logger
       }
       return isSuccessful;
@@ -801,7 +801,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    public boolean doSelectFileAndSave() {
       boolean isSuccessful = true;
-      File transformationRuleFile = DialogUtils.showSaveFileChooser(container,
+      File transformationRuleFile = DialogUtils.showSaveFileChooser(cellfieWorkspace,
             "Mapping Master Transformation Rule (.json)",
             "json");
       if (transformationRuleFile != null) {
@@ -810,7 +810,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
          if (!filePath.endsWith(ext)) {
             filePath = filePath + ext;
          }
-         container.setRuleFileLocation(filePath);
+         cellfieWorkspace.setRuleFileLocation(filePath);
          isSuccessful = doSave(filePath);
       } else {
          isSuccessful = false;
@@ -821,19 +821,19 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
    public boolean safeGuardChanges() {
       boolean isSuccessful = true;
       if (tableModel.hasUnsavedChanges()) {
-         int answer = DialogUtils.showConfirmWithCancelDialog(container,
+         int answer = DialogUtils.showConfirmWithCancelDialog(cellfieWorkspace,
                "There are unsaved changes in your transformation rules."
                + "Do you want to save them?");
          switch (answer) {
             case JOptionPane.YES_OPTION :
-               Optional<String> fileLocation = container.getRuleFileLocation();
+               Optional<String> fileLocation = cellfieWorkspace.getRuleFileLocation();
                if (!fileLocation.isPresent()) {
                   isSuccessful = doSelectFileAndSave();
                } else {
                   isSuccessful = doSave(fileLocation.get());
                }
                if (isSuccessful) {
-                  DialogUtils.showInfoDialog(container, "Transformation rules saved successfully");
+                  DialogUtils.showInfoDialog(cellfieWorkspace, "Transformation rules saved successfully");
                }
                break;
             case JOptionPane.CANCEL_OPTION :

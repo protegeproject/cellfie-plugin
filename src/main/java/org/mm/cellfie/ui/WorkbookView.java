@@ -24,14 +24,14 @@ public class WorkbookView extends JPanel {
 
    private ViewTabbedPane tabSheetContainer;
 
-   public WorkbookView(@Nonnull CellfieWorkspace container) {
-      checkNotNull(container);
+   public WorkbookView(@Nonnull CellfieWorkspace cellfieWorkspace) {
+      checkNotNull(cellfieWorkspace);
       setLayout(new BorderLayout());
       setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
       JPanel pnlContainer = new JPanel();
       pnlContainer.setLayout(new BorderLayout());
-      String title = format("Workbook (%s)", container.getWorkbookFileLocation());
+      String title = format("Workbook (%s)", cellfieWorkspace.getWorkbookFileLocation());
       pnlContainer.setBorder(ComponentFactory.createTitledBorder(title));
       add(pnlContainer, BorderLayout.CENTER);
 
@@ -43,7 +43,7 @@ public class WorkbookView extends JPanel {
       pnlWorkbook.add(tabSheetContainer, BorderLayout.CENTER);
       pnlContainer.add(pnlWorkbook, BorderLayout.CENTER);
 
-      for (org.apache.poi.ss.usermodel.Sheet sheet : container.getActiveWorkbook().getSheets()) {
+      for (org.apache.poi.ss.usermodel.Sheet sheet : cellfieWorkspace.getActiveWorkbook().getSheets()) {
          SheetPanel sheetPanel = new SheetPanel(sheet);
          tabSheetContainer.addTab(sheet.getSheetName(), null, sheetPanel);
       }

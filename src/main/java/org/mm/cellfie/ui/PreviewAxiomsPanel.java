@@ -43,8 +43,8 @@ public class PreviewAxiomsPanel extends JPanel {
    private String logMessage;
 
    @SuppressWarnings("unchecked")
-   public PreviewAxiomsPanel(@Nonnull CellfieWorkspace container, @Nonnull OWLEditorKit editorKit) {
-      checkNotNull(container);
+   public PreviewAxiomsPanel(@Nonnull CellfieWorkspace cellfieWorkspace, @Nonnull OWLEditorKit editorKit) {
+      checkNotNull(cellfieWorkspace);
       checkNotNull(editorKit);
 
       setLayout(new BorderLayout());
@@ -71,7 +71,7 @@ public class PreviewAxiomsPanel extends JPanel {
       lblViewLog.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseClicked(MouseEvent e) {
-            DialogUtils.showDialog(container, "Log Viewer", new LogViewerPanel(getExecutionLog()),
+            DialogUtils.showDialog(cellfieWorkspace, "Log Viewer", new LogViewerPanel(getExecutionLog()),
                   JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION);
          }
       });
