@@ -9,7 +9,6 @@ import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 import org.protege.editor.core.ui.util.ComponentFactory;
 
@@ -19,7 +18,7 @@ import org.protege.editor.core.ui.util.ComponentFactory;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class WorkbookView extends JPanel implements ModelView {
+public class WorkbookView extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
@@ -54,10 +53,5 @@ public class WorkbookView extends JPanel implements ModelView {
    public CellRange getSelectedCellRange() {
       SheetPanel selectedSheetPanel = (SheetPanel) tabSheetContainer.getSelectedComponent();
       return selectedSheetPanel.getSelectedCellRange();
-   }
-
-   @Override
-   public void update() {
-      // NO-OP
    }
 }
