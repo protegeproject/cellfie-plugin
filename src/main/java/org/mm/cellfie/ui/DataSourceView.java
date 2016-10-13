@@ -1,9 +1,11 @@
 package org.mm.cellfie.ui;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
 import java.awt.BorderLayout;
 
+import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
@@ -12,6 +14,8 @@ import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 import org.protege.editor.core.ui.util.ComponentFactory;
 
 /**
+ * Represents the workbook view used to present the UI for the Excel workbook.
+ *
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
@@ -21,7 +25,8 @@ public class DataSourceView extends JPanel implements ModelView {
 
    private ViewTabbedPane tabSheetContainer;
 
-   public DataSourceView(CellfieWorkspace container) {
+   public DataSourceView(@Nonnull CellfieWorkspace container) {
+      checkNotNull(container);
       setLayout(new BorderLayout());
       setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
