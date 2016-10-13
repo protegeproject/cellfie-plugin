@@ -1,9 +1,12 @@
 package org.mm.cellfie.ui;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.annotation.Nonnull;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -17,7 +20,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 /*
- *	Use a JTable as a renderer for row numbers of a given main table.
+ *	Use a JTable as a renderer for row numbers of a given input table.
  *  This table must be added to the row header of the scroll pane that
  *  contains the main table.
  *
@@ -28,16 +31,16 @@ public class RowNumberWrapper extends JTable
 
    private static final long serialVersionUID = 1L;
 
-   private JTable main;
+   private JTable inputTable;
 
-   public RowNumberWrapper(JTable table) {
-      main = table;
-      main.addPropertyChangeListener(this);
-      main.getModel().addTableModelListener(this);
+   public RowNumberWrapper(@Nonnull JTable inputTable) {
+      this.inputTable = checkNotNull(inputTable);
+      inputTable.addPropertyChangeListener(this);
+      inputTable.getModel().addTableModelListener(this);
 
       setFocusable(false);
       setAutoCreateColumnsFromModel(false);
-      setSelectionModel(main.getSelectionModel());
+      setSelectionModel(inputTable.getSelectionModel());
       // setCellSelectionEnabled(true);
       setColumnSelectionAllowed(false);
       setRowSelectionAllowed(true);
@@ -63,16 +66,16 @@ public class RowNumberWrapper extends JTable
    }
 
    /*
-    * Delegate method to main table
+    * Delegate method to input table
     */
    @Override
    public int getRowCount() {
-      return main.getRowCount();
+      return inputTable.getRowCount();
    }
 
    @Override
    public int getRowHeight(int row) {
-      int rowHeight = main.getRowHeight(row);
+      int rowHeight = inputTable.getRowHeight(row);
       if (rowHeight != super.getRowHeight(row)) {
          super.setRowHeight(row, rowHeight);
       }
@@ -106,7 +109,7 @@ public class RowNumberWrapper extends JTable
 
    @Override
    public void stateChanged(ChangeEvent e) {
-      // Keep the scrolling of the row table in sync with main table
+      // Keep the scrolling of the row table in sync with input table
       JViewport viewport = (JViewport) e.getSource();
       JScrollPane scrollPane = (JScrollPane) viewport.getParent();
       scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
@@ -115,13 +118,13 @@ public class RowNumberWrapper extends JTable
    public void propertyChange(PropertyChangeEvent e) {
       // Keep the row table in sync with the main table
       if ("selectionModel".equals(e.getPropertyName())) {
-         setSelectionModel(main.getSelectionModel());
+         setSelectionModel(inputTable.getSelectionModel());
       }
       if ("rowHeight".equals(e.getPropertyName())) {
          repaint();
       }
       if ("model".equals(e.getPropertyName())) {
-         main.getModel().addTableModelListener(this);
+         inputTable.getModel().addTableModelListener(this);
          revalidate();
       }
    }
