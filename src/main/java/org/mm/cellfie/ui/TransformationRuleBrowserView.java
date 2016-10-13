@@ -1,5 +1,6 @@
 package org.mm.cellfie.ui;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
 import java.awt.BorderLayout;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 
+import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -53,6 +55,7 @@ import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSetFactory;
 import org.mm.ui.ModelView;
 import org.protege.editor.core.ui.util.ComponentFactory;
+import org.protege.editor.owl.OWLEditorKit;
 
 /**
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
@@ -62,7 +65,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    private static final long serialVersionUID = 1L;
 
-   private CellfieWorkspace container;
+   private final CellfieWorkspace container;
 
    private JPanel pnlContainer;
 
@@ -78,7 +81,9 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    private TransformationRulesTableModel tableModel;
 
-   public TransformationRuleBrowserView(CellfieWorkspace container) {
+   public TransformationRuleBrowserView(@Nonnull CellfieWorkspace container, @Nonnull OWLEditorKit editorKit) {
+      checkNotNull(container);
+      checkNotNull(editorKit);
       this.container = container;
 
       setLayout(new BorderLayout());
@@ -177,7 +182,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
       cmdGenerateAxioms = new JButton("Generate Axioms");
       cmdGenerateAxioms.setPreferredSize(new Dimension(152, 22));
-      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(container));
+      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(container, editorKit));
       cmdGenerateAxioms.setEnabled(false);
       pnlGenerateAxioms.add(cmdGenerateAxioms);
 
