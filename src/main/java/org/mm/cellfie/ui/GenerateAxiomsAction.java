@@ -120,7 +120,7 @@ public class GenerateAxiomsAction implements ActionListener {
          String logMessage = logBuilder.toString();
 
          // Store Cellfie logging to a file
-         LogUtils.save(getLoggingFile(), logMessage, true);
+         LogWriter.save(getLoggingFile(), logMessage, true);
 
          // Show the preview dialog to users to see all the generated axioms
          showAxiomPreviewDialog(toAxioms(results), logMessage);
@@ -164,7 +164,7 @@ public class GenerateAxiomsAction implements ActionListener {
 
    private String getLogHeader() {
       StringBuilder sb = new StringBuilder();
-      sb.append("Date: ").append(LogUtils.getTimestamp());
+      sb.append("Date: ").append(LogWriter.getTimestamp());
       sb.append("\n");
       sb.append("Ontology source: ").append(container.getOntologyFileLocation());
       sb.append("\n");

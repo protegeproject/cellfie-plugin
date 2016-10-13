@@ -11,7 +11,7 @@ import java.util.Date;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class LogUtils {
+public class LogWriter {
 
    private final static String logSeparator = "===========================================================================================================";
 
