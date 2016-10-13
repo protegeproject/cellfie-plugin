@@ -1,11 +1,14 @@
 package org.mm.cellfie.ui;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -28,37 +31,40 @@ class LogViewerPanel extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
-   public LogViewerPanel(String logMessage) {
+   public LogViewerPanel(@Nonnull String logMessage) {
+      checkNotNull(logMessage);
       setPreferredSize(new Dimension(1020, 420));
       setLayout(new BorderLayout());
-      try {
-         // To force the horizontal scrolling
-         JTextPane txtLogMessage = new JTextPane() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean getScrollableTracksViewportWidth() {
-               return (getSize().width < getParent().getSize().width);
-            }
-
-            @Override
-            public void setSize(Dimension d) {
-               if (d.width < getParent().getSize().width) {
-                  d.width = getParent().getSize().width;
-               }
-               super.setSize(d);
-            }
-         };
-         txtLogMessage.setEditorKit(createHighlightEditorKit());
-         txtLogMessage.setText(logMessage);
-         txtLogMessage.setEditable(false);
-         add(new JScrollPane(txtLogMessage), BorderLayout.CENTER);
-      } catch (Exception e) {
-         throw new RuntimeException("Failed to open the log file", e);
-      }
+      // To force the horizontal scrolling
+      JTextPane txtLogMessage = createLogTextPanel();
+      txtLogMessage.setEditorKit(createHighlightEditorKit());
+      txtLogMessage.setText(logMessage);
+      txtLogMessage.setEditable(false);
+      add(new JScrollPane(txtLogMessage), BorderLayout.CENTER);
    }
 
-   public EditorKit createHighlightEditorKit() {
+   private JTextPane createLogTextPanel() {
+      JTextPane txtLogMessage = new JTextPane() {
+         private static final long serialVersionUID = 1L;
+
+         @Override
+         public boolean getScrollableTracksViewportWidth() {
+            // force to show horizontal scrollbar
+            return (getSize().width < getParent().getSize().width);
+         }
+
+         @Override
+         public void setSize(Dimension d) {
+            if (d.width < getParent().getSize().width) {
+               d.width = getParent().getSize().width;
+            }
+            super.setSize(d);
+         }
+      };
+      return txtLogMessage;
+   }
+
+   private EditorKit createHighlightEditorKit() {
       EditorKit editorKit = new StyledEditorKit() {
          private static final long serialVersionUID = 1L;
 
@@ -70,6 +76,9 @@ class LogViewerPanel extends JPanel {
       return editorKit;
    }
 
+   /*
+    * A custom document highlighter to color comments in the log message
+    */
    private class CommentHighlightDocument extends DefaultStyledDocument {
 
       private static final long serialVersionUID = 1L;
