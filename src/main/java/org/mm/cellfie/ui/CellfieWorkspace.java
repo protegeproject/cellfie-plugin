@@ -181,7 +181,7 @@ public class CellfieWorkspace extends JPanel {
 
    private void setupApplication() {
       try {
-         OWLOntologySourceHook ontologySourceHook = new OWLProtegeOntology(getEditorKit());
+         OWLOntologySourceHook ontologySourceHook = new OWLProtegeOntology(editorKit);
          application = applicationFactory.createApplication(ontologySourceHook);
       } catch (Exception e) {
          DialogUtils.showErrorDialog(this, "Unable to start Cellfie Workspace (see log for details");
@@ -235,10 +235,6 @@ public class CellfieWorkspace extends JPanel {
 
    public Renderer getLogRenderer() {
       return getApplicationModel().getLogRenderer();
-   }
-
-   public OWLEditorKit getEditorKit() {
-      return editorKit;
    }
 
    public DataSourceView getDataSourceView() {
