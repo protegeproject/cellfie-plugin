@@ -11,13 +11,9 @@ import javax.annotation.Nonnull;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.mm.ss.SpreadSheetUtil;
 
 /**
  * @author Josef Hardi <johardi@stanford.edu> <br>
@@ -105,83 +101,6 @@ public class SheetPanel extends JPanel {
     */
    public int[] getSelectionRange() {
       return new int[] { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex };
-   }
-
-   /**
-    * The table model used to presenting the data from the Apache POI Sheet
-    * instance
-    */
-   private class SheetTableModel extends AbstractTableModel {
-
-      private static final long serialVersionUID = 1L;
-
-      private final Sheet sheet;
-
-      public SheetTableModel(@Nonnull Sheet sheet) {
-         this.sheet = checkNotNull(sheet);
-      }
-
-      @Override
-      public int getRowCount() {
-         if (sheet.rowIterator().hasNext()) {
-            return sheet.getLastRowNum() + 1;
-         } else {
-            return 0; // is empty
-         }
-      }
-
-      @Override
-      public int getColumnCount() {
-         int maxCount = 0;
-         for (int i = 0; i < getRowCount(); i++) {
-            Row row = sheet.getRow(i);
-            if (row != null) {
-               int currentCount = row.getLastCellNum();
-               if (currentCount > maxCount) {
-                  maxCount = currentCount;
-               }
-            }
-         }
-         return maxCount;
-      }
-
-      @Override
-      public String getColumnName(int column) {
-         return SpreadSheetUtil.columnNumber2Name(column + 1);
-      }
-
-      @Override
-      public Object getValueAt(int row, int column) {
-         try {
-            Cell cell = sheet.getRow(row).getCell(column);
-            switch (cell.getCellType()) {
-               case Cell.CELL_TYPE_BLANK :
-                  return "";
-               case Cell.CELL_TYPE_STRING :
-                  return cell.getStringCellValue();
-               case Cell.CELL_TYPE_NUMERIC :
-                  // Check if the numeric is double or integer
-                  if (isInteger(cell.getNumericCellValue())) {
-                     return (int) cell.getNumericCellValue();
-                  } else {
-                     return cell.getNumericCellValue();
-                  }
-               case Cell.CELL_TYPE_BOOLEAN :
-                  return cell.getBooleanCellValue();
-               case Cell.CELL_TYPE_FORMULA :
-                  return cell.getNumericCellValue();
-               default :
-                  return "";
-            }
-         } catch (NullPointerException e) {
-            // TODO Log this strange error
-            return "";
-         }
-      }
-
-      private boolean isInteger(double number) {
-         return (number == Math.floor(number) && !Double.isInfinite(number));
-      }
    }
 
    /**
