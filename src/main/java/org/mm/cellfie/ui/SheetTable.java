@@ -1,15 +1,15 @@
 package org.mm.cellfie.ui;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Insets;
 
+import javax.annotation.Nonnull;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -18,6 +18,8 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 /**
+ * Represents the table used to represent the UI of the sheet data.
+ *
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
@@ -25,10 +27,10 @@ public class SheetTable extends JTable {
 
    private static final long serialVersionUID = 1L;
 
-   public SheetTable(TableModel model) {
-      super(model);
+   public SheetTable(@Nonnull TableModel model) {
+      super(checkNotNull(model));
 
-      setDefaultRenderer(String.class, new WorksheetCellRenderer());
+      setDefaultRenderer(String.class, new SheetCellRenderer());
 
       JTableHeader header = new HighlightTableHeader(getColumnModel());
       header.setDefaultRenderer(new ColumnHeaderRenderer());
@@ -93,40 +95,6 @@ public class SheetTable extends JTable {
             setBackground(UIManager.getColor("Table.background"));
          }
          setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-         return this;
-      }
-   }
-
-   /*
-    * Custom cell renderer for the table sheet
-    */
-   private class WorksheetCellRenderer extends DefaultTableCellRenderer {
-
-      private static final long serialVersionUID = 1L;
-
-      public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-            boolean hasFocus, final int row, int column) {
-         JLabel cell = (JLabel) (this);
-         if (hasFocus) {
-            setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
-            cell = null;
-         } else {
-            setBackground(table.getBackground());
-            setBorder(null);
-         }
-         if (isSelected) {
-            setBackground(table.getSelectionBackground());
-            setBorder(null);
-         } else {
-            setBackground(table.getBackground());
-            setBorder(null);
-         }
-         if (cell != null) {
-            cell.setBorder(
-                  new CompoundBorder(new EmptyBorder(new Insets(1, 4, 1, 4)), cell.getBorder()));
-         }
-         this.setOpaque(true);
-         setText((String) value);
          return this;
       }
    }
