@@ -107,7 +107,7 @@ public class CellfieWorkspace extends JPanel {
       /*
        * Transformation rule browser, create, edit, remove panel
        */
-      transformationRuleBrowserView = new TransformationRuleBrowserView(this);
+      transformationRuleBrowserView = new TransformationRuleBrowserView(this, editorKit);
       splitPane.setBottomComponent(transformationRuleBrowserView);
 
       validate();
