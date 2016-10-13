@@ -64,7 +64,7 @@ public class CellfieWorkspace extends JPanel {
    private final OWLOntology ontology;
    private final OWLEditorKit editorKit;
 
-   private DataSourceView dataSourceView;
+   private WorkbookView dataSourceView;
    private TransformationRuleBrowserView transformationRuleBrowserView;
 
    private MMApplication application;
@@ -101,7 +101,7 @@ public class CellfieWorkspace extends JPanel {
       /*
        * Workbook sheet GUI presentation
        */
-      dataSourceView = new DataSourceView(this);
+      dataSourceView = new WorkbookView(this);
       splitPane.setTopComponent(dataSourceView);
 
       /*
@@ -233,7 +233,7 @@ public class CellfieWorkspace extends JPanel {
       return getApplicationModel().getLogRenderer();
    }
 
-   public DataSourceView getDataSourceView() {
+   public WorkbookView getDataSourceView() {
       return dataSourceView;
    }
 

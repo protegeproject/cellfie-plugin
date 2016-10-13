@@ -19,13 +19,13 @@ import org.protege.editor.core.ui.util.ComponentFactory;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class DataSourceView extends JPanel implements ModelView {
+public class WorkbookView extends JPanel implements ModelView {
 
    private static final long serialVersionUID = 1L;
 
    private ViewTabbedPane tabSheetContainer;
 
-   public DataSourceView(@Nonnull CellfieWorkspace container) {
+   public WorkbookView(@Nonnull CellfieWorkspace container) {
       checkNotNull(container);
       setLayout(new BorderLayout());
       setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
