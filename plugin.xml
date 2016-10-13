@@ -5,7 +5,7 @@
    <extension id="cellfie" point="org.protege.editor.core.application.EditorKitMenuAction">
       <name value="Create axioms from Excel workbook..." />
       <toolTip value="Generate OWL axioms from Excel spreadsheet" />
-      <class value="org.mm.cellfie.action.CellfieAction" />
+      <class value="org.mm.cellfie.CellfieAction" />
       <path value="org.protege.editor.owl.menu.tools/SlotF-Z"></path>
       <editorKitId value="OWLEditorKit" />
    </extension>
