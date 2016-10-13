@@ -561,9 +561,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
                lastSelectedRow = -1; // reset
             }
          } else if (e.getClickCount() == 2) { // double-click
-            List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
-            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(
-                  sheetNames);
+            TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(cellfieWorkspace);
             editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
                   getValueAt(selectedRow, 3), getValueAt(selectedRow, 4),
                   getValueAt(selectedRow, 5), getValueAt(selectedRow, 6),
@@ -596,9 +594,8 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
    }
 
    public void addTransformationRule() {
-      List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
       final CellRange selectedCellRange = cellfieWorkspace.getDataSourceView().getSelectedCellRange();
-      TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
+      TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(cellfieWorkspace);
       editorPanel.setSheetName(selectedCellRange.getSheetName());
       editorPanel.setStartColumn(selectedCellRange.getStartColumnName());
       editorPanel.setStartRow(selectedCellRange.getStartRowNumber());
@@ -627,8 +624,7 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
       int selectedRow = tblTransformationRules.getSelectedRow();
       try {
          validateSelection(selectedRow);
-         List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
-         TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
+         TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(cellfieWorkspace);
          editorPanel.fillFormFields(getValueAt(selectedRow, 1), getValueAt(selectedRow, 2),
                getValueAt(selectedRow, 3), getValueAt(selectedRow, 4), getValueAt(selectedRow, 5),
                getValueAt(selectedRow, 6), getValueAt(selectedRow, 7));

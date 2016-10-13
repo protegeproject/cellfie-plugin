@@ -39,8 +39,9 @@ public class TransformationRuleEditorPanel extends JPanel {
 
    private JTextArea txtRule;
 
-   public TransformationRuleEditorPanel(@Nonnull List<String> sheetNames) {
-      checkNotNull(sheetNames);
+   public TransformationRuleEditorPanel(@Nonnull CellfieWorkspace cellfieWorkspace) {
+      checkNotNull(cellfieWorkspace);
+      
       setLayout(new BorderLayout());
 
       JPanel pnlMain = new JPanel(new BorderLayout());
@@ -49,6 +50,7 @@ public class TransformationRuleEditorPanel extends JPanel {
       add(pnlMain, BorderLayout.CENTER);
 
       JLabel lblSheetName = new JLabel("Sheet name:");
+      List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
       cbbSheetName = new JComboBox<>(new DefaultComboBoxModel<>(new Vector<>(sheetNames)));
 
       JLabel lblStartColumn = new JLabel("Start column:");
