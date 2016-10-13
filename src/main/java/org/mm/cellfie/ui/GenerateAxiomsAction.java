@@ -1,17 +1,20 @@
 package org.mm.cellfie.ui;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -32,19 +35,21 @@ import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
-import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLImportsDeclaration;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 
 /**
+ * Represents the action listener for the 'Generate Axioms' command.
+ *
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
@@ -55,11 +60,13 @@ public class GenerateAxiomsAction implements ActionListener {
    private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
    private final CellfieWorkspace container;
-   private final OWLModelManager modelManager;
+   private final OWLEditorKit editorKit;
 
-   public GenerateAxiomsAction(CellfieWorkspace container) {
+   public GenerateAxiomsAction(@Nonnull CellfieWorkspace container, @Nonnull OWLEditorKit editorKit) {
+      checkNotNull(container);
+      checkNotNull(editorKit);
       this.container = container;
-      modelManager = container.getEditorKit().getModelManager();
+      this.editorKit = editorKit;
    }
 
    @Override
@@ -234,15 +241,15 @@ public class GenerateAxiomsAction implements ActionListener {
                createPreviewAxiomsPanel(axioms, logMessage), JOptionPane.PLAIN_MESSAGE,
                JOptionPane.DEFAULT_OPTION, null, options, options[1]);
          switch (answer) {
-            case ADD_TO_CURRENT_ONTOLOGY :
-               modelManager.applyChanges(addAxioms(currentOntology, axioms));
+            case ADD_TO_CURRENT_ONTOLOGY:
+               editorKit.getModelManager().applyChanges(addAxioms(currentOntology, axioms));
                break;
-            case ADD_TO_NEW_ONTOLOGY :
-               OWLOntologyID id = createOntologyID();
-               OWLOntology newOntology =
-                     modelManager.createNewOntology(id, id.getDefaultDocumentIRI().get().toURI());
-               modelManager.applyChanges(addImport(newOntology, currentOntology));
-               modelManager.applyChanges(addAxioms(newOntology, axioms));
+            case ADD_TO_NEW_ONTOLOGY:
+               final OWLOntologyID ontologyId = createOntologyID();
+               final URI physicalUri = ontologyId.getDefaultDocumentIRI().get().toURI();
+               OWLOntology newOntology = editorKit.getModelManager().createNewOntology(ontologyId, physicalUri);
+               editorKit.getModelManager().applyChanges(addImport(newOntology, currentOntology));
+               editorKit.getModelManager().applyChanges(addAxioms(newOntology, axioms));
                break;
          }
       } catch (ClassCastException e) {
@@ -252,15 +259,15 @@ public class GenerateAxiomsAction implements ActionListener {
       }
    }
 
-   private List<? extends OWLOntologyChange> addImport(OWLOntology newOntology,
-         OWLOntology currentOntology) {
+   private List<? extends OWLOntologyChange> addImport(OWLOntology newOntology, OWLOntology currentOntology) {
       List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-      com.google.common.base.Optional<IRI> ontologyIri = currentOntology.getOntologyID()
-            .getOntologyIRI();
+      com.google.common.base.Optional<IRI> ontologyIri = currentOntology.getOntologyID().getOntologyIRI();
       if (ontologyIri.isPresent()) {
-         OWLImportsDeclaration importDeclaration = modelManager.getOWLDataFactory()
-               .getOWLImportsDeclaration(ontologyIri.get());
-         changes.add(new AddImport(newOntology, importDeclaration));
+         final IRI ontologyIriPresent = ontologyIri.get();
+         final OWLDataFactory dataFactory = editorKit.getModelManager().getOWLDataFactory();
+         changes.add(new AddImport(
+               newOntology,
+               dataFactory.getOWLImportsDeclaration(ontologyIriPresent)));
       }
       return changes;
    }
@@ -280,8 +287,10 @@ public class GenerateAxiomsAction implements ActionListener {
       return changes;
    }
 
-   private JPanel createPreviewAxiomsPanel(Set<OWLAxiom> axioms, String logMessage) {
-      return new PreviewAxiomsPanel(container, axioms, logMessage);
+   private JPanel createPreviewAxiomsPanel(Set<OWLAxiom> generatedAxioms, String executionLog) {
+      PreviewAxiomsPanel previewPanel = new PreviewAxiomsPanel(container, editorKit);
+      previewPanel.setContent(generatedAxioms, executionLog);
+      return previewPanel;
    }
 
    private void evaluate(TransformationRule rule, Set<Rendering> results) throws ParseException {
