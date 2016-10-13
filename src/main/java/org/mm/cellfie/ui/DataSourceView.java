@@ -46,11 +46,9 @@ public class DataSourceView extends JPanel implements ModelView {
       validate();
    }
 
-   public Sheet getActiveSheet() {
+   public CellRange getSelectedCellRange() {
       SheetPanel selectedSheetPanel = (SheetPanel) tabSheetContainer.getSelectedComponent();
-      Sheet sheet = new Sheet(selectedSheetPanel.getSheetName());
-      sheet.setSelectionRange(selectedSheetPanel.getSelectionRange());
-      return sheet;
+      return selectedSheetPanel.getSelectedCellRange();
    }
 
    @Override

@@ -597,13 +597,13 @@ public class TransformationRuleBrowserView extends JPanel implements ModelView {
 
    public void addTransformationRule() {
       List<String> sheetNames = container.getActiveWorkbook().getSheetNames();
+      final CellRange selectedCellRange = container.getDataSourceView().getSelectedCellRange();
       TransformationRuleEditorPanel editorPanel = new TransformationRuleEditorPanel(sheetNames);
-      editorPanel.setSheetName(container.getActiveSheet().getName());
-      editorPanel
-            .setStartColumn(container.getActiveSheet().getSelectionRange().getStartColumnName());
-      editorPanel.setStartRow(container.getActiveSheet().getSelectionRange().getStartRowNumber());
-      editorPanel.setEndColumn(container.getActiveSheet().getSelectionRange().getEndColumnName());
-      editorPanel.setEndRow(container.getActiveSheet().getSelectionRange().getEndRowNumber());
+      editorPanel.setSheetName(selectedCellRange.getSheetName());
+      editorPanel.setStartColumn(selectedCellRange.getStartColumnName());
+      editorPanel.setStartRow(selectedCellRange.getStartRowNumber());
+      editorPanel.setEndColumn(selectedCellRange.getEndColumnName());
+      editorPanel.setEndRow(selectedCellRange.getEndRowNumber());
       showMappingEditorDialog(editorPanel, -1);
    }
 

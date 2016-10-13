@@ -16,6 +16,9 @@ import javax.swing.table.JTableHeader;
 import org.apache.poi.ss.usermodel.Sheet;
 
 /**
+ * Represents the sheet panel used to display the cells (or the data) of a
+ * spreadsheet in a table structure.
+ *
  * @author Josef Hardi <johardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
@@ -76,7 +79,7 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * Returns the name of the sheet presented by this UI panel.
+    * Returns the name of the sheet presented by the sheet panel.
     *
     * @return The sheet name.
     */
@@ -84,7 +87,7 @@ public class SheetPanel extends JPanel {
       return sheet.getSheetName();
    }
 
-   private void setSelectionRange(int startColumnIndex, int startRowIndex, int endColumnIndex,
+   private void setSelectedCellRange(int startColumnIndex, int startRowIndex, int endColumnIndex,
          int endRowIndex) {
       this.startColumnIndex = startColumnIndex;
       this.startRowIndex = startRowIndex;
@@ -93,14 +96,16 @@ public class SheetPanel extends JPanel {
    }
 
    /**
-    * Returns the array of the cell selection from this UI panel. The array is
-    * composed by { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex
-    * }
+    * Returns the selection range captured by the sheet panel.
     *
-    * @return The selection array.
+    * @return The selection range.
     */
-   public int[] getSelectionRange() {
-      return new int[] { startColumnIndex, startRowIndex, endColumnIndex, endRowIndex };
+   public CellRange getSelectedCellRange() {
+      return new CellRange(getSheetName(),
+            startColumnIndex,
+            startRowIndex,
+            endColumnIndex,
+            endRowIndex);
    }
 
    /**
@@ -112,9 +117,9 @@ public class SheetPanel extends JPanel {
          int[] selectedColumns = tblBaseSheet.getSelectedColumns();
          int[] selectedRows = tblBaseSheet.getSelectedRows();
          if (selectedColumns.length == 0 || selectedRows.length == 0) {
-            setSelectionRange(START_INDEX, START_INDEX, START_INDEX, END_INDEX); // A:A
+            setSelectedCellRange(START_INDEX, START_INDEX, START_INDEX, END_INDEX); // A:A
          } else {
-            setSelectionRange(selectedColumns[0], selectedRows[0],
+            setSelectedCellRange(selectedColumns[0], selectedRows[0],
                   selectedColumns[selectedColumns.length - 1],
                   selectedRows[selectedRows.length - 1]);
          }
@@ -143,7 +148,7 @@ public class SheetPanel extends JPanel {
          int[] selectedColumns = tblBaseSheet.getSelectedColumns();
          int startColumnIndex = selectedColumns[0];
          int endColumnIndex = selectedColumns[selectedColumns.length - 1];
-         setSelectionRange(startColumnIndex, START_INDEX, endColumnIndex, END_INDEX);
+         setSelectedCellRange(startColumnIndex, START_INDEX, endColumnIndex, END_INDEX);
       }
 
       private void setMouseClickingPoint(MouseEvent e) {
@@ -198,7 +203,7 @@ public class SheetPanel extends JPanel {
          int[] selectedRows = tblBaseSheet.getSelectedRows();
          int startRowIndex = selectedRows[0];
          int endRowIndex = selectedRows[selectedRows.length - 1];
-         setSelectionRange(START_INDEX, startRowIndex, END_INDEX, endRowIndex);
+         setSelectedCellRange(START_INDEX, startRowIndex, END_INDEX, endRowIndex);
       }
 
       private void setMouseClickingPoint(MouseEvent e) {
