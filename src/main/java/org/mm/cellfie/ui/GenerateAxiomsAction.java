@@ -24,12 +24,12 @@ import org.mm.cellfie.exception.CellfieException;
 import org.mm.core.TransformationRule;
 import org.mm.core.settings.ReferenceSettings;
 import org.mm.core.settings.ValueEncodingSetting;
+import org.mm.exceptions.MappingMasterException;
 import org.mm.parser.ASTExpression;
 import org.mm.parser.MappingMasterParser;
 import org.mm.parser.ParseException;
 import org.mm.parser.node.ExpressionNode;
 import org.mm.parser.node.MMExpressionNode;
-import org.mm.renderer.RendererException;
 import org.mm.rendering.Rendering;
 import org.mm.rendering.owlapi.OWLRendering;
 import org.mm.ss.SpreadSheetDataSource;
@@ -195,42 +195,63 @@ public class GenerateAxiomsAction implements ActionListener {
       return System.getProperty("java.io.tmpdir");
    }
 
-   private int getStartColumnIndex(TransformationRule rule) throws Exception { // TODO: Change to CellfieException
-      String startColumn = rule.getStartColumn();
-      if (startColumn.isEmpty()) {
-         throw new CellfieException("Start column is not specified");
+   private int getStartColumnIndex(TransformationRule rule) throws CellfieException {
+      try {
+         String startColumn = checkNotEmpty(rule.getStartColumn());
+         return SpreadSheetUtil.columnName2Number(startColumn);
+      } catch (IllegalArgumentException e) {
+         throw new CellfieException("Missing start column parameter");
+      } catch (MappingMasterException e) {
+         throw new CellfieException(e.getMessage());
       }
-      return SpreadSheetUtil.columnName2Number(startColumn);
    }
 
-   private int getStartRowIndex(TransformationRule rule) throws Exception {
-      String startRow = rule.getStartRow();
-      if (startRow.isEmpty()) {
-         throw new CellfieException("Start row is not specified");
+   private int getStartRowIndex(TransformationRule rule) throws CellfieException {
+      try {
+         String startRow = checkNotEmpty(rule.getStartRow());
+         return SpreadSheetUtil.rowLabel2Number(startRow);
+      } catch (IllegalArgumentException e) {
+         throw new CellfieException("Missing start row parameter");
+      } catch (MappingMasterException e) {
+         throw new CellfieException(e.getMessage());
       }
-      return SpreadSheetUtil.rowLabel2Number(startRow);
    }
 
-   private int getEndColumnIndex(TransformationRule rule, Sheet sheet, int startRowIndex)
-         throws Exception {
-      String endColumn = rule.getEndColumn();
-      if (endColumn.isEmpty()) {
-         throw new CellfieException(
-               "End column is not specified. (Hint: Use a wildcard '+' to indicate the last column)");
+   private int getEndColumnIndex(TransformationRule rule, Sheet sheet, int startRowIndex) throws CellfieException {
+      try {
+         String endColumn = checkNotEmpty(rule.getEndColumn());
+         if (rule.hasEndColumnWildcard()) {
+            return sheet.getRow(startRowIndex).getLastCellNum() + 1;
+         } else {
+            return SpreadSheetUtil.columnName2Number(endColumn);
+         }
+      } catch (IllegalArgumentException e) {
+         throw new CellfieException("Missing end column parameter. (Hint: Use the wildcard '+' to indicate the last column)");
+      } catch (MappingMasterException e) {
+         throw new CellfieException(e.getMessage());
       }
-      return rule.hasEndColumnWildcard() ? sheet.getRow(startRowIndex).getLastCellNum() + 1
-            : SpreadSheetUtil.columnName2Number(endColumn);
    }
 
-   private int getEndRowIndex(TransformationRule rule, Sheet sheet) throws Exception {
-      String endRow = rule.getEndRow();
-      if (endRow.isEmpty()) {
-         throw new CellfieException(
-               "End row is not specified. (Hint: Use a wildcard '+' to indicate the last row)");
+   private int getEndRowIndex(TransformationRule rule, Sheet sheet) throws CellfieException {
+      try {
+         String endRow = checkNotEmpty(rule.getEndRow());
+         if (rule.hasEndRowWildcard()) {
+            return sheet.getLastRowNum() + 1;
+         } else {
+            return SpreadSheetUtil.rowLabel2Number(endRow);
+         }
+      } catch (IllegalArgumentException e) {
+         throw new CellfieException("Missing end row parameter. (Hint: Use the wildcard '+' to indicate the last row)");
+      } catch (MappingMasterException e) {
+         throw new CellfieException(e.getMessage());
       }
-      int endRowIndex = rule.hasEndRowWildcard() ? sheet.getLastRowNum() + 1
-            : SpreadSheetUtil.rowLabel2Number(endRow);
-      return endRowIndex;
+   }
+
+   private static String checkNotEmpty(String indexString) {
+      if (indexString.isEmpty()) {
+         throw new IllegalArgumentException("Cell index must not be empty");
+      }
+      return indexString;
    }
 
    private Set<OWLAxiom> toAxioms(Set<Rendering> results) {
@@ -312,7 +333,7 @@ public class GenerateAxiomsAction implements ActionListener {
    }
 
    private SpreadsheetLocation incrementLocation(SpreadsheetLocation current,
-         SpreadsheetLocation start, SpreadsheetLocation end) throws RendererException {
+         SpreadsheetLocation start, SpreadsheetLocation end) {
       if (current.getPhysicalRowNumber() < end.getPhysicalRowNumber()) {
          return new SpreadsheetLocation(current.getSheetName(), current.getPhysicalColumnNumber(),
                current.getPhysicalRowNumber() + 1);
@@ -323,7 +344,9 @@ public class GenerateAxiomsAction implements ActionListener {
                   current.getPhysicalColumnNumber() + 1, start.getPhysicalRowNumber());
          }
       }
-      throw new RendererException("incrementLocation called redundantly"); // TODO: Switch to CellfieException
+      String message = format("Illegal backward cell iteration from %s to %s",
+            current.getCellLocation(), end.getCellLocation());
+      throw new RuntimeException(message);
    }
 
    private SpreadSheetDataSource getActiveWorkbook() throws CellfieException {
