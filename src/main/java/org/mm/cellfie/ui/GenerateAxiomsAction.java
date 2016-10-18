@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,6 +47,8 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the action listener for the 'Generate Axioms' command.
@@ -54,6 +57,8 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  *         Stanford Center for Biomedical Informatics Research
  */
 public class GenerateAxiomsAction implements ActionListener {
+
+   private static final Logger logger = LoggerFactory.getLogger(GenerateAxiomsAction.class);
 
    private static final int CANCEL_IMPORT = 0;
    private static final int ADD_TO_NEW_ONTOLOGY = 1;
@@ -70,7 +75,7 @@ public class GenerateAxiomsAction implements ActionListener {
    }
 
    @Override
-   public void actionPerformed(ActionEvent e) {
+   public void actionPerformed(ActionEvent event) {
       try {
          // Get all user-defined transformation rules
          List<TransformationRule> rules = getUserRules();
@@ -124,10 +129,19 @@ public class GenerateAxiomsAction implements ActionListener {
 
          // Show the preview dialog to users to see all the generated axioms
          showAxiomPreviewDialog(toAxioms(results), logMessage);
-      } catch (Exception ex) {
-         DialogUtils.showErrorDialog(cellfieWorkspace, ex.getMessage());
-         // TODO: Add logger
-      }
+      }catch (FileNotFoundException e) {
+         String message = "Unable to write to the log file (see log for details)";
+         DialogUtils.showErrorDialog(cellfieWorkspace, message);
+         logger.error(message, e);
+      } catch (ParseException e) {
+         String message = e.getMessage();
+         DialogUtils.showErrorDialog(cellfieWorkspace, message);
+         logger.error(message, e);
+      } catch (Exception e) {
+         String message = e.getMessage();
+         DialogUtils.showErrorDialog(cellfieWorkspace, message);
+         logger.error(message, e);
+      } 
    }
 
    private void logExpression(TransformationRule rule, StringBuilder logBuilder) {
@@ -181,7 +195,7 @@ public class GenerateAxiomsAction implements ActionListener {
       return System.getProperty("java.io.tmpdir");
    }
 
-   private int getStartColumnIndex(TransformationRule rule) throws Exception {
+   private int getStartColumnIndex(TransformationRule rule) throws Exception { // TODO: Change to CellfieException
       String startColumn = rule.getStartColumn();
       if (startColumn.isEmpty()) {
          throw new CellfieException("Start column is not specified");
@@ -309,7 +323,7 @@ public class GenerateAxiomsAction implements ActionListener {
                   current.getPhysicalColumnNumber() + 1, start.getPhysicalRowNumber());
          }
       }
-      throw new RendererException("incrementLocation called redundantly");
+      throw new RendererException("incrementLocation called redundantly"); // TODO: Switch to CellfieException
    }
 
    private SpreadSheetDataSource getActiveWorkbook() throws CellfieException {

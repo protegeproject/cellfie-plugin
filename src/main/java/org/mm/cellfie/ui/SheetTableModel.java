@@ -9,6 +9,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.ss.SpreadSheetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the table model used to presenting the cells of a spreadsheet.
@@ -17,6 +19,8 @@ import org.mm.ss.SpreadSheetUtil;
  *         Stanford Center for Biomedical Informatics Research
  */
 public class SheetTableModel extends AbstractTableModel {
+
+   private static final Logger logger = LoggerFactory.getLogger(SheetTableModel.class);
 
    private static final long serialVersionUID = 1L;
 
@@ -79,7 +83,7 @@ public class SheetTableModel extends AbstractTableModel {
                return "";
          }
       } catch (NullPointerException e) {
-         // TODO: Add logger.warn
+         logger.warn("Looking for a cell beyond the maximum row and column range");
          return "";
       }
    }

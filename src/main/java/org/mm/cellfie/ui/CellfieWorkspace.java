@@ -49,6 +49,8 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.util.OntologyIRIShortFormProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the main Mapping Master user interface. It contains a view of a
@@ -58,6 +60,8 @@ import org.semanticweb.owlapi.util.OntologyIRIShortFormProvider;
  *         Stanford Center for Biomedical Informatics Research
  */
 public class CellfieWorkspace extends JPanel {
+
+   private static final Logger logger = LoggerFactory.getLogger(CellfieWorkspace.class);
 
    private static final long serialVersionUID = 1L;
 
@@ -94,8 +98,7 @@ public class CellfieWorkspace extends JPanel {
       add(splitPane, BorderLayout.CENTER);
 
       loadWorkbookDocument(workbookFilePath);
-      // loadTransformationRuleDocument(ruleFilePath)
-      // XXX In case the UI will allow users to input rule file in advance
+
       setupApplication();
 
       /*
@@ -183,8 +186,9 @@ public class CellfieWorkspace extends JPanel {
          OWLOntologySourceHook ontologySourceHook = new OWLProtegeOntology(editorKit);
          application = applicationFactory.createApplication(ontologySourceHook);
       } catch (Exception e) {
-         DialogUtils.showErrorDialog(this, "Unable to start Cellfie Workspace (see log for details");
-         // TODO: Add logger
+         String message = "Unable to start Cellfie Workspace (see log for details)";
+         DialogUtils.showErrorDialog(this, message);
+         logger.error(message, e);
       }
    }
 

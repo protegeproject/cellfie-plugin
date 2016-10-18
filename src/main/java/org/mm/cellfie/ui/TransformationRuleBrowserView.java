@@ -1,7 +1,6 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -34,12 +33,16 @@ import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSetFactory;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.OWLEditorKit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
 public class TransformationRuleBrowserView extends JPanel {
+
+   private static final Logger logger = LoggerFactory.getLogger(TransformationRuleBrowserView.class);
 
    private static final long serialVersionUID = 1L;
 
@@ -382,7 +385,7 @@ public class TransformationRuleBrowserView extends JPanel {
     */
    private class LoadRulesAction implements ActionListener {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent event) {
          safeGuardChanges();
          File file = DialogUtils.showOpenFileChooser(cellfieWorkspace,
                "Mapping Master Transformation Rules (.json)", "json");
@@ -391,11 +394,12 @@ public class TransformationRuleBrowserView extends JPanel {
             try {
                cellfieWorkspace.loadTransformationRuleDocument(filePath);
                tblTransformationRules.setContent(cellfieWorkspace.getActiveTransformationRules(),
-                     event -> fireTableContentChanged(event));
+                     evt -> fireTableContentChanged(evt));
                drawTitleBorder();
-            } catch (Exception ex) {
-               DialogUtils.showErrorDialog(cellfieWorkspace, format("Error opening file ", filePath));
-               // TODO: Add logger
+            } catch (Exception e) {
+               String message = "Error opening file (see log for details)";
+               DialogUtils.showErrorDialog(cellfieWorkspace, message);
+               logger.error(message, e);
             }
          }
       }
@@ -437,8 +441,9 @@ public class TransformationRuleBrowserView extends JPanel {
          cellfieWorkspace.updateTransformationRuleModel();
       } catch (IOException e) {
          isSuccessful = false;
-         DialogUtils.showErrorDialog(cellfieWorkspace, format("Error saving file ", filePath));
-         // TODO: Add logger
+         String message = "Error saving file (see log for details)";
+         DialogUtils.showErrorDialog(cellfieWorkspace, message);
+         logger.error(message, e);
       }
       return isSuccessful;
    }
