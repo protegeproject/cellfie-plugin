@@ -22,10 +22,12 @@ import javax.swing.SwingUtilities;
 import org.mm.core.TransformationRule;
 
 /**
+ * Represents the editor form used to create a transformation rule.
+ *
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class TransformationRuleEditorPanel extends JPanel {
+public class TransformationRuleEditor extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
@@ -39,7 +41,7 @@ public class TransformationRuleEditorPanel extends JPanel {
 
    private JTextArea txtRule;
 
-   public TransformationRuleEditorPanel(@Nonnull CellfieWorkspace cellfieWorkspace) {
+   public TransformationRuleEditor(@Nonnull CellfieWorkspace cellfieWorkspace) {
       checkNotNull(cellfieWorkspace);
       
       setLayout(new BorderLayout());
@@ -132,50 +134,54 @@ public class TransformationRuleEditorPanel extends JPanel {
       pnlMain.add(txtRule, BorderLayout.CENTER);
    }
 
-   public void setSheetName(String sheetName) {
+   public void setSheetName(@Nonnull String sheetName) {
+      checkNotNull(sheetName);
       cbbSheetName.setSelectedItem(sheetName);
    }
 
-   public void setStartColumn(String columnName) {
+   public void setStartColumn(@Nonnull String columnName) {
+      checkNotNull(columnName);
       if (columnName.isEmpty()) {
          columnName = "A";
       }
       txtStartColumn.setText(columnName);
    }
 
-   public void setStartRow(String rowNumber) {
+   public void setStartRow(@Nonnull String rowNumber) {
+      checkNotNull(rowNumber);
       if (rowNumber.isEmpty()) {
          rowNumber = "1";
       }
       txtStartRow.setText(rowNumber);
    }
 
-   public void setEndColumn(String columnName) {
+   public void setEndColumn(@Nonnull String columnName) {
+      checkNotNull(columnName);
       if (columnName.isEmpty()) {
          columnName = "+";
       }
       txtEndColumn.setText(columnName);
    }
 
-   public void setEndRow(String rowNumber) {
+   public void setEndRow(@Nonnull String rowNumber) {
+      checkNotNull(rowNumber);
       if (rowNumber.isEmpty()) {
          rowNumber = "+";
       }
       txtEndRow.setText(rowNumber);
    }
 
-   public void fillFormFields(String sheetName, String startColumn, String endColumn,
-         String startRow, String endRow, String rule, String comment) {
-      cbbSheetName.setSelectedItem(sheetName);
-      txtStartColumn.setText(startColumn);
-      txtEndColumn.setText(endColumn);
-      txtStartRow.setText(startRow);
-      txtEndRow.setText(endRow);
+   public void setComment(@Nonnull String comment) {
+      checkNotNull(comment);
       txtComment.setText(comment);
-      txtRule.setText(rule);
+   }
+   
+   public void setRuleExpression(@Nonnull String ruleExpression) {
+      checkNotNull(ruleExpression);
+      txtRule.setText(ruleExpression);
    }
 
-   public TransformationRule getUserInput() {
+   public TransformationRule getTransformationRule() {
       return new TransformationRule((String) cbbSheetName.getSelectedItem(),
             txtStartColumn.getText().trim().toUpperCase(),
             txtEndColumn.getText().trim().toUpperCase(), txtStartRow.getText().trim(),

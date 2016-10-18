@@ -163,7 +163,6 @@ public class CellfieWorkspace extends JPanel {
    public void loadTransformationRuleDocument(String path) {
       setRuleFileLocation(path);
       setupApplication();
-      transformationRuleBrowserView.update();
    }
 
    /**
