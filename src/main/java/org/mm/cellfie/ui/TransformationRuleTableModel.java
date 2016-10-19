@@ -3,7 +3,6 @@ package org.mm.cellfie.ui;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -35,30 +34,8 @@ public class TransformationRuleTableModel extends DefaultTableModel {
    private final String[] COLUMN_NAMES = { "", "Sheet Name", "Start Column", "End Column",
          "Start Row", "End Row", "Rule", "Comment" };
 
-   // Prevent external instantiation
-   private TransformationRuleTableModel(@Nonnull final List<TransformationRule> rules) {
+   public TransformationRuleTableModel() {
       super();
-      checkNotNull(rules);
-      for (TransformationRule rule : rules) {
-         Vector<Object> row = new Vector<>();
-         row.add(true);
-         row.add(rule.getSheetName());
-         row.add(rule.getStartColumn());
-         row.add(rule.getEndColumn());
-         row.add(rule.getStartRow());
-         row.add(rule.getEndRow());
-         row.add(rule.getRuleString());
-         row.add(rule.getComment());
-         addRow(row);
-      }
-   }
-
-   public static TransformationRuleTableModel create(@Nonnull final List<TransformationRule> rules) {
-      return new TransformationRuleTableModel(rules);
-   }
-
-   public static TransformationRuleTableModel createEmpty() {
-      return new TransformationRuleTableModel(Collections.emptyList());
    }
 
    @Override

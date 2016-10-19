@@ -29,7 +29,7 @@ public class TransformationRuleTable extends JTable {
 
    private final CheckBoxHeaderRenderer checkBoxRenderer = new CheckBoxHeaderRenderer(this);
 
-   private TransformationRuleTableModel tableModel = TransformationRuleTableModel.createEmpty();
+   private final TransformationRuleTableModel tableModel = new TransformationRuleTableModel();
 
    public TransformationRuleTable() {
       setModel(tableModel);
