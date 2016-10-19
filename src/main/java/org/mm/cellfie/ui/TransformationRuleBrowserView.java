@@ -26,6 +26,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.mm.core.TransformationRule;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class TransformationRuleBrowserView extends JPanel {
+public class TransformationRuleBrowserView extends JPanel implements TableModelListener {
 
    private static final Logger logger = LoggerFactory.getLogger(TransformationRuleBrowserView.class);
 
@@ -73,7 +74,7 @@ public class TransformationRuleBrowserView extends JPanel {
       add(pnlContainer, BorderLayout.CENTER);
 
       tblTransformationRules = new TransformationRuleTable();
-      tblTransformationRules.addTableModelListener(event -> fireTableContentChanged(event));
+      tblTransformationRules.addTableModelListener(this);
       tblTransformationRules.addMouseListener(new RuleEditMouseListener());
       tblTransformationRules.addMouseListener(new RuleSelectionMouseListener());
 
@@ -377,7 +378,8 @@ public class TransformationRuleBrowserView extends JPanel {
       }
    }
 
-   private void fireTableContentChanged(TableModelEvent event) {
+   @Override
+   public void tableChanged(TableModelEvent e) {
       hasUnsavedChanges = true; // flag the rule model is dirty
       updateCommandButtonsUi();
    }
