@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.awt.Color;
 import java.awt.Component;
 import java.util.List;
-import java.util.Vector;
 
 import javax.annotation.Nonnull;
 import javax.swing.JTable;
@@ -33,30 +32,29 @@ public class TransformationRuleTable extends JTable {
    private TransformationRuleTableModel tableModel = TransformationRuleTableModel.createEmpty();
 
    public TransformationRuleTable() {
+      setModel(tableModel);
       setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       setGridColor(new Color(220, 220, 220));
       setDefaultRenderer(String.class, new TransformationRuleTableRenderer());
-      setModel(tableModel);
       setTableHeaderAlignment(SwingConstants.CENTER);
       getColumnModel().getColumn(0).setHeaderRenderer(checkBoxRenderer);
       setPreferredColumnWidth();
-   }
-
-   public void setContent(@Nonnull List<TransformationRule> transformationRules,
-         @Nonnull TableModelListener listener) {
-      checkNotNull(transformationRules);
-      checkNotNull(listener);
-      tableModel = TransformationRuleTableModel.create(transformationRules);
-      tableModel.addTableModelListener(listener);
-      setModel(tableModel);
-      setTableHeaderAlignment(SwingConstants.CENTER);
-      getColumnModel().getColumn(0).setHeaderRenderer(checkBoxRenderer);
-      setPreferredColumnWidth();
-      setPreferredRowHeight();
    }
 
    private void setTableHeaderAlignment(int alignment) {
       ((DefaultTableCellRenderer) getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
+   }
+
+   public void addTableModelListener(TableModelListener listener) {
+      tableModel.addTableModelListener(listener);
+   }
+
+   public void load(@Nonnull List<TransformationRule> rules) {
+      checkNotNull(rules);
+      for (TransformationRule rule : rules) {
+         tableModel.addRule(rule);
+         setPreferredRowHeight();
+      }
    }
 
    public List<TransformationRule> getAllRules() {
@@ -75,36 +73,24 @@ public class TransformationRuleTable extends JTable {
       return getRuleAt(getSelectedRow());
    }
 
-   public void modifyRule(int selectedRow, String sheetName, String startColumn, String endColumn,
-         String startRow, String endRow, String expression, String comment) {
-      final Vector<Object> ruleRecord = createRuleRecordVector(sheetName, startColumn, endColumn,
-            startRow, endRow, expression, comment);
-      tableModel.removeRow(selectedRow);
-      tableModel.insertRow(selectedRow, ruleRecord);
+   public void modifyRule(int selectedRow, @Nonnull TransformationRule rule) {
+      checkNotNull(rule);
+      tableModel.updateRule(selectedRow, rule);
       repaintSelectionAfterModifying(selectedRow);
       setPreferredRowHeight();
    }
 
-   public void modifyRuleAtSelection(String sheetName, String startColumn, String endColumn,
-         String startRow, String endRow, String expression, String comment) {
-      modifyRule(getSelectedRow(),
-            sheetName,
-            startColumn,
-            endColumn,
-            startRow, endRow,
-            expression,
-            comment);
+   public void modifyRuleAtSelection(@Nonnull TransformationRule rule) {
+      modifyRule(getSelectedRow(), rule);
    }
 
    private void repaintSelectionAfterModifying(int modifiedRow) {
       setRowSelectionInterval(modifiedRow, modifiedRow);
    }
 
-   public void addRule(String sheetName, String startColumn, String endColumn, String startRow,
-         String endRow, String expression, String comment) {
-      final Vector<Object> ruleRecord = createRuleRecordVector(sheetName, startColumn, endColumn,
-            startRow, endRow, expression, comment);
-      tableModel.addRow(ruleRecord);
+   public void addRule(@Nonnull TransformationRule rule) {
+      checkNotNull(rule);
+      tableModel.addRule(rule);
       repaintSelectionAfterAdding();
       setPreferredRowHeight();
    }
@@ -178,19 +164,5 @@ public class TransformationRuleTable extends JTable {
          int preferredHeight = ruleExpressionField.getPreferredSize().height;
          setRowHeight(rowIndex, preferredHeight);
       }
-   }
-
-   private Vector<Object> createRuleRecordVector(String sheetName, String startColumn,
-         String endColumn, String startRow, String endRow, String expression, String comment) {
-      Vector<Object> row = new Vector<>();
-      row.add(TransformationRuleTableModel.RULE_SELECT_COLUMN, true);
-      row.add(TransformationRuleTableModel.SHEET_NAME_COLUMN, sheetName);
-      row.add(TransformationRuleTableModel.START_COLUMN_COLUMN, startColumn);
-      row.add(TransformationRuleTableModel.END_COLUMN_COLUMN, endColumn);
-      row.add(TransformationRuleTableModel.START_ROW_COLUMN, startRow);
-      row.add(TransformationRuleTableModel.END_ROW_COLUMN, endRow);
-      row.add(TransformationRuleTableModel.RULE_EXPRESSION_COLUMN, expression);
-      row.add(TransformationRuleTableModel.COMMENT_COLUMN, comment);
-      return row;
    }
 }

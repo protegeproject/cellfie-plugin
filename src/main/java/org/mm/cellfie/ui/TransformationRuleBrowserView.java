@@ -73,6 +73,7 @@ public class TransformationRuleBrowserView extends JPanel {
       add(pnlContainer, BorderLayout.CENTER);
 
       tblTransformationRules = new TransformationRuleTable();
+      tblTransformationRules.addTableModelListener(event -> fireTableContentChanged(event));
       tblTransformationRules.addMouseListener(new RuleEditMouseListener());
       tblTransformationRules.addMouseListener(new RuleSelectionMouseListener());
 
@@ -263,14 +264,7 @@ public class TransformationRuleBrowserView extends JPanel {
       int answer = showTransformationRuleEditorDialog(ruleEditor);
       if (answer == JOptionPane.OK_OPTION) {
          TransformationRule newRule = ruleEditor.getTransformationRule();
-         tblTransformationRules.addRule(
-               newRule.getSheetName(),
-               newRule.getStartColumn(),
-               newRule.getEndColumn(),
-               newRule.getStartRow(),
-               newRule.getEndRow(),
-               newRule.getRuleString(),
-               newRule.getComment());
+         tblTransformationRules.addRule(newRule);
          tblTransformationRules.requestFocusInWindow();
       }
    }
@@ -310,14 +304,7 @@ public class TransformationRuleBrowserView extends JPanel {
       int answer = showTransformationRuleEditorDialog(ruleEditor);
       if (answer == JOptionPane.OK_OPTION) {
          TransformationRule modifiedRule = ruleEditor.getTransformationRule();
-         tblTransformationRules.modifyRuleAtSelection(
-               modifiedRule.getSheetName(),
-               modifiedRule.getStartColumn(),
-               modifiedRule.getEndColumn(),
-               modifiedRule.getStartRow(),
-               modifiedRule.getEndRow(),
-               modifiedRule.getRuleString(),
-               modifiedRule.getComment());
+         tblTransformationRules.modifyRuleAtSelection(modifiedRule);
       }
    }
 
@@ -379,8 +366,7 @@ public class TransformationRuleBrowserView extends JPanel {
          if (inputFile != null) {
             try {
                cellfieWorkspace.setRuleFile(inputFile);
-               tblTransformationRules.setContent(cellfieWorkspace.getActiveTransformationRules(),
-                     evt -> fireTableContentChanged(evt));
+               tblTransformationRules.load(cellfieWorkspace.getActiveTransformationRules());
                drawTitleBorder();
             } catch (Exception e) {
                String message = "Error opening file (see log for details)";
