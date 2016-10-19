@@ -474,10 +474,14 @@ public class TransformationRuleBrowserView extends JPanel {
 
    private void updateCommandButtonsUi() {
       if (hasTransformationRules()) {
+         cmdEdit.setEnabled(true);
+         cmdDelete.setEnabled(true);
          cmdSave.setEnabled(cellfieWorkspace.isRuleFilePresent());
          cmdSaveAs.setEnabled(true);
          cmdGenerateAxioms.setEnabled(true);
       } else {
+         cmdEdit.setEnabled(false);
+         cmdDelete.setEnabled(false);
          cmdGenerateAxioms.setEnabled(false);
       }
    }
