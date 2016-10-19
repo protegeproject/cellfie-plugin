@@ -124,11 +124,22 @@ public class TransformationRuleTable extends JTable {
    }
 
    private void repaintSelectionAfterDeleting(int deletedRow) {
-      int selectedRow = deletedRow;
-      if (deletedRow == tableModel.getAllRules().size()) {
-         selectedRow = deletedRow - 1;
+      int nextSelectedRow = deletedRow;
+      if (isLastRow(deletedRow)) {
+         nextSelectedRow = deletedRow - 1; // the previous row becomes the next selected row
+         if (!isRowPresent(nextSelectedRow)) {
+            return; // skip drawing the row selection
+         }
       }
-      setRowSelectionInterval(selectedRow, selectedRow);
+      setRowSelectionInterval(nextSelectedRow, nextSelectedRow);
+   }
+
+   private boolean isLastRow(int deletedRow) {
+      return deletedRow == tableModel.getAllRules().size();
+   }
+
+   private boolean isRowPresent(int nextSelectedRow) {
+      return nextSelectedRow >= 0;
    }
 
    public void checkSelectAllRules() {
