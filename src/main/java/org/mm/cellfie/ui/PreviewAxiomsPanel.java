@@ -43,9 +43,9 @@ public class PreviewAxiomsPanel extends JPanel {
    private String logMessage;
 
    @SuppressWarnings("unchecked")
-   public PreviewAxiomsPanel(@Nonnull CellfieWorkspace cellfieWorkspace, @Nonnull OWLEditorKit editorKit) {
+   public PreviewAxiomsPanel(@Nonnull CellfieWorkspace cellfieWorkspace) {
       checkNotNull(cellfieWorkspace);
-      checkNotNull(editorKit);
+      OWLEditorKit editorKit = cellfieWorkspace.getOWLEditorKit();
 
       setLayout(new BorderLayout());
 

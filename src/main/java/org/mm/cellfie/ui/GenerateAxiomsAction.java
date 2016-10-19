@@ -36,13 +36,13 @@ import org.mm.ss.SpreadSheetDataSource;
 import org.mm.ss.SpreadSheetUtil;
 import org.mm.ss.SpreadsheetLocation;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
-import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLImportsDeclaration;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -65,13 +65,10 @@ public class GenerateAxiomsAction implements ActionListener {
    private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
    private final CellfieWorkspace cellfieWorkspace;
-   private final OWLEditorKit editorKit;
 
-   public GenerateAxiomsAction(@Nonnull CellfieWorkspace cellfieWorkspace, @Nonnull OWLEditorKit editorKit) {
+   public GenerateAxiomsAction(@Nonnull CellfieWorkspace cellfieWorkspace) {
       checkNotNull(cellfieWorkspace);
-      checkNotNull(editorKit);
       this.cellfieWorkspace = cellfieWorkspace;
-      this.editorKit = editorKit;
    }
 
    @Override
@@ -166,7 +163,7 @@ public class GenerateAxiomsAction implements ActionListener {
 
    private File getLoggingFile() {
       String rootDir = getDefaultRootDirectory();
-      Optional<String> ruleFilePath = cellfieWorkspace.getRuleFileLocation();
+      Optional<String> ruleFilePath = getRuleFileLocation();
       if (ruleFilePath.isPresent()) {
          rootDir = new File(ruleFilePath.get()).getParent();
       }
@@ -180,15 +177,32 @@ public class GenerateAxiomsAction implements ActionListener {
       StringBuilder sb = new StringBuilder();
       sb.append("Date: ").append(LogWriter.getTimestamp());
       sb.append("\n");
-      sb.append("Ontology source: ").append(cellfieWorkspace.getOntologyFileLocation());
+      sb.append("Ontology source: ").append(getOntologyFileLocation());
       sb.append("\n");
-      sb.append("Worksheet source: ").append(cellfieWorkspace.getWorkbookFileLocation());
+      sb.append("Worksheet source: ").append(getWorkbookFileLocation());
       sb.append("\n");
-      sb.append("Transformation rules: ")
-            .append(cellfieWorkspace.getRuleFileLocation().isPresent()
-                  ? cellfieWorkspace.getRuleFileLocation().get() : "N/A");
+      sb.append("Transformation rules: ").append(getRuleFileLocation().orElse("N/A"));
       sb.append("\n");
       return sb.toString();
+   }
+
+   public String getOntologyFileLocation() {
+      OWLOntology ontology = cellfieWorkspace.getActiveOntology();
+      String iriString = ontology.getOWLOntologyManager().getOntologyDocumentIRI(ontology).toString();
+      return iriString.substring(iriString.indexOf(":") + 1, iriString.length());
+   }
+
+   public String getWorkbookFileLocation() {
+      return cellfieWorkspace.getWorkbookFile().getAbsolutePath();
+   }
+
+   public Optional<String> getRuleFileLocation() {
+      Optional<File> ruleFile = cellfieWorkspace.getRuleFile();
+      if (ruleFile.isPresent()) {
+         return Optional.of(ruleFile.get().getAbsolutePath());
+      } else {
+         return Optional.empty();
+      }
    }
 
    private String getDefaultRootDirectory() {
@@ -266,6 +280,7 @@ public class GenerateAxiomsAction implements ActionListener {
 
    private void showAxiomPreviewDialog(Set<OWLAxiom> axioms, String logMessage)
          throws CellfieException {
+      final OWLModelManager modelManager = cellfieWorkspace.getOWLEditorKit().getModelManager();
       final ImportOption[] options = {
             new ImportOption(CANCEL_IMPORT, "Cancel"),
             new ImportOption(ADD_TO_NEW_ONTOLOGY, "Add to a new ontology"),
@@ -277,14 +292,16 @@ public class GenerateAxiomsAction implements ActionListener {
                JOptionPane.DEFAULT_OPTION, null, options, options[1]);
          switch (answer) {
             case ADD_TO_CURRENT_ONTOLOGY:
-               editorKit.getModelManager().applyChanges(addAxioms(currentOntology, axioms));
+               modelManager.applyChanges(addAxioms(currentOntology, axioms));
                break;
             case ADD_TO_NEW_ONTOLOGY:
                final OWLOntologyID ontologyId = createOntologyID();
                final URI physicalUri = ontologyId.getDefaultDocumentIRI().get().toURI();
-               OWLOntology newOntology = editorKit.getModelManager().createNewOntology(ontologyId, physicalUri);
-               editorKit.getModelManager().applyChanges(addImport(newOntology, currentOntology));
-               editorKit.getModelManager().applyChanges(addAxioms(newOntology, axioms));
+               OWLOntology newOntology = modelManager.createNewOntology(ontologyId, physicalUri);
+               IRI ontologyIri = currentOntology.getOntologyID().getOntologyIRI().get();
+               OWLImportsDeclaration importDeclaration = modelManager.getOWLDataFactory().getOWLImportsDeclaration(ontologyIri);
+               modelManager.applyChange(addImport(newOntology, importDeclaration));
+               modelManager.applyChanges(addAxioms(newOntology, axioms));
                break;
          }
       } catch (ClassCastException e) {
@@ -294,17 +311,8 @@ public class GenerateAxiomsAction implements ActionListener {
       }
    }
 
-   private List<? extends OWLOntologyChange> addImport(OWLOntology newOntology, OWLOntology currentOntology) {
-      List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-      com.google.common.base.Optional<IRI> ontologyIri = currentOntology.getOntologyID().getOntologyIRI();
-      if (ontologyIri.isPresent()) {
-         final IRI ontologyIriPresent = ontologyIri.get();
-         final OWLDataFactory dataFactory = editorKit.getModelManager().getOWLDataFactory();
-         changes.add(new AddImport(
-               newOntology,
-               dataFactory.getOWLImportsDeclaration(ontologyIriPresent)));
-      }
-      return changes;
+   private OWLOntologyChange addImport(OWLOntology newOntology, OWLImportsDeclaration importDeclaration) {
+      return new AddImport(newOntology, importDeclaration);
    }
 
    private OWLOntologyID createOntologyID() {
@@ -323,7 +331,7 @@ public class GenerateAxiomsAction implements ActionListener {
    }
 
    private JPanel createPreviewAxiomsPanel(Set<OWLAxiom> generatedAxioms, String executionLog) {
-      PreviewAxiomsPanel previewPanel = new PreviewAxiomsPanel(cellfieWorkspace, editorKit);
+      PreviewAxiomsPanel previewPanel = new PreviewAxiomsPanel(cellfieWorkspace);
       previewPanel.setContent(generatedAxioms, executionLog);
       return previewPanel;
    }

@@ -31,8 +31,8 @@ public class WorkbookView extends JPanel {
 
       JPanel pnlContainer = new JPanel();
       pnlContainer.setLayout(new BorderLayout());
-      String title = format("Workbook (%s)", cellfieWorkspace.getWorkbookFileLocation());
-      pnlContainer.setBorder(ComponentFactory.createTitledBorder(title));
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder(
+            format("Workbook (%s)", cellfieWorkspace.getWorkbookFile().getAbsolutePath())));
       add(pnlContainer, BorderLayout.CENTER);
 
       JPanel pnlWorkbook = new JPanel();

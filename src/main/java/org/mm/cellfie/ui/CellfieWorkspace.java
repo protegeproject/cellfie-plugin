@@ -11,27 +11,30 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.mm.app.MMApplication;
-import org.mm.app.MMApplicationFactory;
 import org.mm.app.MMApplicationModel;
 import org.mm.cellfie.OWLProtegeOntology;
-import org.mm.core.OWLOntologySourceHook;
+import org.mm.core.OWLOntologySource;
 import org.mm.core.TransformationRule;
 import org.mm.core.TransformationRuleSet;
 import org.mm.core.settings.ReferenceSettings;
@@ -65,19 +68,24 @@ public class CellfieWorkspace extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
-   private final OWLOntology ontology;
+   private final OWLOntologySource ontologySource;
+   private final File workbookFile;
    private final OWLEditorKit editorKit;
 
-   private WorkbookView dataSourceView;
-   private TransformationRuleBrowserView transformationRuleBrowserView;
+   private final WorkbookView dataSourceView;
+   private final TransformationRuleBrowserView ruleBrowserView;
 
-   private MMApplication application;
-   private MMApplicationFactory applicationFactory = new MMApplicationFactory();
+   private File ruleFile;
 
-   public CellfieWorkspace(@Nonnull OWLOntology ontology, @Nonnull String workbookFilePath,
-         @Nonnull OWLEditorKit editorKit) {
-      this.ontology = checkNotNull(ontology);
+   private MMApplicationModel applicationModel;
+
+   public CellfieWorkspace(@Nonnull OWLOntologySource ontologySource, @Nonnull File workbookFile,
+         @Nonnull OWLEditorKit editorKit) throws Exception {
+      this.ontologySource = checkNotNull(ontologySource);
+      this.workbookFile = checkNotNull(workbookFile);
       this.editorKit = checkNotNull(editorKit);
+
+      applicationModel = MMApplication.create(ontologySource, workbookFile).getApplicationModel();
 
       setLayout(new BorderLayout());
 
@@ -89,17 +97,13 @@ public class CellfieWorkspace extends JPanel {
       lblTargetOntology.setForeground(Color.DARK_GRAY);
       pnlTargetOntology.add(lblTargetOntology);
 
-      JLabel lblOntologyID = new JLabel(getTitle(ontology));
+      JLabel lblOntologyID = new JLabel(getTitle(ontologySource.getOWLOntology()));
       lblOntologyID.setForeground(Color.DARK_GRAY);
       pnlTargetOntology.add(lblOntologyID);
 
       ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.VERTICAL_SPLIT);
       splitPane.setResizeWeight(0.4);
       add(splitPane, BorderLayout.CENTER);
-
-      loadWorkbookDocument(workbookFilePath);
-
-      setupApplication();
 
       /*
        * Workbook sheet GUI presentation
@@ -110,81 +114,36 @@ public class CellfieWorkspace extends JPanel {
       /*
        * Transformation rule browser, create, edit, remove panel
        */
-      transformationRuleBrowserView = new TransformationRuleBrowserView(this, editorKit);
-      splitPane.setBottomComponent(transformationRuleBrowserView);
+      ruleBrowserView = new TransformationRuleBrowserView(this);
+      splitPane.setBottomComponent(ruleBrowserView);
 
       validate();
    }
 
-   /**
-    * Get the file location of the input ontology.
-    *
-    * @return the file path location
-    */
-   public String getOntologyFileLocation() {
-      String iriString = ontology.getOWLOntologyManager().getOntologyDocumentIRI(ontology).toString();
-      return iriString.substring(iriString.indexOf(":") + 1, iriString.length());
+   public OWLEditorKit getOWLEditorKit() {
+      return editorKit;
    }
 
-   private String getTitle(OWLOntology ontology) {
-      if (ontology.getOntologyID().isAnonymous()) {
-         return ontology.getOntologyID().toString();
-      }
-      final com.google.common.base.Optional<IRI> iri = ontology.getOntologyID().getDefaultDocumentIRI();
-      return getOntologyLabelText(iri);
+   public File getWorkbookFile() {
+      return workbookFile;
    }
 
-   private String getOntologyLabelText(com.google.common.base.Optional<IRI> iri) {
-      StringBuilder sb = new StringBuilder();
-      if (iri.isPresent()) {
-         String shortForm = new OntologyIRIShortFormProvider().getShortForm(iri.get());
-         sb.append(shortForm);
-      } else {
-         sb.append("Anonymous ontology");
-      }
-      sb.append(" (");
-      if (iri.isPresent()) {
-         sb.append(iri.get().toString());
-      }
-      sb.append(")");
-      return sb.toString();
+   public Optional<File> getRuleFile() {
+      return Optional.ofNullable(ruleFile);
    }
 
-   private void loadWorkbookDocument(String path) {
-      applicationFactory.setWorkbookFileLocation(path);
+   public boolean isRuleFilePresent() {
+      return getRuleFile().isPresent();
    }
 
-   /**
-    * Get the file location of the input worksheet.
-    *
-    * @return the file path location
-    */
-   public String getWorkbookFileLocation() {
-      return applicationFactory.getWorkbookFileLocation();
+   public void setRuleFile(@Nonnull File ruleFile) {
+      this.ruleFile = checkNotNull(ruleFile);
+      fireApplicationModelChanged();
    }
 
-   public void loadTransformationRuleDocument(String path) {
-      setRuleFileLocation(path);
-      setupApplication();
-   }
-
-   /**
-    * Get the file location of the input transformation rule.
-    *
-    * @return the file path location.
-    */
-   public Optional<String> getRuleFileLocation() {
-      return Optional.ofNullable(applicationFactory.getRuleFileLocation());
-   }
-
-   public void setRuleFileLocation(String path) {
-      applicationFactory.setRuleFileLocation(path);
-   }
-
-   private void setupApplication() {
+   private void fireApplicationModelChanged() {
       try {
-         OWLOntologySourceHook ontologySourceHook = new OWLProtegeOntology(editorKit);
-         application = applicationFactory.createApplication(ontologySourceHook);
+         applicationModel = MMApplication.create(ontologySource, workbookFile, ruleFile).getApplicationModel();
       } catch (Exception e) {
          String message = "Unable to start Cellfie Workspace (see log for details)";
          DialogUtils.showErrorDialog(this, message);
@@ -192,12 +151,8 @@ public class CellfieWorkspace extends JPanel {
       }
    }
 
-   private MMApplicationModel getApplicationModel() {
-      return application.getApplicationModel();
-   }
-
-   public void evaluate(TransformationRule rule, Renderer renderer, Set<Rendering> results)
-         throws ParseException {
+   public void evaluate(@Nonnull TransformationRule rule, @Nonnull Renderer renderer,
+         @Nonnull Set<Rendering> results) throws ParseException {
       String ruleString = rule.getRuleString();
       MappingMasterParser parser = new MappingMasterParser(
             new ByteArrayInputStream(ruleString.getBytes()), new ReferenceSettings(), -1);
@@ -210,48 +165,56 @@ public class CellfieWorkspace extends JPanel {
       }
    }
 
+   public WorkbookView getDataSourceView() { // TODO: Rename to getWorkbookView
+      return dataSourceView;
+   }
+
+   public TransformationRuleBrowserView getTransformationRuleBrowserView() { // TODO: Shorten to getRuleBrowserView
+      return ruleBrowserView;
+   }
+
    public OWLOntology getActiveOntology() {
-      return ontology;
+      return ontologySource.getOWLOntology();
    }
 
    public SpreadSheetDataSource getActiveWorkbook() {
-      return getApplicationModel().getDataSourceModel().getDataSource();
+      return applicationModel.getDataSourceModel().getDataSource();
    }
 
    public List<TransformationRule> getActiveTransformationRules() {
-      return getApplicationModel().getTransformationRuleModel().getRules();
+      return applicationModel.getTransformationRuleModel().getRules();
    }
 
    /* package */ void updateTransformationRuleModel() {
       final List<TransformationRule> rules = getTransformationRuleBrowserView().getSelectedRules();
       TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
-      getApplicationModel().getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
+      applicationModel.getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
    }
 
    public Renderer getDefaultRenderer() {
-      return getApplicationModel().getDefaultRenderer();
+      return applicationModel.getDefaultRenderer();
    }
 
    public Renderer getLogRenderer() {
-      return getApplicationModel().getLogRenderer();
+      return applicationModel.getLogRenderer();
    }
 
-   public WorkbookView getDataSourceView() {
-      return dataSourceView;
+   public boolean shouldClose() {
+      return ruleBrowserView.safeGuardChanges();
    }
 
-   public TransformationRuleBrowserView getTransformationRuleBrowserView() {
-      return transformationRuleBrowserView;
-   }
+   public static JDialog createDialog(@Nonnull JComponent parent, @Nonnull OWLEditorKit editorKit,
+         @Nonnull File workbookFile) throws Exception {
+      JFrame parentFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, parent);
+      final JDialog dialog = new JDialog(parentFrame, "Cellfie", Dialog.ModalityType.MODELESS);
 
-   public static JDialog createDialog(OWLOntology ontology, String workbookPath,
-         OWLEditorKit editorKit) {
-      final JDialog dialog = new JDialog(null, "Cellfie", Dialog.ModalityType.MODELESS);
-      final CellfieWorkspace workspacePanel = new CellfieWorkspace(ontology, workbookPath, editorKit);
-      workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-            .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
+      final OWLOntologySource ontologySource = new OWLProtegeOntology(editorKit);
+      final CellfieWorkspace workspacePanel = new CellfieWorkspace(ontologySource, workbookFile, editorKit);
+      workspacePanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
       // Closing Cellfie using ESC key
+      workspacePanel.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "CLOSE_DIALOG");
       workspacePanel.getActionMap().put("CLOSE_DIALOG", new AbstractAction() {
          private static final long serialVersionUID = 1L;
          @Override
@@ -265,7 +228,6 @@ public class CellfieWorkspace extends JPanel {
             }
          }
       });
-      dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
       // Closing Cellfie using close [x] button 
       dialog.addWindowListener(new WindowAdapter() {
@@ -276,13 +238,35 @@ public class CellfieWorkspace extends JPanel {
             }
          }
       });
+
+      dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       dialog.setContentPane(workspacePanel);
       dialog.setSize(1200, 900);
       dialog.setResizable(true);
       return dialog;
    }
 
-   protected boolean shouldClose() {
-      return transformationRuleBrowserView.safeGuardChanges();
+   private static String getTitle(OWLOntology ontology) {
+      if (ontology.getOntologyID().isAnonymous()) {
+         return ontology.getOntologyID().toString();
+      }
+      final com.google.common.base.Optional<IRI> iri = ontology.getOntologyID().getDefaultDocumentIRI();
+      return getOntologyLabelText(iri);
+   }
+
+   private static String getOntologyLabelText(com.google.common.base.Optional<IRI> iri) {
+      StringBuilder sb = new StringBuilder();
+      if (iri.isPresent()) {
+         String shortForm = new OntologyIRIShortFormProvider().getShortForm(iri.get());
+         sb.append(shortForm);
+      } else {
+         sb.append("Anonymous ontology");
+      }
+      sb.append(" (");
+      if (iri.isPresent()) {
+         sb.append(iri.get().toString());
+      }
+      sb.append(")");
+      return sb.toString();
    }
 }
