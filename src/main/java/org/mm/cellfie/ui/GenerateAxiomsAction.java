@@ -67,8 +67,7 @@ public class GenerateAxiomsAction implements ActionListener {
    private final CellfieWorkspace cellfieWorkspace;
 
    public GenerateAxiomsAction(@Nonnull CellfieWorkspace cellfieWorkspace) {
-      checkNotNull(cellfieWorkspace);
-      this.cellfieWorkspace = cellfieWorkspace;
+      this.cellfieWorkspace = checkNotNull(cellfieWorkspace);
    }
 
    @Override
