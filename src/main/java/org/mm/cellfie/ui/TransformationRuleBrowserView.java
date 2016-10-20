@@ -73,8 +73,10 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
       add(pnlContainer, BorderLayout.CENTER);
 
-      tblTransformationRules = new TransformationRuleTable();
-      tblTransformationRules.addTableModelListener(this);
+      TransformationRuleTableModel tableModel = new TransformationRuleTableModel();
+      tableModel.addTableModelListener(this);
+
+      tblTransformationRules = new TransformationRuleTable(tableModel);
       tblTransformationRules.addMouseListener(new RuleEditMouseListener());
       tblTransformationRules.addMouseListener(new RuleSelectionMouseListener());
 
