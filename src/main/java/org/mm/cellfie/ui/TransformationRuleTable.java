@@ -146,8 +146,8 @@ public class TransformationRuleTable extends JTable {
 
    private void setPreferredColumnWidth() {
       final TableColumnModel columnModel = getColumnModel();
-      columnModel.getColumn(TransformationRuleTableModel.RULE_SELECT_COLUMN).setPreferredWidth(30);
-      columnModel.getColumn(TransformationRuleTableModel.RULE_SELECT_COLUMN).setMaxWidth(60);
+      columnModel.getColumn(TransformationRuleTableModel.RULE_PICK_COLUMN).setPreferredWidth(30);
+      columnModel.getColumn(TransformationRuleTableModel.RULE_PICK_COLUMN).setMaxWidth(60);
       columnModel.getColumn(TransformationRuleTableModel.SHEET_NAME_COLUMN).setPreferredWidth(100);
       columnModel.getColumn(TransformationRuleTableModel.SHEET_NAME_COLUMN).setMaxWidth(120);
       columnModel.getColumn(TransformationRuleTableModel.START_COLUMN_COLUMN).setPreferredWidth(100);

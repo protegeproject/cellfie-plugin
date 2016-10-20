@@ -13,7 +13,7 @@ public class TransformationRuleTableModel extends DefaultTableModel {
 
    private static final long serialVersionUID = 1L;
 
-   public static final int RULE_SELECT_COLUMN = 0;
+   public static final int RULE_PICK_COLUMN = 0;
    public static final int SHEET_NAME_COLUMN = 1;
    public static final int START_COLUMN_COLUMN = 2;
    public static final int END_COLUMN_COLUMN = 3;

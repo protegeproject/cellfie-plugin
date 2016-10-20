@@ -43,15 +43,15 @@ public class CheckBoxHeaderRenderer extends JCheckBox implements TableCellRender
       header.addMouseListener(new MouseAdapter() {
          @Override
          public void mouseClicked(MouseEvent e) {
-            if (isClickingRuleSelectColumn(header, e.getPoint())) {
+            if (isClickingRulePickColumnHeader(header, e.getPoint())) {
                toggleSelection();
                applySelection(table, isSelected());
             }
          }
 
-         private boolean isClickingRuleSelectColumn(JTableHeader header, Point clickPoint) {
+         private boolean isClickingRulePickColumnHeader(JTableHeader header, Point clickPoint) {
             int columnIndex = header.columnAtPoint(clickPoint);
-            return columnIndex == TransformationRuleTableModel.RULE_SELECT_COLUMN;
+            return columnIndex == TransformationRuleTableModel.RULE_PICK_COLUMN;
          }
 
          private void toggleSelection() {
@@ -62,7 +62,7 @@ public class CheckBoxHeaderRenderer extends JCheckBox implements TableCellRender
             int rowSize = table.getRowCount();
             if (rowSize > 0) {
                for (int rowIndex = 0; rowIndex < rowSize; rowIndex++) {
-                  table.setValueAt(isSelected, rowIndex, TransformationRuleTableModel.RULE_SELECT_COLUMN);
+                  table.setValueAt(isSelected, rowIndex, TransformationRuleTableModel.RULE_PICK_COLUMN);
                }
             }
          }

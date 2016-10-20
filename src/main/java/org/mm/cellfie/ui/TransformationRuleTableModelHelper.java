@@ -74,12 +74,12 @@ public class TransformationRuleTableModelHelper {
 
    private boolean isRulePickedAt(int rowIndex) {
       final Vector<?> rowVector = (Vector<?>) tableModel.getDataVector().elementAt(rowIndex);
-      return (boolean) rowVector.get(TransformationRuleTableModel.RULE_SELECT_COLUMN);
+      return (boolean) rowVector.get(TransformationRuleTableModel.RULE_PICK_COLUMN);
    }
 
    private static Vector<Object> asRowVector(TransformationRule rule) {
       Vector<Object> rowVector = new Vector<>();
-      rowVector.add(TransformationRuleTableModel.RULE_SELECT_COLUMN, true);
+      rowVector.add(TransformationRuleTableModel.RULE_PICK_COLUMN, true);
       rowVector.add(TransformationRuleTableModel.SHEET_NAME_COLUMN, rule.getSheetName());
       rowVector.add(TransformationRuleTableModel.START_COLUMN_COLUMN, rule.getStartColumn());
       rowVector.add(TransformationRuleTableModel.END_COLUMN_COLUMN, rule.getEndColumn());

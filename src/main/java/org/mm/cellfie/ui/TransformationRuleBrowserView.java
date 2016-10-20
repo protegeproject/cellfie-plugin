@@ -221,13 +221,13 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       private boolean isRuleSelectionEvent(MouseEvent event) {
          Point clickPoint = event.getPoint();
          int selectedColumn = tblTransformationRules.columnAtPoint(clickPoint);
-         return selectedColumn == TransformationRuleTableModel.RULE_SELECT_COLUMN;
+         return selectedColumn == TransformationRuleTableModel.RULE_PICK_COLUMN;
       }
 
       private boolean isUserDeselecting(int rowIndex) {
          final TableModel tableModel = tblTransformationRules.getModel();
          boolean selectionValue = (Boolean) tableModel.getValueAt(rowIndex,
-               TransformationRuleTableModel.RULE_SELECT_COLUMN);
+               TransformationRuleTableModel.RULE_PICK_COLUMN);
          return selectionValue == false;
       }
 
