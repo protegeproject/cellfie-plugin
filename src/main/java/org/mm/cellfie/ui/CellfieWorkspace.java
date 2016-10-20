@@ -186,7 +186,7 @@ public class CellfieWorkspace extends JPanel {
    }
 
    /* package */ void updateTransformationRuleModel() {
-      final List<TransformationRule> rules = getTransformationRuleBrowserView().getSelectedRules();
+      final List<TransformationRule> rules = getTransformationRuleBrowserView().getPickedRules();
       TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
       applicationModel.getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
    }

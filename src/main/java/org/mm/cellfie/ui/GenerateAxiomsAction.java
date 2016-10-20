@@ -75,7 +75,7 @@ public class GenerateAxiomsAction implements ActionListener {
    public void actionPerformed(ActionEvent event) {
       try {
          // Get all user-defined transformation rules
-         List<TransformationRule> rules = getUserRules();
+         List<TransformationRule> rules = getPickedRules();
 
          // Initialize string builder to stack log messages
          StringBuilder logBuilder = new StringBuilder(getLogHeader());
@@ -365,9 +365,8 @@ public class GenerateAxiomsAction implements ActionListener {
       return dataSource;
    }
 
-   private List<TransformationRule> getUserRules() throws CellfieException {
-      List<TransformationRule> rules = cellfieWorkspace.getTransformationRuleBrowserView()
-            .getSelectedRules();
+   private List<TransformationRule> getPickedRules() throws CellfieException {
+      List<TransformationRule> rules = cellfieWorkspace.getTransformationRuleBrowserView().getPickedRules();
       if (rules.isEmpty()) {
          throw new CellfieException("No transformation rules were selected");
       }

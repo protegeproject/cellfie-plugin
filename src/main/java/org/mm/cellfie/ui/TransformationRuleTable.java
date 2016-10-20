@@ -69,7 +69,7 @@ public class TransformationRuleTable extends JTable {
       return tableModelHelper.getAllRules();
    }
 
-   public List<TransformationRule> getSelectedRules() {
+   public List<TransformationRule> getPickedRules() {
       return tableModelHelper.getPickedRules();
    }
 

@@ -165,8 +165,8 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       return tblTransformationRules.getAllRules();
    }
 
-   public List<TransformationRule> getSelectedRules() {
-      return tblTransformationRules.getSelectedRules();
+   public List<TransformationRule> getPickedRules() {
+      return tblTransformationRules.getPickedRules();
    }
 
    /*
