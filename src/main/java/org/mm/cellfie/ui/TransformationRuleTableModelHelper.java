@@ -85,7 +85,7 @@ public class TransformationRuleTableModelHelper {
       rowVector.add(TransformationRuleTableModel.END_COLUMN_COLUMN, rule.getEndColumn());
       rowVector.add(TransformationRuleTableModel.START_ROW_COLUMN, rule.getStartRow());
       rowVector.add(TransformationRuleTableModel.END_ROW_COLUMN, rule.getEndRow());
-      rowVector.add(TransformationRuleTableModel.RULE_EXPRESSION_COLUMN, rule.getRuleString());
+      rowVector.add(TransformationRuleTableModel.RULE_EXPRESSION_COLUMN, rule.getRuleExpression());
       rowVector.add(TransformationRuleTableModel.COMMENT_COLUMN, rule.getComment());
       return rowVector;
    }

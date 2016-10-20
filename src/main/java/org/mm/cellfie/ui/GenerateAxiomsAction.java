@@ -153,7 +153,7 @@ public class GenerateAxiomsAction implements ActionListener {
             rule.getComment());
       logBuilder.append(asComment(additionalInformation));
       logBuilder.append("\n");
-      logBuilder.append(asComment(rule.getRuleString()));
+      logBuilder.append(asComment(rule.getRuleExpression()));
       logBuilder.append("\n\n");
    }
 
@@ -376,7 +376,7 @@ public class GenerateAxiomsAction implements ActionListener {
 
    private void logEvaluation(TransformationRule rule, StringBuilder logBuilder)
          throws ParseException {
-      String ruleString = rule.getRuleString();
+      String ruleString = rule.getRuleExpression();
       MappingMasterParser parser = new MappingMasterParser(
             new ByteArrayInputStream(ruleString.getBytes()), getReferenceSettings(), -1);
       MMExpressionNode ruleNode = new ExpressionNode((ASTExpression) parser.expression())

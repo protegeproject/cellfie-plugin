@@ -153,9 +153,9 @@ public class CellfieWorkspace extends JPanel {
 
    public void evaluate(@Nonnull TransformationRule rule, @Nonnull Renderer renderer,
          @Nonnull Set<Rendering> results) throws ParseException {
-      String ruleString = rule.getRuleString();
+      String ruleExpression = rule.getRuleExpression();
       MappingMasterParser parser = new MappingMasterParser(
-            new ByteArrayInputStream(ruleString.getBytes()), new ReferenceSettings(), -1);
+            new ByteArrayInputStream(ruleExpression.getBytes()), new ReferenceSettings(), -1);
       SimpleNode simpleNode = parser.expression();
       MMExpressionNode ruleNode = new ExpressionNode((ASTExpression) simpleNode)
             .getMMExpressionNode();
@@ -173,15 +173,15 @@ public class CellfieWorkspace extends JPanel {
       return ruleBrowserView;
    }
 
-   public OWLOntology getActiveOntology() {
+   public OWLOntology getActiveOntology() { // TODO Rename to getOntology
       return ontologySource.getOWLOntology();
    }
 
-   public SpreadSheetDataSource getActiveWorkbook() {
+   public SpreadSheetDataSource getActiveWorkbook() { // TODO Rename to getWorkbook
       return applicationModel.getDataSourceModel().getDataSource();
    }
 
-   public List<TransformationRule> getActiveTransformationRules() {
+   public List<TransformationRule> getActiveTransformationRules() { // TODO Rename to getTransformationRules
       return applicationModel.getTransformationRuleModel().getRules();
    }
 
