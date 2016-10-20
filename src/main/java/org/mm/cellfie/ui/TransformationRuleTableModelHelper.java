@@ -74,7 +74,7 @@ public class TransformationRuleTableModelHelper {
 
    private boolean isRulePickedAt(int rowIndex) {
       final Vector<?> rowVector = (Vector<?>) tableModel.getDataVector().elementAt(rowIndex);
-      return (boolean) rowVector.get(TransformationRuleTableModel.RULE_PICK_COLUMN);
+      return (Boolean) rowVector.get(TransformationRuleTableModel.RULE_PICK_COLUMN);
    }
 
    private static Vector<Object> asRowVector(TransformationRule rule) {
