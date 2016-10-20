@@ -82,41 +82,39 @@ public class GenerateAxiomsAction implements ActionListener {
          // TODO: Move this business logic inside the renderer
          Set<Rendering> results = new HashSet<Rendering>();
          for (TransformationRule rule : rules) {
-            if (rule.isActive()) {
-               String sheetName = rule.getSheetName();
-               Sheet sheet = getActiveWorkbook().getWorkbook().getSheet(sheetName);
+            String sheetName = rule.getSheetName();
+            Sheet sheet = getActiveWorkbook().getWorkbook().getSheet(sheetName);
 
-               int startColumnIndex = getStartColumnIndex(rule);
-               int startRowIndex = getStartRowIndex(rule);
-               int endColumnIndex = getEndColumnIndex(rule, sheet, startRowIndex);
-               int endRowIndex = getEndRowIndex(rule, sheet);
+            int startColumnIndex = getStartColumnIndex(rule);
+            int startRowIndex = getStartRowIndex(rule);
+            int endColumnIndex = getEndColumnIndex(rule, sheet, startRowIndex);
+            int endRowIndex = getEndRowIndex(rule, sheet);
 
-               if (startColumnIndex > endColumnIndex) {
-                  throw new CellfieException("Start column after finish column in rule " + rule);
-               }
-               if (startRowIndex > endRowIndex) {
-                  throw new CellfieException("Start row after finish row in rule " + rule);
-               }
-
-               SpreadsheetLocation endLocation =
-                     new SpreadsheetLocation(sheetName, endColumnIndex, endRowIndex);
-               SpreadsheetLocation startLocation =
-                     new SpreadsheetLocation(sheetName, startColumnIndex, startRowIndex);
-               SpreadsheetLocation currentLocation =
-                     new SpreadsheetLocation(sheetName, startColumnIndex, startRowIndex);
-
-               getActiveWorkbook().setCurrentLocation(currentLocation);
-               logExpression(rule, logBuilder);
-               do {
-                  evaluate(rule, results);
-                  logEvaluation(rule, logBuilder);
-                  if (currentLocation.equals(endLocation)) {
-                     break;
-                  }
-                  currentLocation = incrementLocation(currentLocation, startLocation, endLocation);
-                  getActiveWorkbook().setCurrentLocation(currentLocation);
-               } while (true);
+            if (startColumnIndex > endColumnIndex) {
+               throw new CellfieException("Start column after finish column in rule " + rule);
             }
+            if (startRowIndex > endRowIndex) {
+               throw new CellfieException("Start row after finish row in rule " + rule);
+            }
+
+            SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumnIndex,
+                  endRowIndex);
+            SpreadsheetLocation startLocation = new SpreadsheetLocation(sheetName, startColumnIndex,
+                  startRowIndex);
+            SpreadsheetLocation currentLocation = new SpreadsheetLocation(sheetName, startColumnIndex,
+                  startRowIndex);
+
+            getActiveWorkbook().setCurrentLocation(currentLocation);
+            logExpression(rule, logBuilder);
+            do {
+               evaluate(rule, results);
+               logEvaluation(rule, logBuilder);
+               if (currentLocation.equals(endLocation)) {
+                  break;
+               }
+               currentLocation = incrementLocation(currentLocation, startLocation, endLocation);
+               getActiveWorkbook().setCurrentLocation(currentLocation);
+            } while (true);
          }
          String logMessage = logBuilder.toString();
 
