@@ -178,7 +178,7 @@ public class CellfieWorkspace extends JPanel {
    }
 
    public SpreadSheetDataSource getActiveWorkbook() { // TODO Rename to getWorkbook
-      return applicationModel.getDataSourceModel().getDataSource();
+      return applicationModel.getWorkbook();
    }
 
    public List<TransformationRule> getActiveTransformationRules() { // TODO Rename to getTransformationRules
@@ -192,7 +192,7 @@ public class CellfieWorkspace extends JPanel {
    }
 
    public Renderer getDefaultRenderer() {
-      return applicationModel.getDefaultRenderer();
+      return applicationModel.getTransformationRenderer();
    }
 
    public Renderer getLogRenderer() {
