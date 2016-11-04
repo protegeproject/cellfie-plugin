@@ -19,7 +19,6 @@ import javax.annotation.Nonnull;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.cellfie.exception.CellfieException;
 import org.mm.core.TransformationRule;
 import org.mm.core.settings.ReferenceSettings;
@@ -32,9 +31,10 @@ import org.mm.parser.node.ExpressionNode;
 import org.mm.parser.node.MMExpressionNode;
 import org.mm.rendering.Rendering;
 import org.mm.rendering.owlapi.OWLRendering;
-import org.mm.ss.SpreadSheetDataSource;
-import org.mm.ss.SpreadSheetUtil;
-import org.mm.ss.SpreadsheetLocation;
+import org.mm.workbook.Sheet;
+import org.mm.workbook.SpreadSheetUtil;
+import org.mm.workbook.SpreadsheetLocation;
+import org.mm.workbook.Workbook;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
@@ -83,7 +83,7 @@ public class GenerateAxiomsAction implements ActionListener {
          Set<Rendering> results = new HashSet<Rendering>();
          for (TransformationRule rule : rules) {
             String sheetName = rule.getSheetName();
-            Sheet sheet = getActiveWorkbook().getWorkbook().getSheet(sheetName);
+            Sheet sheet = getActiveWorkbook().getSheet(sheetName);
 
             int startColumnIndex = getStartColumnIndex(rule);
             int startRowIndex = getStartRowIndex(rule);
@@ -232,7 +232,7 @@ public class GenerateAxiomsAction implements ActionListener {
       try {
          String endColumn = checkNotEmpty(rule.getEndColumn());
          if (rule.hasEndColumnWildcard()) {
-            return sheet.getRow(startRowIndex).getLastCellNum() + 1;
+            return sheet.getLastColumnIndexAt(startRowIndex) + 1;
          } else {
             return SpreadSheetUtil.columnName2Number(endColumn);
          }
@@ -247,7 +247,7 @@ public class GenerateAxiomsAction implements ActionListener {
       try {
          String endRow = checkNotEmpty(rule.getEndRow());
          if (rule.hasEndRowWildcard()) {
-            return sheet.getLastRowNum() + 1;
+            return sheet.getLastRowIndex() + 1;
          } else {
             return SpreadSheetUtil.rowLabel2Number(endRow);
          }
@@ -354,12 +354,12 @@ public class GenerateAxiomsAction implements ActionListener {
       throw new RuntimeException(message);
    }
 
-   private SpreadSheetDataSource getActiveWorkbook() throws CellfieException {
-      SpreadSheetDataSource dataSource = cellfieWorkspace.getActiveWorkbook();
-      if (dataSource == null) {
+   private Workbook getActiveWorkbook() throws CellfieException {
+      Workbook workbook = cellfieWorkspace.getActiveWorkbook();
+      if (workbook == null) {
          throw new CellfieException("No workbook was loaded");
       }
-      return dataSource;
+      return workbook;
    }
 
    private List<TransformationRule> getPickedRules() throws CellfieException {

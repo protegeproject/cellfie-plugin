@@ -13,7 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 
-import org.apache.poi.ss.usermodel.Sheet;
+import org.mm.workbook.Sheet;
 
 /**
  * Represents the sheet panel used to display the cells (or the data) of a
@@ -84,7 +84,7 @@ public class SheetPanel extends JPanel {
     * @return The sheet name.
     */
    public String getSheetName() {
-      return sheet.getSheetName();
+      return sheet.getName();
    }
 
    private void setSelectedCellRange(int startColumnIndex, int startRowIndex, int endColumnIndex,

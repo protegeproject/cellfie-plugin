@@ -46,7 +46,7 @@ import org.mm.parser.node.ExpressionNode;
 import org.mm.parser.node.MMExpressionNode;
 import org.mm.renderer.Renderer;
 import org.mm.rendering.Rendering;
-import org.mm.ss.SpreadSheetDataSource;
+import org.mm.workbook.Workbook;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
@@ -177,7 +177,7 @@ public class CellfieWorkspace extends JPanel {
       return ontologySource.getOWLOntology();
    }
 
-   public SpreadSheetDataSource getActiveWorkbook() { // TODO Rename to getWorkbook
+   public Workbook getActiveWorkbook() { // TODO Rename to getWorkbook
       return applicationModel.getWorkbook();
    }
 

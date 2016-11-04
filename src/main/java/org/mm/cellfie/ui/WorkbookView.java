@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import org.mm.workbook.Sheet;
 import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 import org.protege.editor.core.ui.util.ComponentFactory;
 
@@ -43,9 +44,9 @@ public class WorkbookView extends JPanel {
       pnlWorkbook.add(tabSheetContainer, BorderLayout.CENTER);
       pnlContainer.add(pnlWorkbook, BorderLayout.CENTER);
 
-      for (org.apache.poi.ss.usermodel.Sheet sheet : cellfieWorkspace.getActiveWorkbook().getSheets()) {
+      for (Sheet sheet : cellfieWorkspace.getActiveWorkbook().getSheets()) {
          SheetPanel sheetPanel = new SheetPanel(sheet);
-         tabSheetContainer.addTab(sheet.getSheetName(), null, sheetPanel);
+         tabSheetContainer.addTab(sheet.getName(), null, sheetPanel);
       }
       validate();
    }
