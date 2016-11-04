@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import javax.swing.table.AbstractTableModel;
 
 import org.mm.workbook.Sheet;
-import org.mm.workbook.SpreadSheetUtil;
+import org.mm.workbook.WorkbookUtils;
 
 /**
  * Represents the table model used to presenting the cells of a spreadsheet.
@@ -43,7 +43,7 @@ public class SheetTableModel extends AbstractTableModel {
 
    @Override
    public String getColumnName(int column) {
-      return SpreadSheetUtil.columnNumber2Name(column + 1);
+      return WorkbookUtils.columnNumber2Name(column + 1);
    }
 
    @Override

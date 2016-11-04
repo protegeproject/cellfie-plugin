@@ -32,7 +32,7 @@ import org.mm.parser.node.MMExpressionNode;
 import org.mm.rendering.Rendering;
 import org.mm.rendering.owlapi.OWLRendering;
 import org.mm.workbook.Sheet;
-import org.mm.workbook.SpreadSheetUtil;
+import org.mm.workbook.WorkbookUtils;
 import org.mm.workbook.SpreadsheetLocation;
 import org.mm.workbook.Workbook;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
@@ -209,7 +209,7 @@ public class GenerateAxiomsAction implements ActionListener {
    private int getStartColumnIndex(TransformationRule rule) throws CellfieException {
       try {
          String startColumn = checkNotEmpty(rule.getStartColumn());
-         return SpreadSheetUtil.columnName2Number(startColumn);
+         return WorkbookUtils.columnName2Number(startColumn);
       } catch (IllegalArgumentException e) {
          throw new CellfieException("Missing start column parameter");
       } catch (MappingMasterException e) {
@@ -220,7 +220,7 @@ public class GenerateAxiomsAction implements ActionListener {
    private int getStartRowIndex(TransformationRule rule) throws CellfieException {
       try {
          String startRow = checkNotEmpty(rule.getStartRow());
-         return SpreadSheetUtil.rowLabel2Number(startRow);
+         return WorkbookUtils.rowLabel2Number(startRow);
       } catch (IllegalArgumentException e) {
          throw new CellfieException("Missing start row parameter");
       } catch (MappingMasterException e) {
@@ -234,7 +234,7 @@ public class GenerateAxiomsAction implements ActionListener {
          if (rule.hasEndColumnWildcard()) {
             return sheet.getLastColumnIndexAt(startRowIndex) + 1;
          } else {
-            return SpreadSheetUtil.columnName2Number(endColumn);
+            return WorkbookUtils.columnName2Number(endColumn);
          }
       } catch (IllegalArgumentException e) {
          throw new CellfieException("Missing end column parameter. (Hint: Use the wildcard '+' to indicate the last column)");
@@ -249,7 +249,7 @@ public class GenerateAxiomsAction implements ActionListener {
          if (rule.hasEndRowWildcard()) {
             return sheet.getLastRowIndex() + 1;
          } else {
-            return SpreadSheetUtil.rowLabel2Number(endRow);
+            return WorkbookUtils.rowLabel2Number(endRow);
          }
       } catch (IllegalArgumentException e) {
          throw new CellfieException("Missing end row parameter. (Hint: Use the wildcard '+' to indicate the last row)");
