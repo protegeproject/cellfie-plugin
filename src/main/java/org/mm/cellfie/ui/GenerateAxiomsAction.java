@@ -33,7 +33,7 @@ import org.mm.rendering.Rendering;
 import org.mm.rendering.owlapi.OWLRendering;
 import org.mm.workbook.Sheet;
 import org.mm.workbook.WorkbookUtils;
-import org.mm.workbook.SpreadsheetLocation;
+import org.mm.workbook.CellLocation;
 import org.mm.workbook.Workbook;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.owl.model.OWLModelManager;
@@ -97,14 +97,11 @@ public class GenerateAxiomsAction implements ActionListener {
                throw new CellfieException("Start row after finish row in rule " + rule);
             }
 
-            SpreadsheetLocation endLocation = new SpreadsheetLocation(sheetName, endColumnIndex,
-                  endRowIndex);
-            SpreadsheetLocation startLocation = new SpreadsheetLocation(sheetName, startColumnIndex,
-                  startRowIndex);
-            SpreadsheetLocation currentLocation = new SpreadsheetLocation(sheetName, startColumnIndex,
-                  startRowIndex);
+            CellLocation endLocation = new CellLocation(sheetName, endColumnIndex, endRowIndex);
+            CellLocation startLocation = new CellLocation(sheetName, startColumnIndex, startRowIndex);
+            CellLocation currentLocation = new CellLocation(sheetName, startColumnIndex, startRowIndex);
 
-            getActiveWorkbook().setCurrentLocation(currentLocation);
+            getActiveWorkbook().setCurrentCellLocation(currentLocation);
             logExpression(rule, logBuilder);
             do {
                evaluate(rule, results);
@@ -113,7 +110,7 @@ public class GenerateAxiomsAction implements ActionListener {
                   break;
                }
                currentLocation = incrementLocation(currentLocation, startLocation, endLocation);
-               getActiveWorkbook().setCurrentLocation(currentLocation);
+               getActiveWorkbook().setCurrentCellLocation(currentLocation);
             } while (true);
          }
          String logMessage = logBuilder.toString();
@@ -337,16 +334,15 @@ public class GenerateAxiomsAction implements ActionListener {
       cellfieWorkspace.evaluate(rule, cellfieWorkspace.getDefaultRenderer(), results);
    }
 
-   private SpreadsheetLocation incrementLocation(SpreadsheetLocation current,
-         SpreadsheetLocation start, SpreadsheetLocation end) {
+   private CellLocation incrementLocation(CellLocation current, CellLocation start, CellLocation end) {
       if (current.getPhysicalRowNumber() < end.getPhysicalRowNumber()) {
-         return new SpreadsheetLocation(current.getSheetName(), current.getPhysicalColumnNumber(),
+         return new CellLocation(current.getSheetName(), current.getPhysicalColumnNumber(),
                current.getPhysicalRowNumber() + 1);
       }
       if (current.getPhysicalRowNumber() == end.getPhysicalRowNumber()) {
          if (current.getPhysicalColumnNumber() < end.getPhysicalColumnNumber()) {
-            return new SpreadsheetLocation(current.getSheetName(),
-                  current.getPhysicalColumnNumber() + 1, start.getPhysicalRowNumber());
+            return new CellLocation(current.getSheetName(), current.getPhysicalColumnNumber() + 1,
+                  start.getPhysicalRowNumber());
          }
       }
       String message = format("Illegal backward cell iteration from %s to %s",
