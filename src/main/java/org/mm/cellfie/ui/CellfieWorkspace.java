@@ -181,14 +181,14 @@ public class CellfieWorkspace extends JPanel {
       return applicationModel.getWorkbook();
    }
 
-   public List<TransformationRule> getActiveTransformationRules() { // TODO Rename to getTransformationRules
-      return applicationModel.getTransformationRuleModel().getRules();
+   public TransformationRuleSet getActiveTransformationRules() { // TODO Rename to getTransformationRules
+      return applicationModel.getTransformationRules();
    }
 
    /* package */ void updateTransformationRuleModel() {
       final List<TransformationRule> rules = getTransformationRuleBrowserView().getPickedRules();
       TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
-      applicationModel.getTransformationRuleModel().changeTransformationRuleSet(ruleSet);
+      applicationModel.setTransformationRules(ruleSet);
    }
 
    public Renderer getDefaultRenderer() {

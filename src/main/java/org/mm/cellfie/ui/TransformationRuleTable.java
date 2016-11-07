@@ -16,6 +16,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import org.mm.transformationrule.TransformationRule;
+import org.mm.transformationrule.TransformationRuleSet;
 
 /**
  * Represents the table used to show the list of transformation rules.
@@ -57,9 +58,9 @@ public class TransformationRuleTable extends JTable {
       ((DefaultTableCellRenderer) getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
    }
 
-   public void load(@Nonnull List<TransformationRule> rules) {
-      checkNotNull(rules);
-      for (TransformationRule rule : rules) {
+   public void load(@Nonnull TransformationRuleSet ruleSet) {
+      checkNotNull(ruleSet);
+      for (TransformationRule rule : ruleSet) {
          tableModelHelper.addRule(rule);
          setPreferredRowHeight();
       }
