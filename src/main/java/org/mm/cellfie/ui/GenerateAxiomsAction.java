@@ -20,7 +20,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.mm.cellfie.exception.CellfieException;
-import org.mm.core.TransformationRule;
 import org.mm.core.settings.ReferenceSettings;
 import org.mm.core.settings.ValueEncodingSetting;
 import org.mm.exceptions.MappingMasterException;
@@ -31,6 +30,7 @@ import org.mm.parser.node.ExpressionNode;
 import org.mm.parser.node.MMExpressionNode;
 import org.mm.rendering.Rendering;
 import org.mm.rendering.owlapi.OWLRendering;
+import org.mm.transformationrule.TransformationRule;
 import org.mm.workbook.Sheet;
 import org.mm.workbook.WorkbookUtils;
 import org.mm.workbook.CellLocation;

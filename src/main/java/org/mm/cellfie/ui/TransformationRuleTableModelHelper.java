@@ -9,7 +9,7 @@ import java.util.Vector;
 import javax.annotation.Nonnull;
 import javax.swing.table.DefaultTableModel;
 
-import org.mm.core.TransformationRule;
+import org.mm.transformationrule.TransformationRule;
 
 /**
  * A helper class used for data transaction between the table UI and the table model.

@@ -15,7 +15,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import org.mm.core.TransformationRule;
+import org.mm.transformationrule.TransformationRule;
 
 /**
  * Represents the table used to show the list of transformation rules.

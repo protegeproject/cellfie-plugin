@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import org.mm.core.TransformationRule;
+import org.mm.transformationrule.TransformationRule;
 
 /**
  * Represents the editor form used to create a transformation rule.

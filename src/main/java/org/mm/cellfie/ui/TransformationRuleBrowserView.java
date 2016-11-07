@@ -29,8 +29,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import org.mm.core.TransformationRule;
-import org.mm.core.TransformationRuleSetFactory;
+import org.mm.transformationrule.TransformationRule;
+import org.mm.transformationrule.TransformationRuleSetManager;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -414,7 +414,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       if (cellfieWorkspace.isRuleFilePresent()) {
          try {
             File ruleFile = cellfieWorkspace.getRuleFile().get();
-            TransformationRuleSetFactory.saveTransformationRulesToDocument(ruleFile, getAllRules());
+            TransformationRuleSetManager.saveTransformationRulesToDocument(ruleFile, getAllRules());
             cellfieWorkspace.updateTransformationRuleModel();
             isSuccessful = true;
          } catch (IOException e) {
