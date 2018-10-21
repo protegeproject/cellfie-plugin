@@ -1,7 +1,7 @@
 Cellfie
 =======
 
-A Protégé Desktop plugin for mapping spreadsheets to OWL ontologies.
+A Protégé Desktop plugin for importing spreadsheet data into OWL ontologies.
 
 <img src="https://raw.githubusercontent.com/protegeproject/github-wiki-resources/master/cellfie/README/cellfie-screenshot.png" alt="Cellfie screenshot" width="650px"/>
 
