@@ -1,6 +1,7 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.swing.table.AbstractTableModel;
 import org.mm.renderer.Sheet;
@@ -39,6 +40,7 @@ public class SheetTableModel extends AbstractTableModel {
 
    @Override
    public Object getValueAt(int row, int column) {
-      return sheet.getValueFromCell(column, row);
+      Optional<String> value = sheet.getValueFromCell(column, row);
+      return (value.isPresent()) ? value.get() : "";
    }
 }
