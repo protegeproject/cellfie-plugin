@@ -2,10 +2,10 @@ package org.mm.cellfie.transformationrule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import javax.annotation.Nonnull;
-import org.mm.renderer.Sheet;
-import org.mm.renderer.internal.CellUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Represents the data model for the MappingMaster transformation rule
@@ -19,17 +19,30 @@ public class TransformationRule {
    public static final String START_ROW = "1";
    public static final String ANY_WILDCARD = "+";
 
-   private final Sheet sheet;
+   @Expose @SerializedName("sheetName")
+   private final String sheetName;
+   
+   @Expose @SerializedName("startColumn")
    private final String startColumn;
+   
+   @Expose @SerializedName("endColumn")
    private final String endColumn;
+   
+   @Expose @SerializedName("startRow")
    private final String startRow;
+   
+   @Expose @SerializedName("endRow")
    private final String endRow;
+   
+   @Expose @SerializedName("comment")
    private final String comment;
+   
+   @Expose @SerializedName("rule")
    private final String ruleExpression;
 
-   public TransformationRule(@Nonnull Sheet sheet, @Nonnull String startColumn, @Nonnull String endColumn,
+   public TransformationRule(@Nonnull String sheetName, @Nonnull String startColumn, @Nonnull String endColumn,
          @Nonnull String startRow, @Nonnull String endRow, @Nonnull String comment, @Nonnull String ruleExpression) {
-      this.sheet = checkNotNull(sheet);
+      this.sheetName = checkNotNull(sheetName);
       this.startColumn = checkNotNull(startColumn);
       this.endColumn = checkNotNull(endColumn);
       this.startRow = checkNotNull(startRow);
@@ -50,7 +63,7 @@ public class TransformationRule {
 
    @Nonnull
    public String getSheetName() {
-      return sheet.getSheetName();
+      return sheetName;
    }
 
    @Nonnull
@@ -58,17 +71,9 @@ public class TransformationRule {
       return startColumn;
    }
 
-   public int getStartColumnIndex() {
-      return CellUtils.toColumnIndex(startColumn);
-   }
-
    @Nonnull
    public String getEndColumn() {
       return endColumn;
-   }
-
-   public int getEndColumnIndex() {
-      return (ANY_WILDCARD.equals(endColumn)) ? sheet.getEndColumnIndex() : CellUtils.toColumnIndex(endColumn);
    }
 
    @Nonnull
@@ -76,17 +81,9 @@ public class TransformationRule {
       return startRow;
    }
 
-   public int getStartRowIndex() {
-      return CellUtils.toRowIndex(startRow);
-   }
-
    @Nonnull
    public String getEndRow() {
       return endRow;
-   }
-
-   public int getEndRowIndex() {
-      return (ANY_WILDCARD.equals(endRow)) ? sheet.getEndRowIndex() : CellUtils.toRowIndex(endRow);
    }
 
    @Override
@@ -101,7 +98,7 @@ public class TransformationRule {
          return false;
      }
      TransformationRule other = (TransformationRule) obj;
-     return getSheetName().equals(other.getSheetName()) && startColumn.equals(other.startColumn)
+     return sheetName.equals(other.sheetName) && startColumn.equals(other.startColumn)
            && endColumn.equals(other.endColumn) && startRow.equals(other.startRow)
            && endRow.equals(other.endRow) && comment.equals(other.comment)
            && ruleExpression.equals(other.ruleExpression);
@@ -109,13 +106,13 @@ public class TransformationRule {
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(getSheetName(), startColumn, endColumn, startRow, endRow, comment, ruleExpression);
+      return Objects.hashCode(sheetName, startColumn, endColumn, startRow, endRow, comment, ruleExpression);
    }
 
    @Override
    public String toString() {
       return MoreObjects.toStringHelper(this)
-            .add("sheetName", getSheetName())
+            .add("sheetName", sheetName)
             .add("startColumn", startColumn)
             .add("endColumn", endColumn)
             .add("startRow", startRow)

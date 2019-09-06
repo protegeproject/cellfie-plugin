@@ -17,7 +17,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.mm.cellfie.transformationrule.TransformationRule;
-import org.mm.renderer.Sheet;
 
 /**
  * Represents the editor form used to create a transformation rule.
@@ -29,7 +28,7 @@ public class TransformationRuleEditor extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
-   private JComboBox<Sheet> cbbSheetName;
+   private JComboBox<String> cbbSheetName;
 
    private JTextField txtStartColumn;
    private JTextField txtEndColumn;
@@ -50,8 +49,8 @@ public class TransformationRuleEditor extends JPanel {
       add(pnlMain, BorderLayout.CENTER);
 
       JLabel lblSheetName = new JLabel("Sheet name:");
-      List<Sheet> sheets = cellfieWorkspace.getWorkbook().getSheets();
-      cbbSheetName = new JComboBox<>(new DefaultComboBoxModel<>(new Vector<>(sheets)));
+      List<String> sheetNames = cellfieWorkspace.getWorkbook().getSheetNames();
+      cbbSheetName = new JComboBox<>(new DefaultComboBoxModel<>(new Vector<>(sheetNames)));
 
       JLabel lblStartColumn = new JLabel("Start column:");
       txtStartColumn = new JTextField("");
@@ -180,7 +179,7 @@ public class TransformationRuleEditor extends JPanel {
    }
 
    public TransformationRule getTransformationRule() {
-      return new TransformationRule((Sheet) cbbSheetName.getSelectedItem(),
+      return new TransformationRule((String) cbbSheetName.getSelectedItem(),
             txtStartColumn.getText().trim().toUpperCase(),
             txtEndColumn.getText().trim().toUpperCase(),
             txtStartRow.getText().trim(),

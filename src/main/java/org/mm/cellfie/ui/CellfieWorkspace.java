@@ -1,6 +1,7 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.mm.cellfie.transformationrule.TransformationRule.ANY_WILDCARD;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dialog;
@@ -31,7 +32,9 @@ import org.mm.cellfie.transformationrule.TransformationRule;
 import org.mm.cellfie.transformationrule.TransformationRuleSet;
 import org.mm.parser.ParseException;
 import org.mm.renderer.RenderingContext;
+import org.mm.renderer.Sheet;
 import org.mm.renderer.Workbook;
+import org.mm.renderer.internal.CellUtils;
 import org.mm.renderer.owl.OwlEntityResolver;
 import org.mm.renderer.owl.OwlFactory;
 import org.mm.renderer.owl.OwlRenderer;
@@ -109,12 +112,28 @@ public class CellfieWorkspace extends JPanel {
          String ruleString = rule.getRuleExpression();
          results.addAll(renderer.render(ruleString, workbook,
                new RenderingContext(rule.getSheetName(),
-                     rule.getStartColumnIndex(),
-                     rule.getEndColumnIndex(),
-                     rule.getStartRowIndex(),
-                     rule.getEndRowIndex())));
+                     getStartColumnIndex(rule.getStartColumn(), workbook.getSheet(rule.getSheetName())),
+                     getEndColumnIndex(rule.getEndColumn(), workbook.getSheet(rule.getSheetName())),
+                     getStartRowIndex(rule.getStartRow(), workbook.getSheet(rule.getSheetName())),
+                     getEndRowIndex(rule.getEndRow(), workbook.getSheet(rule.getSheetName())))));
       }
       return results;
+   }
+
+   private int getStartColumnIndex(String startColumn, Sheet sheet) {
+      return CellUtils.toColumnIndex(startColumn);
+   }
+
+   private int getEndColumnIndex(String endColumn, Sheet sheet) {
+      return (ANY_WILDCARD.equals(endColumn)) ? sheet.getEndColumnIndex() : CellUtils.toColumnIndex(endColumn);
+   }
+
+   private int getStartRowIndex(String startRow, Sheet sheet) {
+      return CellUtils.toRowIndex(startRow);
+   }
+
+   private int getEndRowIndex(String endRow, Sheet sheet) {
+      return (ANY_WILDCARD.equals(endRow)) ? sheet.getEndRowIndex() : CellUtils.toRowIndex(endRow);
    }
 
    public WorkbookView getWorkbookView() {

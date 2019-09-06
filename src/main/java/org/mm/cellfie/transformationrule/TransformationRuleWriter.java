@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import javax.annotation.Nonnull;
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
@@ -24,7 +24,10 @@ public class TransformationRuleWriter {
          throws IOException {
       checkNotNull(file);
       checkNotNull(ruleSet);
-      String json = new Gson().toJson(TransformationRuleSet.create(ruleSet));
+      final GsonBuilder builder = new GsonBuilder();
+      builder.excludeFieldsWithoutExposeAnnotation();
+      builder.setPrettyPrinting();
+      String json = builder.create().toJson(ruleSet);
       FileWriter writer = new FileWriter(file);
       writer.write(json);
       writer.close();
