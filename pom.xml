@@ -76,6 +76,8 @@
                      poi-ooxml,
                      poi-ooxml-schemas,
                      ooxml-schemas,
+                     commons-compress,
+                     commons-collections4,
                      xmlbeans,
                      gson,
                      mapping-master
@@ -84,8 +86,10 @@
                      org.mm.*,
                      org.apache.poi.*,
                      org.apache.xmlbeans.*,
+                     org.apache.commons.compress.*,
                      org.openxmlformats.*,
                      com.microsoft.schemas.office.*,
+                     com.microsoft.schemas.vml,
                      org.w3.x2000.x09.xmldsig,
                      org.etsi.uri.x01903.v13,
                      schemasMicrosoftComVml,
@@ -94,19 +98,17 @@
                      repackage
                   </_exportcontents>
                   <Import-Package>
-                     org.protege.editor.core.*;version="5.0.0",
-                     org.protege.editor.owl.*;version="5.0.0",
+                     org.protege.editor.core.*;version="[5.0.0,6.0.0)",
+                     org.protege.editor.owl.*;version="[5.0.0,6.0.0)",
                      org.semanticweb.owlapi.*;version="[4.1.3,5.0.0)",
                      junit.framework;resolution:=optional,
                      org.apache.*;resolution:=optional,
                      org.bouncycastle.*;resolution:=optional,
                      org.etsi.*;resolution:=optional,
-                     org.junit.*;resolution:=optional,
                      org.openxmlformats.*;resolution:=optional,
-                     schemasMicrosoftCom*;resolution:=optional,
                      com.sun.*;resolution:=optional,
                      javax.*;resolution:=optional,
-                     *
+                     *;resolution:=optional
                   </Import-Package>
                   <Include-Resource>plugin.xml, {maven-dependencies}, {maven-resources}</Include-Resource>
                </instructions>
@@ -130,7 +132,6 @@
          </plugin>
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
-            <version>2.5</version>
             <dependencies>
                <dependency>
                   <groupId>org.apache.maven.scm</groupId>
