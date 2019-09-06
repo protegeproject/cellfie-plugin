@@ -1,7 +1,6 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dialog;
@@ -10,12 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -30,30 +25,23 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-
-import org.mm.app.MMApplication;
-import org.mm.app.MMApplicationModel;
-import org.mm.cellfie.OWLProtegeOntology;
-import org.mm.core.OWLOntologySource;
-import org.mm.core.settings.ReferenceSettings;
-import org.mm.parser.ASTExpression;
-import org.mm.parser.MappingMasterParser;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.mm.cellfie.ProtegeEntityResolver;
+import org.mm.cellfie.transformationrule.TransformationRule;
+import org.mm.cellfie.transformationrule.TransformationRuleSet;
 import org.mm.parser.ParseException;
-import org.mm.parser.SimpleNode;
-import org.mm.parser.node.ExpressionNode;
-import org.mm.parser.node.MMExpressionNode;
-import org.mm.renderer.Renderer;
-import org.mm.rendering.Rendering;
-import org.mm.transformationrule.TransformationRule;
-import org.mm.transformationrule.TransformationRuleSet;
-import org.mm.workbook.Workbook;
+import org.mm.renderer.RenderingContext;
+import org.mm.renderer.Workbook;
+import org.mm.renderer.owl.OwlEntityResolver;
+import org.mm.renderer.owl.OwlFactory;
+import org.mm.renderer.owl.OwlRenderer;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.util.OntologyIRIShortFormProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.collect.Sets;
 
 /**
  * This is the main Mapping Master user interface. It contains a view of a
@@ -64,28 +52,22 @@ import org.slf4j.LoggerFactory;
  */
 public class CellfieWorkspace extends JPanel {
 
-   private static final Logger logger = LoggerFactory.getLogger(CellfieWorkspace.class);
-
    private static final long serialVersionUID = 1L;
 
-   private final OWLOntologySource ontologySource;
-   private final File workbookFile;
+   private final OWLOntology ontology;
+   private final Workbook workbook;
+   private final OwlRenderer renderer;
    private final OWLEditorKit editorKit;
 
-   private final WorkbookView dataSourceView;
+   private final WorkbookView workbookView;
    private final TransformationRuleBrowserView ruleBrowserView;
 
-   private File ruleFile;
-
-   private MMApplicationModel applicationModel;
-
-   public CellfieWorkspace(@Nonnull OWLOntologySource ontologySource, @Nonnull File workbookFile,
-         @Nonnull OWLEditorKit editorKit) throws Exception {
-      this.ontologySource = checkNotNull(ontologySource);
-      this.workbookFile = checkNotNull(workbookFile);
+   public CellfieWorkspace(@Nonnull OWLOntology ontology, @Nonnull Workbook workbook,
+         @Nonnull OwlRenderer renderer, @Nonnull OWLEditorKit editorKit) {
+      this.ontology = checkNotNull(ontology);
+      this.workbook = checkNotNull(workbook);
+      this.renderer = checkNotNull(renderer);
       this.editorKit = checkNotNull(editorKit);
-
-      applicationModel = MMApplication.create(ontologySource, workbookFile).getApplicationModel();
 
       setLayout(new BorderLayout());
 
@@ -97,7 +79,7 @@ public class CellfieWorkspace extends JPanel {
       lblTargetOntology.setForeground(Color.DARK_GRAY);
       pnlTargetOntology.add(lblTargetOntology);
 
-      JLabel lblOntologyID = new JLabel(getTitle(ontologySource.getOWLOntology()));
+      JLabel lblOntologyID = new JLabel(getTitle(ontology));
       lblOntologyID.setForeground(Color.DARK_GRAY);
       pnlTargetOntology.add(lblOntologyID);
 
@@ -108,8 +90,8 @@ public class CellfieWorkspace extends JPanel {
       /*
        * Workbook sheet GUI presentation
        */
-      dataSourceView = new WorkbookView(this);
-      splitPane.setTopComponent(dataSourceView);
+      workbookView = new WorkbookView(this);
+      splitPane.setTopComponent(workbookView);
 
       /*
        * Transformation rule browser, create, edit, remove panel
@@ -120,96 +102,55 @@ public class CellfieWorkspace extends JPanel {
       validate();
    }
 
-   public OWLEditorKit getOWLEditorKit() {
-      return editorKit;
-   }
-
-   public File getWorkbookFile() {
-      return workbookFile;
-   }
-
-   public Optional<File> getRuleFile() {
-      return Optional.ofNullable(ruleFile);
-   }
-
-   public boolean isRuleFilePresent() {
-      return getRuleFile().isPresent();
-   }
-
-   public void setRuleFile(@Nonnull File ruleFile) {
-      this.ruleFile = checkNotNull(ruleFile);
-      fireApplicationModelChanged();
-   }
-
-   private void fireApplicationModelChanged() {
-      try {
-         applicationModel = MMApplication.create(ontologySource, workbookFile, ruleFile).getApplicationModel();
-      } catch (Exception e) {
-         String message = "Unable to start Cellfie Workspace (see log for details)";
-         DialogUtils.showErrorDialog(this, message);
-         logger.error(message, e);
+   public Set<OWLAxiom> doTransformation() throws ParseException {
+      Set<OWLAxiom> results = Sets.newHashSet();
+      TransformationRuleSet transformationRules = getRuleBrowserView().getPickedRules();
+      for (TransformationRule rule : transformationRules) {
+         String ruleString = rule.getRuleExpression();
+         results.addAll(renderer.render(ruleString, workbook,
+               new RenderingContext(rule.getSheetName(),
+                     rule.getStartColumnIndex(),
+                     rule.getEndColumnIndex(),
+                     rule.getStartRowIndex(),
+                     rule.getEndRowIndex())));
       }
+      return results;
    }
 
-   public void evaluate(@Nonnull TransformationRule rule, @Nonnull Renderer renderer,
-         @Nonnull Set<Rendering> results) throws ParseException {
-      String ruleExpression = rule.getRuleExpression();
-      MappingMasterParser parser = new MappingMasterParser(
-            new ByteArrayInputStream(ruleExpression.getBytes()), new ReferenceSettings(), -1);
-      SimpleNode simpleNode = parser.expression();
-      MMExpressionNode ruleNode = new ExpressionNode((ASTExpression) simpleNode)
-            .getMMExpressionNode();
-      Optional<? extends Rendering> renderingResult = renderer.render(ruleNode);
-      if (renderingResult.isPresent()) {
-         results.add(renderingResult.get());
-      }
+   public WorkbookView getWorkbookView() {
+      return workbookView;
    }
 
-   public WorkbookView getDataSourceView() { // TODO: Rename to getWorkbookView
-      return dataSourceView;
-   }
-
-   public TransformationRuleBrowserView getTransformationRuleBrowserView() { // TODO: Shorten to getRuleBrowserView
+   public TransformationRuleBrowserView getRuleBrowserView() {
       return ruleBrowserView;
    }
 
-   public OWLOntology getActiveOntology() { // TODO Rename to getOntology
-      return ontologySource.getOWLOntology();
+   public OWLOntology getOntology() {
+      return ontology;
    }
 
-   public Workbook getActiveWorkbook() { // TODO Rename to getWorkbook
-      return applicationModel.getWorkbook();
+   public Workbook getWorkbook() {
+      return workbook;
    }
 
-   public TransformationRuleSet getActiveTransformationRules() { // TODO Rename to getTransformationRules
-      return applicationModel.getTransformationRules();
-   }
-
-   /* package */ void updateTransformationRuleModel() {
-      final List<TransformationRule> rules = getTransformationRuleBrowserView().getPickedRules();
-      TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
-      applicationModel.setTransformationRules(ruleSet);
-   }
-
-   public Renderer getDefaultRenderer() {
-      return applicationModel.getTransformationRenderer();
-   }
-
-   public Renderer getLogRenderer() {
-      return applicationModel.getLogRenderer();
+   public OWLEditorKit getEditorKit() {
+      return editorKit;
    }
 
    public boolean shouldClose() {
       return ruleBrowserView.safeGuardChanges();
    }
 
-   public static JDialog createDialog(@Nonnull JComponent parent, @Nonnull OWLEditorKit editorKit,
-         @Nonnull File workbookFile) throws Exception {
+   public static JDialog createDialog(@Nonnull JComponent parent, @Nonnull File workbookFile,
+         @Nonnull OWLEditorKit editorKit) throws Exception {
       JFrame parentFrame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, parent);
       final JDialog dialog = new JDialog(parentFrame, "Cellfie", Dialog.ModalityType.MODELESS);
 
-      final OWLOntologySource ontologySource = new OWLProtegeOntology(editorKit);
-      final CellfieWorkspace workspacePanel = new CellfieWorkspace(ontologySource, workbookFile, editorKit);
+      final OWLOntology ontology = editorKit.getOWLModelManager().getActiveOntology();
+      final Workbook workbook = new Workbook(WorkbookFactory.create(workbookFile));
+      final OwlEntityResolver entityResolver = new ProtegeEntityResolver(editorKit.getModelManager());
+      final OwlRenderer renderer = new OwlRenderer(new OwlFactory(entityResolver));
+      final CellfieWorkspace workspacePanel = new CellfieWorkspace(ontology, workbook, renderer, editorKit);
       workspacePanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
       // Closing Cellfie using ESC key

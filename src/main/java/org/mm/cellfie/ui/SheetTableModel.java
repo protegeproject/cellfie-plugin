@@ -1,12 +1,10 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import javax.annotation.Nonnull;
 import javax.swing.table.AbstractTableModel;
-
-import org.mm.workbook.Sheet;
-import org.mm.workbook.WorkbookUtils;
+import org.mm.renderer.Sheet;
+import org.mm.renderer.internal.CellUtils;
 
 /**
  * Represents the table model used to presenting the cells of a spreadsheet.
@@ -26,28 +24,21 @@ public class SheetTableModel extends AbstractTableModel {
 
    @Override
    public int getRowCount() {
-      return sheet.getLastRowIndex();
+      return sheet.getEndRowIndex() + 1;
    }
 
    @Override
    public int getColumnCount() {
-      int maxCount = 0;
-      for (int currentRow = 0; currentRow < getRowCount(); currentRow++) {
-         int currentCount = sheet.getLastColumnIndexAt(currentRow);
-         if (currentCount > maxCount) {
-            maxCount = currentCount;
-         }
-      }
-      return maxCount;
+      return sheet.getEndColumnIndex() + 1;
    }
 
    @Override
    public String getColumnName(int column) {
-      return WorkbookUtils.columnNumber2Name(column + 1);
+      return CellUtils.toColumnLabel(column + 1);
    }
 
    @Override
    public Object getValueAt(int row, int column) {
-      return sheet.getCellValue(row, column);
+      return sheet.getValueFromCell(column, row);
    }
 }

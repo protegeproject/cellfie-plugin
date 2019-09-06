@@ -2,9 +2,7 @@ package org.mm.cellfie;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-
 import javax.swing.JDialog;
-
 import org.mm.cellfie.ui.CellfieWorkspace;
 import org.mm.cellfie.ui.DialogUtils;
 import org.protege.editor.owl.model.OWLWorkspace;
@@ -47,7 +45,7 @@ public class CellfieAction extends ProtegeOWLAction {
    }
 
    private void showCellfieDialog(File workbookFile) throws Exception {
-      JDialog cellfieDialog = CellfieWorkspace.createDialog(protegeWorkspace, getOWLEditorKit(), workbookFile);
+      JDialog cellfieDialog = CellfieWorkspace.createDialog(protegeWorkspace, workbookFile, getOWLEditorKit());
       cellfieDialog.setVisible(true);
    }
 

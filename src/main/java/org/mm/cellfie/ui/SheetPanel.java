@@ -1,19 +1,16 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.annotation.Nonnull;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
-
-import org.mm.workbook.Sheet;
+import org.mm.renderer.Sheet;
 
 /**
  * Represents the sheet panel used to display the cells (or the data) of a
@@ -84,7 +81,7 @@ public class SheetPanel extends JPanel {
     * @return The sheet name.
     */
    public String getSheetName() {
-      return sheet.getName();
+      return sheet.getSheetName();
    }
 
    private void setSelectedCellRange(int startColumnIndex, int startRowIndex, int endColumnIndex,

@@ -1,15 +1,13 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-
 import javax.annotation.Nonnull;
 import javax.swing.table.DefaultTableModel;
-
-import org.mm.transformationrule.TransformationRule;
+import org.mm.cellfie.transformationrule.TransformationRule;
+import org.mm.renderer.Sheet;
 
 /**
  * A helper class used for data transaction between the table UI and the table model.
@@ -52,7 +50,7 @@ public class TransformationRuleTableModelHelper {
    @Nonnull
    public TransformationRule getRuleAt(int rowIndex) {
       final Vector<?> rowVector = (Vector<?>) tableModel.getDataVector().elementAt(rowIndex);
-      String sheetName = String.valueOf(rowVector.get(TransformationRuleTableModel.SHEET_NAME_COLUMN));
+      Sheet sheetName = (Sheet) rowVector.get(TransformationRuleTableModel.SHEET_NAME_COLUMN);
       String startColumn = String.valueOf(rowVector.get(TransformationRuleTableModel.START_COLUMN_COLUMN));
       String endColumn = String.valueOf(rowVector.get(TransformationRuleTableModel.END_COLUMN_COLUMN));
       String startRow = String.valueOf(rowVector.get(TransformationRuleTableModel.START_ROW_COLUMN));

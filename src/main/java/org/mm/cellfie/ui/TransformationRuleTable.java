@@ -1,11 +1,8 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.awt.Color;
 import java.awt.Component;
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -14,9 +11,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
-
-import org.mm.transformationrule.TransformationRule;
-import org.mm.transformationrule.TransformationRuleSet;
+import org.mm.cellfie.transformationrule.TransformationRule;
+import org.mm.cellfie.transformationrule.TransformationRuleSet;
 
 /**
  * Represents the table used to show the list of transformation rules.
@@ -66,12 +62,12 @@ public class TransformationRuleTable extends JTable {
       }
    }
 
-   public List<TransformationRule> getAllRules() {
-      return tableModelHelper.getAllRules();
+   public TransformationRuleSet getAllRules() {
+      return TransformationRuleSet.create(tableModelHelper.getAllRules());
    }
 
-   public List<TransformationRule> getPickedRules() {
-      return tableModelHelper.getPickedRules();
+   public TransformationRuleSet getPickedRules() {
+      return TransformationRuleSet.create(tableModelHelper.getPickedRules());
    }
 
    public TransformationRule getRuleAt(int rowIndex) {

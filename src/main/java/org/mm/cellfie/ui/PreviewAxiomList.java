@@ -1,13 +1,10 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.Vector;
-
 import javax.annotation.Nonnull;
-
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.owl.OWLEditorKit;

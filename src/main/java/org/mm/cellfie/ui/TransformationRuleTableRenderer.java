@@ -1,7 +1,6 @@
 package org.mm.cellfie.ui;
 
 import java.awt.Component;
-
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;

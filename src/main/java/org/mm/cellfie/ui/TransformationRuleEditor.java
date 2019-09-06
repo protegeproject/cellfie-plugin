@@ -1,14 +1,12 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.List;
 import java.util.Vector;
-
 import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -18,8 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
-import org.mm.transformationrule.TransformationRule;
+import org.mm.cellfie.transformationrule.TransformationRule;
+import org.mm.renderer.Sheet;
 
 /**
  * Represents the editor form used to create a transformation rule.
@@ -31,7 +29,7 @@ public class TransformationRuleEditor extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
-   private JComboBox<String> cbbSheetName;
+   private JComboBox<Sheet> cbbSheetName;
 
    private JTextField txtStartColumn;
    private JTextField txtEndColumn;
@@ -52,8 +50,8 @@ public class TransformationRuleEditor extends JPanel {
       add(pnlMain, BorderLayout.CENTER);
 
       JLabel lblSheetName = new JLabel("Sheet name:");
-      List<String> sheetNames = cellfieWorkspace.getActiveWorkbook().getSheetNames();
-      cbbSheetName = new JComboBox<>(new DefaultComboBoxModel<>(new Vector<>(sheetNames)));
+      List<Sheet> sheets = cellfieWorkspace.getWorkbook().getSheets();
+      cbbSheetName = new JComboBox<>(new DefaultComboBoxModel<>(new Vector<>(sheets)));
 
       JLabel lblStartColumn = new JLabel("Start column:");
       txtStartColumn = new JTextField("");
@@ -142,7 +140,7 @@ public class TransformationRuleEditor extends JPanel {
    public void setStartColumn(@Nonnull String columnName) {
       checkNotNull(columnName);
       if (columnName.isEmpty()) {
-         columnName = "A";
+         columnName = TransformationRule.START_COLUMN;
       }
       txtStartColumn.setText(columnName);
    }
@@ -150,7 +148,7 @@ public class TransformationRuleEditor extends JPanel {
    public void setStartRow(@Nonnull String rowNumber) {
       checkNotNull(rowNumber);
       if (rowNumber.isEmpty()) {
-         rowNumber = "1";
+         rowNumber = TransformationRule.START_ROW;
       }
       txtStartRow.setText(rowNumber);
    }
@@ -158,7 +156,7 @@ public class TransformationRuleEditor extends JPanel {
    public void setEndColumn(@Nonnull String columnName) {
       checkNotNull(columnName);
       if (columnName.isEmpty()) {
-         columnName = "+";
+         columnName = TransformationRule.ANY_WILDCARD;
       }
       txtEndColumn.setText(columnName);
    }
@@ -166,7 +164,7 @@ public class TransformationRuleEditor extends JPanel {
    public void setEndRow(@Nonnull String rowNumber) {
       checkNotNull(rowNumber);
       if (rowNumber.isEmpty()) {
-         rowNumber = "+";
+         rowNumber = TransformationRule.ANY_WILDCARD;
       }
       txtEndRow.setText(rowNumber);
    }
@@ -182,9 +180,12 @@ public class TransformationRuleEditor extends JPanel {
    }
 
    public TransformationRule getTransformationRule() {
-      return new TransformationRule((String) cbbSheetName.getSelectedItem(),
+      return new TransformationRule((Sheet) cbbSheetName.getSelectedItem(),
             txtStartColumn.getText().trim().toUpperCase(),
-            txtEndColumn.getText().trim().toUpperCase(), txtStartRow.getText().trim(),
-            txtEndRow.getText().trim(), txtComment.getText().trim(), txtRule.getText().trim());
+            txtEndColumn.getText().trim().toUpperCase(),
+            txtStartRow.getText().trim(),
+            txtEndRow.getText().trim(),
+            txtComment.getText().trim(),
+            txtRule.getText().trim());
    }
 }

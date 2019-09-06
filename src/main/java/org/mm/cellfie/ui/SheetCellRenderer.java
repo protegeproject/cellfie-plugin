@@ -2,7 +2,6 @@ package org.mm.cellfie.ui;
 
 import java.awt.Component;
 import java.awt.Insets;
-
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.UIManager;

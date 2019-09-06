@@ -1,15 +1,11 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.lang.String.format;
-
 import java.awt.BorderLayout;
-
 import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-
-import org.mm.workbook.Sheet;
+import org.mm.renderer.Sheet;
 import org.protege.editor.core.ui.tabbedpane.ViewTabbedPane;
 import org.protege.editor.core.ui.util.ComponentFactory;
 
@@ -32,8 +28,7 @@ public class WorkbookView extends JPanel {
 
       JPanel pnlContainer = new JPanel();
       pnlContainer.setLayout(new BorderLayout());
-      pnlContainer.setBorder(ComponentFactory.createTitledBorder(
-            format("Workbook (%s)", cellfieWorkspace.getWorkbookFile().getAbsolutePath())));
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder("Workbook"));
       add(pnlContainer, BorderLayout.CENTER);
 
       JPanel pnlWorkbook = new JPanel();
@@ -44,9 +39,9 @@ public class WorkbookView extends JPanel {
       pnlWorkbook.add(tabSheetContainer, BorderLayout.CENTER);
       pnlContainer.add(pnlWorkbook, BorderLayout.CENTER);
 
-      for (Sheet sheet : cellfieWorkspace.getActiveWorkbook().getSheets()) {
+      for (Sheet sheet : cellfieWorkspace.getWorkbook().getSheets()) {
          SheetPanel sheetPanel = new SheetPanel(sheet);
-         tabSheetContainer.addTab(sheet.getName(), null, sheetPanel);
+         tabSheetContainer.addTab(sheet.getSheetName(), null, sheetPanel);
       }
       validate();
    }

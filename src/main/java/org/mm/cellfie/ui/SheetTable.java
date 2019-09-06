@@ -1,10 +1,8 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.awt.Color;
 import java.awt.Component;
-
 import javax.annotation.Nonnull;
 import javax.swing.JLabel;
 import javax.swing.JTable;

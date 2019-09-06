@@ -2,19 +2,13 @@ package org.mm.cellfie;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-
 import java.util.Optional;
-
 import javax.annotation.Nonnull;
-
-import org.mm.core.OWLEntityResolver;
-import org.mm.exceptions.EntityCreationException;
-import org.mm.exceptions.EntityNotFoundException;
-import org.protege.editor.owl.OWLEditorKit;
+import org.mm.renderer.owl.EntityCreationException;
+import org.mm.renderer.owl.EntityNotFoundException;
+import org.mm.renderer.owl.OwlEntityResolver;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.entity.OWLEntityCreationException;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
-import org.protege.editor.owl.model.find.OWLEntityFinder;
 import org.semanticweb.owlapi.formats.PrefixDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -33,17 +27,12 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class OWLProtegeEntityResolver implements OWLEntityResolver {
+public class ProtegeEntityResolver implements OwlEntityResolver {
 
    private final OWLModelManager modelManager;
-   private final OWLEntityFinder entityFinder;
-   private final OWLEntityFactory entityFactory;
 
-   public OWLProtegeEntityResolver(@Nonnull OWLEditorKit editorKit) {
-      checkNotNull(editorKit);
-      modelManager = editorKit.getModelManager();
-      entityFinder = modelManager.getOWLEntityFinder();
-      entityFactory = modelManager.getOWLEntityFactory();
+   public ProtegeEntityResolver(@Nonnull OWLModelManager modelManager) {
+      this.modelManager = checkNotNull(modelManager);
    }
 
    /**
@@ -68,7 +57,7 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
    public <T extends OWLEntity> T resolve(String entityName, final Class<T> entityType)
          throws EntityNotFoundException {
       T entity = null;
-      OWLEntity foundEntity = entityFinder.getOWLEntity(entityName);
+      OWLEntity foundEntity = modelManager.getOWLEntityFinder().getOWLEntity(entityName);
       if (foundEntity == null) {
          entity = createNewForBuiltInEntity(entityName, entityType);
       } else {
@@ -146,7 +135,7 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
    @Override
    public <T extends OWLEntity> T create(String entityName, final Class<T> entityType)
          throws EntityCreationException {
-      OWLEntity entity = entityFinder.getOWLEntity(entityName);
+      OWLEntity entity = modelManager.getOWLEntityFinder().getOWLEntity(entityName);
       if (entity == null) {
          try {
             return createNew(entityName, entityType);
@@ -162,7 +151,7 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
       String localName = getLocalName(entityName);
       Optional<IRI> prefix = getPrefix(entityName);
       IRI baseIri = prefix.orElseGet(() -> null);
-      return entityFactory.createOWLEntity(entityType, localName, baseIri).getOWLEntity();
+      return modelManager.getOWLEntityFactory().createOWLEntity(entityType, localName, baseIri).getOWLEntity();
    }
 
    @Override
