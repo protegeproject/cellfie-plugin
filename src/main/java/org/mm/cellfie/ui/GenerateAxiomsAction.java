@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.mm.cellfie.exception.CellfieException;
-import org.mm.parser.ParseException;
+import org.protege.editor.core.ui.error.ErrorLogPanel;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
@@ -24,8 +24,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents the action listener for the 'Generate Axioms' command.
@@ -34,8 +32,6 @@ import org.slf4j.LoggerFactory;
  *         Stanford Center for Biomedical Informatics Research
  */
 public class GenerateAxiomsAction implements ActionListener {
-
-   private static final Logger logger = LoggerFactory.getLogger(GenerateAxiomsAction.class);
 
    private static final int CANCEL_IMPORT = 0;
    private static final int ADD_TO_NEW_ONTOLOGY = 1;
@@ -52,14 +48,8 @@ public class GenerateAxiomsAction implements ActionListener {
       try {
          Set<OWLAxiom> results = cellfieWorkspace.doTransformation();
          showAxiomPreviewDialog(results);
-      } catch (ParseException e) {
-         String message = e.getMessage();
-         DialogUtils.showErrorDialog(cellfieWorkspace, message);
-         logger.error(message, e);
       } catch (Exception e) {
-         String message = e.getMessage();
-         DialogUtils.showErrorDialog(cellfieWorkspace, message);
-         logger.error(message, e);
+         ErrorLogPanel.showErrorDialog(e);
       } 
    }
 
