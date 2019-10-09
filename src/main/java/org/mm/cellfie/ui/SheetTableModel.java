@@ -25,22 +25,22 @@ public class SheetTableModel extends AbstractTableModel {
 
    @Override
    public int getRowCount() {
-      return sheet.getEndRowIndex() + 1;
+      return sheet.getEndRowNumber();
    }
 
    @Override
    public int getColumnCount() {
-      return sheet.getEndColumnIndex() + 1;
+      return sheet.getEndColumnNumber();
    }
 
    @Override
    public String getColumnName(int column) {
-      return CellUtils.toColumnLabel(column + 1);
+      return CellUtils.toColumnLabel(column+1);
    }
 
    @Override
    public Object getValueAt(int row, int column) {
-      Optional<String> value = sheet.getValueFromCell(column, row);
+      Optional<String> value = sheet.getValueFromCell(column+1, row+1);
       return (value.isPresent()) ? value.get() : "";
    }
 }

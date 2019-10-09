@@ -36,7 +36,6 @@ import org.mm.renderer.Sheet;
 import org.mm.renderer.Workbook;
 import org.mm.renderer.internal.CellUtils;
 import org.mm.renderer.owl.OwlEntityResolver;
-import org.mm.renderer.owl.OwlFactory;
 import org.mm.renderer.owl.OwlRenderer;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
@@ -108,32 +107,34 @@ public class CellfieWorkspace extends JPanel {
    public Set<OWLAxiom> doTransformation() throws ParseException {
       Set<OWLAxiom> results = Sets.newHashSet();
       TransformationRuleSet transformationRules = getRuleBrowserView().getPickedRules();
+      final OwlEntityResolver entityResolver = new ProtegeEntityResolver(editorKit.getModelManager());
       for (TransformationRule rule : transformationRules) {
          String ruleString = rule.getRuleExpression();
          results.addAll(renderer.render(ruleString, workbook,
                new RenderingContext(rule.getSheetName(),
-                     getStartColumnIndex(rule.getStartColumn(), workbook.getSheet(rule.getSheetName())),
-                     getEndColumnIndex(rule.getEndColumn(), workbook.getSheet(rule.getSheetName())),
-                     getStartRowIndex(rule.getStartRow(), workbook.getSheet(rule.getSheetName())),
-                     getEndRowIndex(rule.getEndRow(), workbook.getSheet(rule.getSheetName())))));
+                     getStartColumnNumber(rule.getStartColumn()),
+                     getEndColumnNumber(rule.getEndColumn(), workbook.getSheet(rule.getSheetName())),
+                     getStartRowNumber(rule.getStartRow()),
+                     getEndRowNumber(rule.getEndRow(), workbook.getSheet(rule.getSheetName()))),
+               entityResolver));
       }
       return results;
    }
 
-   private int getStartColumnIndex(String startColumn, Sheet sheet) {
-      return CellUtils.toColumnIndex(startColumn);
+   private int getStartColumnNumber(String startColumn) {
+      return CellUtils.toColumnNumber(startColumn);
    }
 
-   private int getEndColumnIndex(String endColumn, Sheet sheet) {
-      return (ANY_WILDCARD.equals(endColumn)) ? sheet.getEndColumnIndex() : CellUtils.toColumnIndex(endColumn);
+   private int getEndColumnNumber(String endColumn, Sheet sheet) {
+      return (ANY_WILDCARD.equals(endColumn)) ? sheet.getEndColumnNumber() : CellUtils.toColumnNumber(endColumn);
    }
 
-   private int getStartRowIndex(String startRow, Sheet sheet) {
-      return CellUtils.toRowIndex(startRow);
+   private int getStartRowNumber(String startRow) {
+      return CellUtils.toRowNumber(startRow);
    }
 
-   private int getEndRowIndex(String endRow, Sheet sheet) {
-      return (ANY_WILDCARD.equals(endRow)) ? sheet.getEndRowIndex() : CellUtils.toRowIndex(endRow);
+   private int getEndRowNumber(String endRow, Sheet sheet) {
+      return (ANY_WILDCARD.equals(endRow)) ? sheet.getEndRowNumber() : CellUtils.toRowNumber(endRow);
    }
 
    public WorkbookView getWorkbookView() {
@@ -167,8 +168,7 @@ public class CellfieWorkspace extends JPanel {
 
       final OWLOntology ontology = editorKit.getOWLModelManager().getActiveOntology();
       final Workbook workbook = new Workbook(WorkbookFactory.create(workbookFile));
-      final OwlEntityResolver entityResolver = new ProtegeEntityResolver(editorKit.getModelManager());
-      final OwlRenderer renderer = new OwlRenderer(new OwlFactory(entityResolver));
+      final OwlRenderer renderer = new OwlRenderer();
       final CellfieWorkspace workspacePanel = new CellfieWorkspace(ontology, workbook, renderer, editorKit);
       workspacePanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 

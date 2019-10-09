@@ -67,22 +67,22 @@ public class TransformationRule {
    }
 
    @Nonnull
-   public String getStartColumn() {
+   public String getStartColumn() { // 1-based index
       return startColumn;
    }
 
    @Nonnull
-   public String getEndColumn() {
+   public String getEndColumn() { // 1-based index
       return endColumn;
    }
 
    @Nonnull
-   public String getStartRow() {
+   public String getStartRow() { // 1-based index
       return startRow;
    }
 
    @Nonnull
-   public String getEndRow() {
+   public String getEndRow() { // 1-based index
       return endRow;
    }
 
