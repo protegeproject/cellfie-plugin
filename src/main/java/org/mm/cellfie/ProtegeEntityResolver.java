@@ -146,6 +146,12 @@ public class ProtegeEntityResolver implements OwlEntityResolver {
       return entityType.cast(entity);
    }
 
+   @Override
+   public <T extends OWLEntity> boolean hasType(String entityName, Class<T> entityType) {
+      OWLEntity entity = modelManager.getOWLEntityFinder().getOWLEntity(entityName);
+      return (entity != null) ? entityType.isInstance(entity) : false;
+   }
+
    private <T extends OWLEntity> T createNew(String entityName, final Class<T> entityType)
          throws OWLEntityCreationException {
       String localName = getLocalName(entityName);
