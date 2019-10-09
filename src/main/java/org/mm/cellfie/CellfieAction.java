@@ -5,6 +5,7 @@ import java.io.File;
 import javax.swing.JDialog;
 import org.mm.cellfie.ui.CellfieWorkspace;
 import org.mm.cellfie.ui.DialogUtils;
+import org.protege.editor.core.ui.error.ErrorLogPanel;
 import org.protege.editor.owl.model.OWLWorkspace;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class CellfieAction extends ProtegeOWLAction {
             showCellfieDialog(workbookFile);
          } catch (Exception e) {
             String message = "Error starting Cellfie (see log for details)";
-            DialogUtils.showErrorDialog(protegeWorkspace, message);
+            ErrorLogPanel.showErrorDialog(e);
             logger.error(message, e);
          }
       }
