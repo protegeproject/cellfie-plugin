@@ -312,7 +312,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       editorPanel.setStartRow(rule.getStartRow());
       editorPanel.setEndColumn(rule.getEndColumn());
       editorPanel.setEndRow(rule.getEndRow());
-      editorPanel.setComment(rule.getComment());
+      editorPanel.setDescription(rule.getComment());
       editorPanel.setRuleExpression(rule.getRuleExpression());
       return editorPanel;
    }
