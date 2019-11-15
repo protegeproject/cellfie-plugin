@@ -31,10 +31,6 @@ public class TransformationRuleTable extends JTable {
 
    private final TransformationRuleTableModelHelper tableModelHelper;
 
-   public TransformationRuleTable() {
-      this(new TransformationRuleTableModel());
-   }
-
    public TransformationRuleTable(@Nonnull DefaultTableModel tableModel) {
       this.tableModel = checkNotNull(tableModel);
       tableModelHelper = new TransformationRuleTableModelHelper(tableModel);
