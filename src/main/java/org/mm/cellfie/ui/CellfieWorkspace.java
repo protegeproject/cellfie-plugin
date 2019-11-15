@@ -5,6 +5,7 @@ import static org.mm.cellfie.transformationrule.TransformationRule.ANY_WILDCARD;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -15,6 +16,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -85,21 +87,21 @@ public class CellfieWorkspace extends JPanel {
       lblOntologyID.setForeground(Color.DARK_GRAY);
       pnlTargetOntology.add(lblOntologyID);
 
-      ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.VERTICAL_SPLIT);
-      splitPane.setResizeWeight(0.4);
+      ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+      splitPane.setResizeWeight(0.80);
       add(splitPane, BorderLayout.CENTER);
 
       /*
        * Workbook sheet GUI presentation
        */
       workbookView = new WorkbookView(this);
-      splitPane.setTopComponent(workbookView);
+      splitPane.setLeftComponent(workbookView);
 
       /*
        * Transformation rule browser, create, edit, remove panel
        */
       ruleBrowserView = new TransformationRuleBrowserView(this);
-      splitPane.setBottomComponent(ruleBrowserView);
+      splitPane.setRightComponent(ruleBrowserView);
 
       validate();
    }
@@ -201,7 +203,7 @@ public class CellfieWorkspace extends JPanel {
 
       dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
       dialog.setContentPane(workspacePanel);
-      dialog.setSize(1200, 900);
+      dialog.setSize(1500, 900);
       dialog.setResizable(true);
       return dialog;
    }
