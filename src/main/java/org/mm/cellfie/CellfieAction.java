@@ -47,6 +47,7 @@ public class CellfieAction extends ProtegeOWLAction {
 
    private void showCellfieDialog(File workbookFile) throws Exception {
       JDialog cellfieDialog = CellfieWorkspace.createDialog(protegeWorkspace, workbookFile, getOWLEditorKit());
+      cellfieDialog.setLocationRelativeTo(null);
       cellfieDialog.setVisible(true);
    }
 
