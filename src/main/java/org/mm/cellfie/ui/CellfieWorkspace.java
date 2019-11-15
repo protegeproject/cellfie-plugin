@@ -3,10 +3,8 @@ package org.mm.cellfie.ui;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mm.cellfie.transformationrule.TransformationRule.ANY_WILDCARD;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -20,14 +18,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.mm.cellfie.ProtegeEntityResolver;
 import org.mm.cellfie.transformationrule.TransformationRule;
@@ -41,10 +37,8 @@ import org.mm.renderer.owl.OwlEntityResolver;
 import org.mm.renderer.owl.OwlRenderer;
 import org.protege.editor.core.ui.split.ViewSplitPane;
 import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.util.OntologyIRIShortFormProvider;
 import com.google.common.collect.Sets;
 
 /**
@@ -75,20 +69,8 @@ public class CellfieWorkspace extends JPanel {
 
       setLayout(new BorderLayout());
 
-      JPanel pnlTargetOntology = new JPanel(new FlowLayout(FlowLayout.LEFT));
-      pnlTargetOntology.setBorder(new EmptyBorder(5, 5, 0, 5));
-      add(pnlTargetOntology, BorderLayout.NORTH);
-
-      JLabel lblTargetOntology = new JLabel("Target Ontology: ");
-      lblTargetOntology.setForeground(Color.DARK_GRAY);
-      pnlTargetOntology.add(lblTargetOntology);
-
-      JLabel lblOntologyID = new JLabel(getTitle(ontology));
-      lblOntologyID.setForeground(Color.DARK_GRAY);
-      pnlTargetOntology.add(lblOntologyID);
-
       ViewSplitPane splitPane = new ViewSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-      splitPane.setResizeWeight(0.80);
+      splitPane.setResizeWeight(1);
       add(splitPane, BorderLayout.CENTER);
 
       /*
@@ -102,6 +84,14 @@ public class CellfieWorkspace extends JPanel {
        */
       ruleBrowserView = new TransformationRuleBrowserView(this);
       splitPane.setRightComponent(ruleBrowserView);
+
+      JPanel pnlGenerateAxioms = new JPanel();
+      add(pnlGenerateAxioms, BorderLayout.SOUTH);
+
+      JButton cmdGenerateAxioms = new JButton("Generate Axioms");
+      cmdGenerateAxioms.setPreferredSize(new Dimension(152, 32));
+      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(this));
+      pnlGenerateAxioms.add(cmdGenerateAxioms);
 
       validate();
    }
@@ -206,29 +196,5 @@ public class CellfieWorkspace extends JPanel {
       dialog.setSize(1500, 900);
       dialog.setResizable(true);
       return dialog;
-   }
-
-   private static String getTitle(OWLOntology ontology) {
-      if (ontology.getOntologyID().isAnonymous()) {
-         return ontology.getOntologyID().toString();
-      }
-      final com.google.common.base.Optional<IRI> iri = ontology.getOntologyID().getDefaultDocumentIRI();
-      return getOntologyLabelText(iri);
-   }
-
-   private static String getOntologyLabelText(com.google.common.base.Optional<IRI> iri) {
-      StringBuilder sb = new StringBuilder();
-      if (iri.isPresent()) {
-         String shortForm = new OntologyIRIShortFormProvider().getShortForm(iri.get());
-         sb.append(shortForm);
-      } else {
-         sb.append("Anonymous ontology");
-      }
-      sb.append(" (");
-      if (iri.isPresent()) {
-         sb.append(iri.get().toString());
-      }
-      sb.append(")");
-      return sb.toString();
    }
 }

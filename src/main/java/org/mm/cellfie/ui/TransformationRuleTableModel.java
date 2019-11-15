@@ -14,16 +14,17 @@ public class TransformationRuleTableModel extends DefaultTableModel {
    private static final long serialVersionUID = 1L;
 
    public static final int RULE_PICK_COLUMN = 0;
-   public static final int SHEET_NAME_COLUMN = 1;
-   public static final int START_COLUMN_COLUMN = 2;
-   public static final int END_COLUMN_COLUMN = 3;
-   public static final int START_ROW_COLUMN = 4;
-   public static final int END_ROW_COLUMN = 5;
-   public static final int RULE_EXPRESSION_COLUMN = 6;
-   public static final int COMMENT_COLUMN = 7;
+   public static final int RULE_EXPRESSION_COLUMN = 1;
+   public static final int SHEET_NAME_COLUMN = 2;
+   public static final int START_COLUMN_COLUMN = 3;
+   public static final int END_COLUMN_COLUMN = 4;
+   public static final int START_ROW_COLUMN = 5;
+   public static final int END_ROW_COLUMN = 6;
+   public static final int DESCRIPTION_COLUMN = 7;
 
-   private final String[] COLUMN_NAMES = { "", "Sheet Name", "Start Column", "End Column",
-         "Start Row", "End Row", "Rule", "Comment" };
+   private final String[] COLUMN_NAMES = { "", "Expression Rule",
+         "Sheet Name", "Start Column", "End Column", "Start Row",
+         "End Row", "Description" };
 
    public TransformationRuleTableModel() {
       super();

@@ -49,14 +49,14 @@ public class TransformationRuleTableModelHelper {
    @Nonnull
    public TransformationRule getRuleAt(int rowIndex) {
       final Vector<?> rowVector = (Vector<?>) tableModel.getDataVector().elementAt(rowIndex);
-      String sheetName = (String) rowVector.get(TransformationRuleTableModel.SHEET_NAME_COLUMN);
+      String sheetName = String.valueOf(rowVector.get(TransformationRuleTableModel.SHEET_NAME_COLUMN));
       String startColumn = String.valueOf(rowVector.get(TransformationRuleTableModel.START_COLUMN_COLUMN));
       String endColumn = String.valueOf(rowVector.get(TransformationRuleTableModel.END_COLUMN_COLUMN));
       String startRow = String.valueOf(rowVector.get(TransformationRuleTableModel.START_ROW_COLUMN));
       String endRow = String.valueOf(rowVector.get(TransformationRuleTableModel.END_ROW_COLUMN));
       String expression = String.valueOf(rowVector.get(TransformationRuleTableModel.RULE_EXPRESSION_COLUMN));
-      String comment = String.valueOf(rowVector.get(TransformationRuleTableModel.COMMENT_COLUMN));
-      return new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, comment, expression);
+      String description = String.valueOf(rowVector.get(TransformationRuleTableModel.DESCRIPTION_COLUMN));
+      return new TransformationRule(sheetName, startColumn, endColumn, startRow, endRow, description, expression);
    }
 
    public void removeRule(int selectedRow) {
@@ -77,13 +77,13 @@ public class TransformationRuleTableModelHelper {
    private static Vector<Object> asRowVector(TransformationRule rule) {
       Vector<Object> rowVector = new Vector<>();
       rowVector.add(TransformationRuleTableModel.RULE_PICK_COLUMN, true);
+      rowVector.add(TransformationRuleTableModel.RULE_EXPRESSION_COLUMN, rule.getRuleExpression());
       rowVector.add(TransformationRuleTableModel.SHEET_NAME_COLUMN, rule.getSheetName());
       rowVector.add(TransformationRuleTableModel.START_COLUMN_COLUMN, rule.getStartColumn());
       rowVector.add(TransformationRuleTableModel.END_COLUMN_COLUMN, rule.getEndColumn());
       rowVector.add(TransformationRuleTableModel.START_ROW_COLUMN, rule.getStartRow());
       rowVector.add(TransformationRuleTableModel.END_ROW_COLUMN, rule.getEndRow());
-      rowVector.add(TransformationRuleTableModel.RULE_EXPRESSION_COLUMN, rule.getRuleExpression());
-      rowVector.add(TransformationRuleTableModel.COMMENT_COLUMN, rule.getComment());
+      rowVector.add(TransformationRuleTableModel.DESCRIPTION_COLUMN, rule.getComment());
       return rowVector;
    }
 }

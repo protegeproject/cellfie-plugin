@@ -22,20 +22,9 @@ class TransformationRuleTableRenderer extends JTextArea implements TableCellRend
    @Override
    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
          boolean hasFocus, int row, int column) {
-      if (isSelected) {
-         setForeground(table.getSelectionForeground());
-         setBackground(table.getSelectionBackground());
-      } else {
-         setForeground(table.getForeground());
-         setBackground(table.getBackground());
-      }
       setFont(table.getFont());
       if (hasFocus) {
          setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
-         if (table.isCellEditable(row, column)) {
-            setForeground(UIManager.getColor("Table.focusCellForeground"));
-            setBackground(UIManager.getColor("Table.focusCellBackground"));
-         }
       } else {
          setBorder(new EmptyBorder(1, 2, 1, 2));
       }

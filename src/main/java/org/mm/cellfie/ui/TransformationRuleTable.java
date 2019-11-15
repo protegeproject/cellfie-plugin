@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.awt.Color;
 import java.awt.Component;
 import javax.annotation.Nonnull;
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -46,13 +47,30 @@ public class TransformationRuleTable extends JTable {
       setGridColor(new Color(220, 220, 220));
       setDefaultRenderer(String.class, new TransformationRuleTableRenderer());
       setTableHeaderAlignment(SwingConstants.CENTER);
-      getColumnModel().getColumn(0).setHeaderRenderer(checkBoxRenderer);
-      setPreferredColumnWidth();
+      setTableColumnLayout();
    }
 
    private void setTableHeaderAlignment(int alignment) {
       ((DefaultTableCellRenderer) getTableHeader().getDefaultRenderer()).setHorizontalAlignment(alignment);
    }
+
+   @Override
+   public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+      Component c = super.prepareRenderer(renderer, row, column);
+      if (c instanceof JComponent) {
+         JComponent jc = (JComponent) c;
+         if(column == TransformationRuleTableModel.RULE_EXPRESSION_COLUMN){
+            final TransformationRule tr = getRuleAt(row);
+            String text = String.format(
+                  "<html><b>Sheet name</b>: %s<br>"
+                  + "<b>Cell range</b>: %s<br>"
+                  + "<b>Desctiption</b>: %s</html>",
+                  tr.getSheetName(), tr.getCellRange(), tr.getComment());
+            jc.setToolTipText(text);
+         }
+      }
+      return c;
+  }
 
    public void load(@Nonnull TransformationRuleSet ruleSet) {
       checkNotNull(ruleSet);
@@ -141,22 +159,18 @@ public class TransformationRuleTable extends JTable {
       checkBoxRenderer.setSelected(false);
    }
 
-   private void setPreferredColumnWidth() {
+   private void setTableColumnLayout() {
       final TableColumnModel columnModel = getColumnModel();
+      columnModel.getColumn(TransformationRuleTableModel.RULE_PICK_COLUMN).setHeaderRenderer(checkBoxRenderer);
       columnModel.getColumn(TransformationRuleTableModel.RULE_PICK_COLUMN).setPreferredWidth(30);
-      columnModel.getColumn(TransformationRuleTableModel.RULE_PICK_COLUMN).setMaxWidth(60);
-      columnModel.getColumn(TransformationRuleTableModel.SHEET_NAME_COLUMN).setPreferredWidth(100);
-      columnModel.getColumn(TransformationRuleTableModel.SHEET_NAME_COLUMN).setMaxWidth(120);
-      columnModel.getColumn(TransformationRuleTableModel.START_COLUMN_COLUMN).setPreferredWidth(100);
-      columnModel.getColumn(TransformationRuleTableModel.START_COLUMN_COLUMN).setMaxWidth(120);
-      columnModel.getColumn(TransformationRuleTableModel.END_COLUMN_COLUMN).setPreferredWidth(100);
-      columnModel.getColumn(TransformationRuleTableModel.END_COLUMN_COLUMN).setMaxWidth(120);
-      columnModel.getColumn(TransformationRuleTableModel.START_ROW_COLUMN).setPreferredWidth(100);
-      columnModel.getColumn(TransformationRuleTableModel.START_ROW_COLUMN).setMaxWidth(120);
-      columnModel.getColumn(TransformationRuleTableModel.END_ROW_COLUMN).setPreferredWidth(100);
-      columnModel.getColumn(TransformationRuleTableModel.END_ROW_COLUMN).setMaxWidth(120);
-      columnModel.getColumn(TransformationRuleTableModel.RULE_EXPRESSION_COLUMN).setPreferredWidth(360);
-      columnModel.getColumn(TransformationRuleTableModel.COMMENT_COLUMN).setPreferredWidth(180);
+      columnModel.getColumn(TransformationRuleTableModel.RULE_PICK_COLUMN).setMaxWidth(30);
+      // Remove columns in the reverse order to not break the index ordering
+      columnModel.removeColumn(columnModel.getColumn(TransformationRuleTableModel.DESCRIPTION_COLUMN));
+      columnModel.removeColumn(columnModel.getColumn(TransformationRuleTableModel.END_ROW_COLUMN));
+      columnModel.removeColumn(columnModel.getColumn(TransformationRuleTableModel.START_ROW_COLUMN));
+      columnModel.removeColumn(columnModel.getColumn(TransformationRuleTableModel.END_COLUMN_COLUMN));
+      columnModel.removeColumn(columnModel.getColumn(TransformationRuleTableModel.START_COLUMN_COLUMN));
+      columnModel.removeColumn(columnModel.getColumn(TransformationRuleTableModel.SHEET_NAME_COLUMN));
    }
 
    private void setPreferredRowHeight() {

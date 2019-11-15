@@ -59,8 +59,8 @@ public class SheetPanel extends JPanel {
 
       header = tblBaseSheet.getTableHeader();
       header.setReorderingAllowed(false);
-      header.addMouseListener(new SelectColumnHeadersOnMouseClicked());
-      header.addMouseMotionListener(new SelectColumnHeadersOnMouseDragged());
+//      header.addMouseListener(new SelectColumnHeadersOnMouseClicked());
+//      header.addMouseMotionListener(new SelectColumnHeadersOnMouseDragged());
 
       tblRowNumberSheet = new RowNumberWrapper(tblBaseSheet);
       tblRowNumberSheet.addMouseListener(new SelectRowHeadersOnMouseClicked());

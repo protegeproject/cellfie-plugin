@@ -11,7 +11,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
@@ -38,7 +37,6 @@ public class SheetTable extends JTable {
       setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
       setColumnSelectionAllowed(true);
       setRowSelectionAllowed(false);
-      // setCellSelectionEnabled(true);
       resizeColumnWidth();
       setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
    }
@@ -46,13 +44,7 @@ public class SheetTable extends JTable {
    private void resizeColumnWidth() {
       final TableColumnModel columnModel = getColumnModel();
       for (int column = 0; column < getColumnCount(); column++) {
-         int width = 50; // Min width
-         for (int row = 0; row < getRowCount(); row++) {
-            TableCellRenderer renderer = getCellRenderer(row, column);
-            Component comp = prepareRenderer(renderer, row, column);
-            width = Math.max(comp.getPreferredSize().width + 1, width);
-         }
-         columnModel.getColumn(column).setPreferredWidth(width);
+         columnModel.getColumn(column).setPreferredWidth(222);
       }
    }
 

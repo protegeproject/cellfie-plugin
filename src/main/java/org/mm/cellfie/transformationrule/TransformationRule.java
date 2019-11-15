@@ -86,6 +86,15 @@ public class TransformationRule {
       return endRow;
    }
 
+   @Nonnull
+   public String getCellRange() {
+      return String.format("(%s:%s, %s:%s)",
+            getStartRow(),
+            (ANY_WILDCARD.equals(getEndRow()) ? "" : getEndRow()),
+            getStartColumn(),
+            (ANY_WILDCARD.equals(getEndColumn()) ? "" : getEndColumn()));
+   }
+
    @Override
    public boolean equals(Object obj) {
       if (obj == null) {

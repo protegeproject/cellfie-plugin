@@ -52,7 +52,6 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    private JButton cmdDelete;
    private JButton cmdSave;
    private JButton cmdSaveAs;
-   private JButton cmdGenerateAxioms;
 
    private TransformationRuleTable tblTransformationRules;
 
@@ -96,12 +95,12 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
       JScrollPane scrMappingExpression = new JScrollPane(tblTransformationRules);
 
-      JPanel pnlTop = new JPanel(new BorderLayout());
-      pnlTop.setBorder(new EmptyBorder(2, 5, 7, 5));
-      pnlContainer.add(pnlTop, BorderLayout.NORTH);
+      JPanel pnlAddEditDelete = new JPanel(new BorderLayout());
+      pnlAddEditDelete.setBorder(new EmptyBorder(2, 5, 7, 5));
+      pnlContainer.add(pnlAddEditDelete, BorderLayout.NORTH);
 
       JPanel pnlCommandButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      pnlTop.add(pnlCommandButton, BorderLayout.WEST);
+      pnlAddEditDelete.add(pnlCommandButton, BorderLayout.WEST);
 
       cmdAdd = new JButton("Add");
       cmdAdd.setPreferredSize(new Dimension(72, 22));
@@ -120,39 +119,30 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       cmdDelete.addActionListener(new DeleteRuleButtonAction());
       pnlCommandButton.add(cmdDelete);
 
-      JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-      pnlTop.add(pnlMappingOpenSave, BorderLayout.EAST);
+      JPanel pnlExpressionBrowser = new JPanel(new BorderLayout());
+      pnlContainer.add(pnlExpressionBrowser, BorderLayout.CENTER);
+
+      pnlExpressionBrowser.add(scrMappingExpression, BorderLayout.CENTER);
+
+      JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      pnlContainer.add(pnlMappingOpenSave, BorderLayout.SOUTH);
 
       JButton cmdLoad = new JButton("Load Rules");
-      cmdLoad.setPreferredSize(new Dimension(152, 22));
+      cmdLoad.setPreferredSize(new Dimension(122, 22));
       cmdLoad.addActionListener(new LoadRulesAction());
       pnlMappingOpenSave.add(cmdLoad);
 
       cmdSave = new JButton("Save Rules");
-      cmdSave.setPreferredSize(new Dimension(152, 22));
+      cmdSave.setPreferredSize(new Dimension(122, 22));
       cmdSave.addActionListener(new SaveRulesAction());
       cmdSave.setEnabled(false);
       pnlMappingOpenSave.add(cmdSave);
 
       cmdSaveAs = new JButton("Save As...");
-      cmdSaveAs.setPreferredSize(new Dimension(152, 22));
+      cmdSaveAs.setPreferredSize(new Dimension(122, 22));
       cmdSaveAs.addActionListener(new SaveAsAction());
       cmdSaveAs.setEnabled(false);
       pnlMappingOpenSave.add(cmdSaveAs);
-
-      JPanel pnlCenter = new JPanel(new BorderLayout());
-      pnlContainer.add(pnlCenter, BorderLayout.CENTER);
-
-      pnlCenter.add(scrMappingExpression, BorderLayout.CENTER);
-
-      JPanel pnlGenerateAxioms = new JPanel();
-      pnlContainer.add(pnlGenerateAxioms, BorderLayout.SOUTH);
-
-      cmdGenerateAxioms = new JButton("Generate Axioms");
-      cmdGenerateAxioms.setPreferredSize(new Dimension(152, 22));
-      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(cellfieWorkspace));
-      cmdGenerateAxioms.setEnabled(false);
-      pnlGenerateAxioms.add(cmdGenerateAxioms);
 
       validate();
    }
@@ -472,11 +462,9 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
          cmdDelete.setEnabled(true);
          cmdSave.setEnabled(!isFileLoaded());
          cmdSaveAs.setEnabled(true);
-         cmdGenerateAxioms.setEnabled(true);
       } else {
          cmdEdit.setEnabled(false);
          cmdDelete.setEnabled(false);
-         cmdGenerateAxioms.setEnabled(false);
       }
    }
 
