@@ -29,6 +29,7 @@ import org.mm.cellfie.transformationrule.TransformationRule;
 import org.mm.cellfie.transformationrule.TransformationRuleReader;
 import org.mm.cellfie.transformationrule.TransformationRuleSet;
 import org.mm.cellfie.transformationrule.TransformationRuleWriter;
+import org.protege.editor.core.ui.error.ErrorLogPanel;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    private JButton cmdSave;
    private JButton cmdSaveAs;
 
+   private TransformationRuleTableModel transformationRuleModel;
    private TransformationRuleTable tblTransformationRules;
 
    private boolean hasUnsavedChanges = false;
@@ -72,10 +74,10 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
       add(pnlContainer, BorderLayout.CENTER);
 
-      TransformationRuleTableModel tableModel = new TransformationRuleTableModel();
-      tableModel.addTableModelListener(this);
+      transformationRuleModel = new TransformationRuleTableModel();
+      transformationRuleModel.addTableModelListener(this);
 
-      tblTransformationRules = new TransformationRuleTable(tableModel);
+      tblTransformationRules = new TransformationRuleTable(transformationRuleModel);
       tblTransformationRules.addMouseListener(new RuleEditMouseListener());
       tblTransformationRules.addMouseListener(new RuleSelectionMouseListener());
 
@@ -357,17 +359,20 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    private class LoadRulesAction implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent event) {
-         safeGuardChanges();
-         ruleFile = DialogUtils.showOpenFileChooser(cellfieWorkspace,
-               "Mapping Master Transformation Rules (.json)", "json");
-         try {
-            TransformationRuleSet ruleSet = TransformationRuleReader.readFromDocument(ruleFile);
-            tblTransformationRules.load(ruleSet);
-            drawTitleBorder();
-         } catch (Exception e) {
-            String message = "Error opening file (see log for details)";
-            DialogUtils.showErrorDialog(cellfieWorkspace, message);
-            logger.error(message, e);
+         boolean canProceed = safeGuardChanges();
+         if (canProceed) {
+            ruleFile = DialogUtils.showOpenFileChooser(cellfieWorkspace,
+                  "Mapping Master Transformation Rules (.json)", "json");
+            if (ruleFile != null) {
+               try {
+                  TransformationRuleSet ruleSet = TransformationRuleReader.readFromDocument(ruleFile);
+                  tblTransformationRules.load(ruleSet);
+                  drawTitleBorder();
+               } catch (Exception e) {
+                  ErrorLogPanel.showErrorDialog(e);
+                  logger.error(e.getMessage(), e);
+               }
+            }
          }
       }
    }
@@ -408,9 +413,8 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
             TransformationRuleWriter.writeToDocument(ruleFile, getAllRules());
             isSuccessful = true;
          } catch (IOException e) {
-            String message = "Error saving file (see log for details)";
-            DialogUtils.showErrorDialog(cellfieWorkspace, message);
-            logger.error(message, e);
+            ErrorLogPanel.showErrorDialog(e);
+            logger.error(e.getMessage(), e);
          }
       }
       return isSuccessful;
@@ -426,32 +430,47 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
             TransformationRuleWriter.writeToDocument(newFile, getAllRules());
             isSuccessful = true;
          } catch (IOException e) {
-            String message = "Error saving file (see log for details)";
-            DialogUtils.showErrorDialog(cellfieWorkspace, message);
-            logger.error(message, e);
+            ErrorLogPanel.showErrorDialog(e);
+            logger.error(e.getMessage(), e);
          }
       }
       return isSuccessful;
    }
 
    public boolean safeGuardChanges() {
-      boolean isSuccessful = true;
+      boolean canProceed = true;
       if (hasUnsavedChanges) {
          int answer = DialogUtils.showConfirmWithCancelDialog(cellfieWorkspace,
                "There are unsaved changes in your transformation rules. Do you want to save them?");
          if (answer == JOptionPane.YES_OPTION) {
             if (!isFileLoaded()) {
-               isSuccessful = saveAsFile();
+               canProceed = saveAsFile();
             } else {
-               isSuccessful = saveFile();
+               canProceed = saveFile();
             }
-            if (isSuccessful) {
+            if (canProceed) {
                hasUnsavedChanges = false;
                DialogUtils.showInfoDialog(cellfieWorkspace, "Saving was successful");
             }
+         } else if (answer == JOptionPane.NO_OPTION) {
+            canProceed = clearTable();
          } else if (answer == JOptionPane.CANCEL_OPTION) {
-            isSuccessful = false; // avoid closing
+            canProceed = false; // avoid closing
          }
+      }
+      return canProceed;
+   }
+
+   private boolean clearTable() {
+      boolean isSuccessful = true;
+      try {
+         for (int rowIndex = 0; rowIndex < transformationRuleModel.getRowCount(); rowIndex++) {
+            transformationRuleModel.removeRow(rowIndex);
+         }
+      } catch (Exception e) {
+         ErrorLogPanel.showErrorDialog(e);
+         logger.error(e.getMessage(), e);
+         isSuccessful = false;
       }
       return isSuccessful;
    }
