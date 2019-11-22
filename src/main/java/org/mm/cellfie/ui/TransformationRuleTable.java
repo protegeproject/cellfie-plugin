@@ -9,7 +9,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.mm.cellfie.transformationrule.TransformationRule;
@@ -27,13 +26,10 @@ public class TransformationRuleTable extends JTable {
 
    private final CheckBoxHeaderRenderer checkBoxRenderer = new CheckBoxHeaderRenderer(this);
 
-   private final DefaultTableModel tableModel;
+   private final TransformationRuleTableModel tableModel;
 
-   private final TransformationRuleTableModelHelper tableModelHelper;
-
-   public TransformationRuleTable(@Nonnull DefaultTableModel tableModel) {
+   public TransformationRuleTable(@Nonnull TransformationRuleTableModel tableModel) {
       this.tableModel = checkNotNull(tableModel);
-      tableModelHelper = new TransformationRuleTableModelHelper(tableModel);
       createGui();
    }
 
@@ -70,22 +66,23 @@ public class TransformationRuleTable extends JTable {
 
    public void load(@Nonnull TransformationRuleSet ruleSet) {
       checkNotNull(ruleSet);
+      tableModel.removeAllRules();
       for (TransformationRule rule : ruleSet) {
-         tableModelHelper.addRule(rule);
+         tableModel.addRule(rule);
          setPreferredRowHeight();
       }
    }
 
    public TransformationRuleSet getAllRules() {
-      return TransformationRuleSet.create(tableModelHelper.getAllRules());
+      return TransformationRuleSet.create(tableModel.getAllRules());
    }
 
    public TransformationRuleSet getPickedRules() {
-      return TransformationRuleSet.create(tableModelHelper.getPickedRules());
+      return TransformationRuleSet.create(tableModel.getPickedRules());
    }
 
    public TransformationRule getRuleAt(int rowIndex) {
-      return tableModelHelper.getRuleAt(rowIndex);
+      return tableModel.getRuleAt(rowIndex);
    }
 
    public TransformationRule getRuleAtSelection() {
@@ -94,7 +91,7 @@ public class TransformationRuleTable extends JTable {
 
    public void modifyRule(int selectedRow, @Nonnull TransformationRule rule) {
       checkNotNull(rule);
-      tableModelHelper.updateRule(selectedRow, rule);
+      tableModel.updateRule(selectedRow, rule);
       repaintSelectionAfterModifying(selectedRow);
       setPreferredRowHeight();
    }
@@ -109,7 +106,7 @@ public class TransformationRuleTable extends JTable {
 
    public void addRule(@Nonnull TransformationRule rule) {
       checkNotNull(rule);
-      tableModelHelper.addRule(rule);
+      tableModel.addRule(rule);
       repaintSelectionAfterAdding();
       setPreferredRowHeight();
    }
@@ -140,7 +137,7 @@ public class TransformationRuleTable extends JTable {
    }
 
    private boolean isLastRow(int deletedRow) {
-      return deletedRow == tableModelHelper.getAllRules().size();
+      return deletedRow == tableModel.getRowCount();
    }
 
    private boolean isRowPresent(int nextSelectedRow) {
