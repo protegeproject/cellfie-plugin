@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import org.mm.cellfie.transformationrule.TransformationRule;
-import org.mm.cellfie.transformationrule.TransformationRuleSet;
+import org.mm.cellfie.transformationrule.TransformationRuleList;
 
 /**
  * Represents the table used to show the list of transformation rules.
@@ -64,21 +64,21 @@ public class TransformationRuleTable extends JTable {
       return c;
   }
 
-   public void load(@Nonnull TransformationRuleSet ruleSet) {
-      checkNotNull(ruleSet);
+   public void load(@Nonnull TransformationRuleList ruleList) {
+      checkNotNull(ruleList);
       tableModel.removeAllRules();
-      for (TransformationRule rule : ruleSet) {
+      for (TransformationRule rule : ruleList) {
          tableModel.addRule(rule);
          setPreferredRowHeight();
       }
    }
 
-   public TransformationRuleSet getAllRules() {
-      return TransformationRuleSet.create(tableModel.getAllRules());
+   public TransformationRuleList getAllRules() {
+      return new TransformationRuleList(tableModel.getAllRules());
    }
 
-   public TransformationRuleSet getPickedRules() {
-      return TransformationRuleSet.create(tableModel.getPickedRules());
+   public TransformationRuleList getPickedRules() {
+      return new TransformationRuleList(tableModel.getPickedRules());
    }
 
    public TransformationRule getRuleAt(int rowIndex) {

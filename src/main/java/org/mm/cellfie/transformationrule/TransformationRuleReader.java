@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.annotation.Nonnull;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
@@ -17,18 +18,32 @@ import com.google.gson.Gson;
 public class TransformationRuleReader {
 
    @Nonnull
-   public static TransformationRuleSet readFromDocument(@Nonnull InputStream inputStream)
+   public static TransformationRuleList readFromDocument(@Nonnull InputStream inputStream)
          throws FileNotFoundException {
       checkNotNull(inputStream);
-      BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-      return new Gson().fromJson(br, TransformationRuleSet.class);
+      try {
+         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+         return new Gson().fromJson(br, TransformationRuleList.class);
+      } catch (JsonSyntaxException e) {
+         // Handle previous version of transformation rules serialization
+         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+         TransformationRuleSet ruleSet = new Gson().fromJson(br, TransformationRuleSet.class);
+         return new TransformationRuleList(ruleSet.getTransformationRules());
+      }
    }
 
    @Nonnull
-   public static TransformationRuleSet readFromDocument(@Nonnull File file)
+   public static TransformationRuleList readFromDocument(@Nonnull File file)
          throws FileNotFoundException {
       checkNotNull(file);
-      BufferedReader br = new BufferedReader(new FileReader(file));
-      return new Gson().fromJson(br, TransformationRuleSet.class);
+      try {
+         BufferedReader br = new BufferedReader(new FileReader(file));
+         return new Gson().fromJson(br, TransformationRuleList.class);
+      } catch (JsonSyntaxException e) {
+         // Handle previous version of transformation rules serialization
+         BufferedReader br = new BufferedReader(new FileReader(file));
+         TransformationRuleSet ruleSet = new Gson().fromJson(br, TransformationRuleSet.class);
+         return new TransformationRuleList(ruleSet.getTransformationRules());
+      }
    }
 }

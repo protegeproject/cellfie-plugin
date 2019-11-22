@@ -16,18 +16,18 @@ public class TransformationRuleWriter {
 
    public static void writeToDocument(@Nonnull File file, @Nonnull Collection<TransformationRule> rules)
          throws IOException {
-      TransformationRuleSet ruleSet = TransformationRuleSet.create(rules);
+      TransformationRuleList ruleSet = new TransformationRuleList(rules);
       writeToDocument(file, ruleSet);
    }
 
-   public static void writeToDocument(@Nonnull File file, @Nonnull TransformationRuleSet ruleSet)
+   public static void writeToDocument(@Nonnull File file, @Nonnull TransformationRuleList ruleList)
          throws IOException {
       checkNotNull(file);
-      checkNotNull(ruleSet);
+      checkNotNull(ruleList);
       final GsonBuilder builder = new GsonBuilder();
       builder.excludeFieldsWithoutExposeAnnotation();
       builder.setPrettyPrinting();
-      String json = builder.create().toJson(ruleSet);
+      String json = builder.create().toJson(ruleList);
       FileWriter writer = new FileWriter(file);
       writer.write(json);
       writer.close();

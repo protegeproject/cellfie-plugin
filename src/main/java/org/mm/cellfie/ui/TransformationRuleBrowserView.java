@@ -26,8 +26,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import org.mm.cellfie.transformationrule.TransformationRule;
+import org.mm.cellfie.transformationrule.TransformationRuleList;
 import org.mm.cellfie.transformationrule.TransformationRuleReader;
-import org.mm.cellfie.transformationrule.TransformationRuleSet;
 import org.mm.cellfie.transformationrule.TransformationRuleWriter;
 import org.protege.editor.core.ui.error.ErrorLogPanel;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -70,7 +70,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
       pnlContainer = new JPanel();
       pnlContainer.setLayout(new BorderLayout());
-      drawTitleBorder();
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder("Transformation Rules"));
 
       add(pnlContainer, BorderLayout.CENTER);
 
@@ -157,11 +157,11 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       return tblTransformationRules.getRowCount() > 0;
    }
 
-   public TransformationRuleSet getAllRules() {
+   public TransformationRuleList getAllRules() {
       return tblTransformationRules.getAllRules();
    }
 
-   public TransformationRuleSet getPickedRules() {
+   public TransformationRuleList getPickedRules() {
       return tblTransformationRules.getPickedRules();
    }
 
@@ -365,9 +365,9 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
                   "Mapping Master Transformation Rules (.json)", "json");
             if (ruleFile != null) {
                try {
-                  TransformationRuleSet ruleSet = TransformationRuleReader.readFromDocument(ruleFile);
-                  tblTransformationRules.load(ruleSet);
-                  drawTitleBorder();
+                  TransformationRuleList ruleList = TransformationRuleReader.readFromDocument(ruleFile);
+                  tblTransformationRules.load(ruleList);
+                  hasUnsavedChanges = false;
                } catch (Exception e) {
                   ErrorLogPanel.showErrorDialog(e);
                   logger.error(e.getMessage(), e);
@@ -401,7 +401,6 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       public void actionPerformed(ActionEvent e) {
          if (saveAsFile()) {
             cmdSave.setEnabled(true);
-            drawTitleBorder();
          }
       }
    }
@@ -443,36 +442,31 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
          int answer = DialogUtils.showConfirmWithCancelDialog(cellfieWorkspace,
                "There are unsaved changes in your transformation rules. Do you want to save them?");
          if (answer == JOptionPane.YES_OPTION) {
-            if (!isFileLoaded()) {
-               canProceed = saveAsFile();
-            } else {
-               canProceed = saveFile();
-            }
-            if (canProceed) {
-               hasUnsavedChanges = false;
-               DialogUtils.showInfoDialog(cellfieWorkspace, "Saving was successful");
-            }
+            saveTable();
          } else if (answer == JOptionPane.NO_OPTION) {
-            canProceed = clearTable();
+            clearTable();
          } else if (answer == JOptionPane.CANCEL_OPTION) {
-            canProceed = false; // avoid closing
+            canProceed = false;
          }
       }
       return canProceed;
    }
 
-   private boolean clearTable() {
-      boolean isSuccessful = true;
-      try {
-         for (int rowIndex = 0; rowIndex < transformationRuleModel.getRowCount(); rowIndex++) {
-            transformationRuleModel.removeRow(rowIndex);
-         }
-      } catch (Exception e) {
-         ErrorLogPanel.showErrorDialog(e);
-         logger.error(e.getMessage(), e);
-         isSuccessful = false;
+   private void saveTable() {
+      boolean isSuccessful = false;
+      if (!isFileLoaded()) {
+         isSuccessful = saveAsFile();
+      } else {
+         isSuccessful = saveFile();
       }
-      return isSuccessful;
+      if (isSuccessful) {
+         hasUnsavedChanges = false;
+         DialogUtils.showInfoDialog(cellfieWorkspace, "Saving was successful");
+      }
+   }
+
+   private void clearTable() {
+      transformationRuleModel.removeAllRules();
    }
 
    private void updateCommandButtonsUi() {
@@ -485,9 +479,5 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
          cmdEdit.setEnabled(false);
          cmdDelete.setEnabled(false);
       }
-   }
-
-   private void drawTitleBorder() {
-      pnlContainer.setBorder(ComponentFactory.createTitledBorder("Transformation Rules"));
    }
 }

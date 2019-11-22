@@ -27,7 +27,7 @@ import javax.swing.WindowConstants;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.mm.cellfie.ProtegeEntityResolver;
 import org.mm.cellfie.transformationrule.TransformationRule;
-import org.mm.cellfie.transformationrule.TransformationRuleSet;
+import org.mm.cellfie.transformationrule.TransformationRuleList;
 import org.mm.parser.ParseException;
 import org.mm.renderer.RenderingContext;
 import org.mm.renderer.Sheet;
@@ -98,7 +98,7 @@ public class CellfieWorkspace extends JPanel {
 
    public Set<OWLAxiom> doTransformation() throws ParseException {
       Set<OWLAxiom> results = Sets.newHashSet();
-      TransformationRuleSet transformationRules = getRuleBrowserView().getPickedRules();
+      TransformationRuleList transformationRules = getRuleBrowserView().getPickedRules();
       final OwlEntityResolver entityResolver = new ProtegeEntityResolver(editorKit.getModelManager());
       for (TransformationRule rule : transformationRules) {
          String ruleString = rule.getRuleExpression();
