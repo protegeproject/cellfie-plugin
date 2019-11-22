@@ -37,14 +37,14 @@ public class DialogUtils {
       checkNotNull(parent);
       checkNotNull(message);
       return showDialog(parent, "Info", new JLabel(message),
-            JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_OPTION);
+            JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
    }
 
    public static int showErrorDialog(@Nonnull Component parent, @Nonnull String message) {
       checkNotNull(parent);
       checkNotNull(message);
       return showDialog(parent, "Error", new JLabel(message), JOptionPane.ERROR_MESSAGE,
-            JOptionPane.OK_OPTION);
+            JOptionPane.DEFAULT_OPTION);
    }
 
    public static int showDialog(@Nonnull Component parent, @Nonnull String title,
