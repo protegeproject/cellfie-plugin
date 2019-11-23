@@ -97,9 +97,32 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
       JScrollPane scrMappingExpression = new JScrollPane(tblTransformationRules);
 
+      JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      pnlContainer.add(pnlMappingOpenSave, BorderLayout.NORTH);
+
+      JButton cmdLoad = new JButton("Open...");
+      cmdLoad.setPreferredSize(new Dimension(122, 22));
+      cmdLoad.addActionListener(new LoadRulesAction());
+      pnlMappingOpenSave.add(cmdLoad);
+
+      cmdSave = new JButton("Save");
+      cmdSave.setPreferredSize(new Dimension(122, 22));
+      cmdSave.addActionListener(new SaveRulesAction());
+      pnlMappingOpenSave.add(cmdSave);
+
+      cmdSaveAs = new JButton("Save As...");
+      cmdSaveAs.setPreferredSize(new Dimension(122, 22));
+      cmdSaveAs.addActionListener(new SaveAsAction());
+      pnlMappingOpenSave.add(cmdSaveAs);
+
+      JPanel pnlExpressionBrowser = new JPanel(new BorderLayout());
+      pnlContainer.add(pnlExpressionBrowser, BorderLayout.CENTER);
+
+      pnlExpressionBrowser.add(scrMappingExpression, BorderLayout.CENTER);
+
       JPanel pnlAddEditDelete = new JPanel(new BorderLayout());
       pnlAddEditDelete.setBorder(new EmptyBorder(2, 5, 7, 5));
-      pnlContainer.add(pnlAddEditDelete, BorderLayout.NORTH);
+      pnlContainer.add(pnlAddEditDelete, BorderLayout.SOUTH);
 
       JPanel pnlCommandButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       pnlAddEditDelete.add(pnlCommandButton, BorderLayout.WEST);
@@ -120,31 +143,6 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       cmdDelete.setEnabled(false);
       cmdDelete.addActionListener(new DeleteRuleButtonAction());
       pnlCommandButton.add(cmdDelete);
-
-      JPanel pnlExpressionBrowser = new JPanel(new BorderLayout());
-      pnlContainer.add(pnlExpressionBrowser, BorderLayout.CENTER);
-
-      pnlExpressionBrowser.add(scrMappingExpression, BorderLayout.CENTER);
-
-      JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.CENTER));
-      pnlContainer.add(pnlMappingOpenSave, BorderLayout.SOUTH);
-
-      JButton cmdLoad = new JButton("Load Rules");
-      cmdLoad.setPreferredSize(new Dimension(122, 22));
-      cmdLoad.addActionListener(new LoadRulesAction());
-      pnlMappingOpenSave.add(cmdLoad);
-
-      cmdSave = new JButton("Save Rules");
-      cmdSave.setPreferredSize(new Dimension(122, 22));
-      cmdSave.addActionListener(new SaveRulesAction());
-      cmdSave.setEnabled(true);
-      pnlMappingOpenSave.add(cmdSave);
-
-      cmdSaveAs = new JButton("Save As...");
-      cmdSaveAs.setPreferredSize(new Dimension(122, 22));
-      cmdSaveAs.addActionListener(new SaveAsAction());
-      cmdSaveAs.setEnabled(true);
-      pnlMappingOpenSave.add(cmdSaveAs);
 
       validate();
    }
