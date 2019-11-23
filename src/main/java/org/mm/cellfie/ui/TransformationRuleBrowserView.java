@@ -137,19 +137,19 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       cmdSave = new JButton("Save Rules");
       cmdSave.setPreferredSize(new Dimension(122, 22));
       cmdSave.addActionListener(new SaveRulesAction());
-      cmdSave.setEnabled(false);
+      cmdSave.setEnabled(true);
       pnlMappingOpenSave.add(cmdSave);
 
       cmdSaveAs = new JButton("Save As...");
       cmdSaveAs.setPreferredSize(new Dimension(122, 22));
       cmdSaveAs.addActionListener(new SaveAsAction());
-      cmdSaveAs.setEnabled(false);
+      cmdSaveAs.setEnabled(true);
       pnlMappingOpenSave.add(cmdSaveAs);
 
       validate();
    }
 
-   private boolean isFileLoaded() {
+   private boolean isFilePresent() {
       return ruleFile != null;
    }
 
@@ -389,7 +389,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    private class SaveRulesAction implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent e) {
-         saveFile();
+         saveTable();
       }
    }
 
@@ -399,41 +399,30 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    private class SaveAsAction implements ActionListener {
       @Override
       public void actionPerformed(ActionEvent e) {
-         if (saveAsFile()) {
-            cmdSave.setEnabled(true);
-         }
+         saveAsFile();
       }
    }
 
-   private boolean saveFile() {
-      boolean isSuccessful = false;
-      if (ruleFile != null) {
-         try {
-            TransformationRuleWriter.writeToDocument(ruleFile, getAllRules());
-            isSuccessful = true;
-         } catch (IOException e) {
-            ErrorLogPanel.showErrorDialog(e);
-            logger.error(e.getMessage(), e);
-         }
-      }
-      return isSuccessful;
-   }
-
-   private boolean saveAsFile() {
-      boolean isSuccessful = false;
-      File newFile = DialogUtils.showSaveFileChooser(cellfieWorkspace,
+   private void saveAsFile() {
+      File chosenFile = DialogUtils.showSaveFileChooser(cellfieWorkspace,
             "Mapping Master Transformation Rule (.json)",
             "json");
-      if (newFile != null) {
-         try {
-            TransformationRuleWriter.writeToDocument(newFile, getAllRules());
-            isSuccessful = true;
-         } catch (IOException e) {
-            ErrorLogPanel.showErrorDialog(e);
-            logger.error(e.getMessage(), e);
-         }
+      if (chosenFile != null) {
+         String filePath = chosenFile.getAbsolutePath();
+         ruleFile = (!filePath.endsWith(".json")) ? new File(filePath + ".json") : new File(filePath);
+         saveFile(ruleFile);
       }
-      return isSuccessful;
+   }
+
+   private void saveFile(File targetFile) {
+      try {
+         TransformationRuleWriter.writeToDocument(targetFile, getAllRules());
+         DialogUtils.showInfoDialog(cellfieWorkspace, "Saving was successful");
+         hasUnsavedChanges = false;
+      } catch (IOException e) {
+         ErrorLogPanel.showErrorDialog(e);
+         logger.error(e.getMessage(), e);
+      }
    }
 
    public boolean safeGuardChanges() {
@@ -453,15 +442,10 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    }
 
    private void saveTable() {
-      boolean isSuccessful = false;
-      if (!isFileLoaded()) {
-         isSuccessful = saveAsFile();
+      if (!isFilePresent()) {
+         saveAsFile();
       } else {
-         isSuccessful = saveFile();
-      }
-      if (isSuccessful) {
-         hasUnsavedChanges = false;
-         DialogUtils.showInfoDialog(cellfieWorkspace, "Saving was successful");
+         saveFile(ruleFile);
       }
    }
 
@@ -473,8 +457,6 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       if (hasTransformationRules()) {
          cmdEdit.setEnabled(true);
          cmdDelete.setEnabled(true);
-         cmdSave.setEnabled(!isFileLoaded());
-         cmdSaveAs.setEnabled(true);
       } else {
          cmdEdit.setEnabled(false);
          cmdDelete.setEnabled(false);
