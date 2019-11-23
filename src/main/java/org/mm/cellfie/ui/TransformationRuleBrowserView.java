@@ -368,6 +368,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
                   TransformationRuleList ruleList = TransformationRuleReader.readFromDocument(ruleFile);
                   tblTransformationRules.load(ruleList);
                   hasUnsavedChanges = false;
+                  showSavedChanges();
                } catch (Exception e) {
                   ErrorLogPanel.showErrorDialog(e);
                   logger.error(e.getMessage(), e);
@@ -380,6 +381,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    @Override
    public void tableChanged(TableModelEvent e) {
       hasUnsavedChanges = true; // flag the rule model is dirty
+      showUnsavedChanges();
       updateCommandButtonsUi();
    }
 
@@ -417,8 +419,8 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    private void saveFile(File targetFile) {
       try {
          TransformationRuleWriter.writeToDocument(targetFile, getAllRules());
-         DialogUtils.showInfoDialog(cellfieWorkspace, "Saving was successful");
          hasUnsavedChanges = false;
+         showSavedChanges();
       } catch (IOException e) {
          ErrorLogPanel.showErrorDialog(e);
          logger.error(e.getMessage(), e);
@@ -451,6 +453,14 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
    private void clearTable() {
       transformationRuleModel.removeAllRules();
+   }
+
+   private void showUnsavedChanges() {
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder("Transformation Rules*"));
+   }
+
+   private void showSavedChanges() {
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder("Transformation Rules"));
    }
 
    private void updateCommandButtonsUi() {
