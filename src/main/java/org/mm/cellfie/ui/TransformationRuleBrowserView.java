@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -97,21 +98,21 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
       JScrollPane scrMappingExpression = new JScrollPane(tblTransformationRules);
 
-      JPanel pnlMappingOpenSave = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      JPanel pnlMappingOpenSave = new JPanel(new GridLayout(1, 3));
       pnlContainer.add(pnlMappingOpenSave, BorderLayout.NORTH);
 
       JButton cmdLoad = new JButton("Open...");
-      cmdLoad.setPreferredSize(new Dimension(122, 22));
+      cmdLoad.setMinimumSize(new Dimension(122, 22));
       cmdLoad.addActionListener(new LoadRulesAction());
       pnlMappingOpenSave.add(cmdLoad);
 
       cmdSave = new JButton("Save");
-      cmdSave.setPreferredSize(new Dimension(122, 22));
+      cmdSave.setMinimumSize(new Dimension(122, 22));
       cmdSave.addActionListener(new SaveRulesAction());
       pnlMappingOpenSave.add(cmdSave);
 
       cmdSaveAs = new JButton("Save As...");
-      cmdSaveAs.setPreferredSize(new Dimension(122, 22));
+      cmdSaveAs.setMinimumSize(new Dimension(122, 22));
       cmdSaveAs.addActionListener(new SaveAsAction());
       pnlMappingOpenSave.add(cmdSaveAs);
 
@@ -121,25 +122,24 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       pnlExpressionBrowser.add(scrMappingExpression, BorderLayout.CENTER);
 
       JPanel pnlAddEditDelete = new JPanel(new BorderLayout());
-      pnlAddEditDelete.setBorder(new EmptyBorder(2, 5, 7, 5));
       pnlContainer.add(pnlAddEditDelete, BorderLayout.SOUTH);
 
       JPanel pnlCommandButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
       pnlAddEditDelete.add(pnlCommandButton, BorderLayout.WEST);
 
       cmdAdd = new JButton("Add");
-      cmdAdd.setPreferredSize(new Dimension(72, 22));
+      cmdAdd.setMaximumSize(new Dimension(92, 22));
       cmdAdd.addActionListener(new AddRuleButtonAction());
       pnlCommandButton.add(cmdAdd);
 
       cmdEdit = new JButton("Edit");
-      cmdEdit.setPreferredSize(new Dimension(72, 22));
+      cmdEdit.setMaximumSize(new Dimension(92, 22));
       cmdEdit.setEnabled(false);
       cmdEdit.addActionListener(new EditRuleButtonAction());
       pnlCommandButton.add(cmdEdit);
 
       cmdDelete = new JButton("Delete");
-      cmdDelete.setPreferredSize(new Dimension(72, 22));
+      cmdDelete.setMaximumSize(new Dimension(92, 22));
       cmdDelete.setEnabled(false);
       cmdDelete.addActionListener(new DeleteRuleButtonAction());
       pnlCommandButton.add(cmdDelete);

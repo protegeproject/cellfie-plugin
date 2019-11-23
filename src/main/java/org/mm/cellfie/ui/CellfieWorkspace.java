@@ -85,13 +85,12 @@ public class CellfieWorkspace extends JPanel {
       ruleBrowserView = new TransformationRuleBrowserView(this);
       splitPane.setRightComponent(ruleBrowserView);
 
-      JPanel pnlGenerateAxioms = new JPanel();
+      JPanel pnlGenerateAxioms = new JPanel(new BorderLayout());
       add(pnlGenerateAxioms, BorderLayout.SOUTH);
 
-      JButton cmdGenerateAxioms = new JButton("Generate Axioms");
-      cmdGenerateAxioms.setPreferredSize(new Dimension(152, 32));
+      JButton cmdGenerateAxioms = new JButton("Generate OWL Axioms");
       cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(this));
-      pnlGenerateAxioms.add(cmdGenerateAxioms);
+      pnlGenerateAxioms.add(cmdGenerateAxioms, BorderLayout.CENTER);
 
       validate();
    }
