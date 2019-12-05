@@ -19,6 +19,9 @@ public class WorkbookView extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
+   private static final String DEFAULT_TITLE = "Workbook";
+
+   private JPanel pnlContainer;
    private ViewTabbedPane tabSheetContainer;
 
    public WorkbookView(@Nonnull CellfieWorkspace cellfieWorkspace) {
@@ -26,9 +29,9 @@ public class WorkbookView extends JPanel {
       setLayout(new BorderLayout());
       setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-      JPanel pnlContainer = new JPanel();
+      pnlContainer = new JPanel();
       pnlContainer.setLayout(new BorderLayout());
-      pnlContainer.setBorder(ComponentFactory.createTitledBorder("Workbook"));
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder(DEFAULT_TITLE));
       add(pnlContainer, BorderLayout.CENTER);
 
       JPanel pnlWorkbook = new JPanel();
@@ -44,6 +47,11 @@ public class WorkbookView extends JPanel {
          tabSheetContainer.addTab(sheet.getSheetName(), null, sheetPanel);
       }
       validate();
+   }
+
+   public void setTitle(String title) {
+      pnlContainer.setBorder(ComponentFactory.createTitledBorder(
+            String.format("%s: %s", DEFAULT_TITLE, title)));
    }
 
    public CellRange getSelectedCellRange() {

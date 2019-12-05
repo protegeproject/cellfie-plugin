@@ -95,6 +95,10 @@ public class CellfieWorkspace extends JPanel {
       validate();
    }
 
+   public void setWorkbookTitle(String title) {
+      workbookView.setTitle(title);
+   }
+
    public Set<OWLAxiom> doTransformation() throws ParseException {
       Set<OWLAxiom> results = Sets.newHashSet();
       TransformationRuleList transformationRules = getRuleBrowserView().getPickedRules();
@@ -161,6 +165,7 @@ public class CellfieWorkspace extends JPanel {
       final Workbook workbook = new Workbook(WorkbookFactory.create(workbookFile));
       final OwlRenderer renderer = new OwlRenderer();
       final CellfieWorkspace workspacePanel = new CellfieWorkspace(ontology, workbook, renderer, editorKit);
+      workspacePanel.setWorkbookTitle(workbookFile.getAbsolutePath().toString());
       workspacePanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
       // Closing Cellfie using ESC key
