@@ -208,6 +208,8 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
                   tblTransformationRules.checkSelectAllRules();
                }
             }
+            cmdEdit.setEnabled(true);
+            cmdDelete.setEnabled(true);
             repaint();
          }
       }
@@ -366,6 +368,8 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
                   TransformationRuleList ruleList = TransformationRuleReader.readFromDocument(ruleFile);
                   tblTransformationRules.load(ruleList);
                   hasUnsavedChanges = false;
+                  cmdEdit.setEnabled(false);
+                  cmdDelete.setEnabled(false);
                   showSavedChanges();
                } catch (Exception e) {
                   ErrorLogPanel.showErrorDialog(e);
@@ -380,7 +384,6 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    public void tableChanged(TableModelEvent e) {
       hasUnsavedChanges = true; // flag the rule model is dirty
       showUnsavedChanges();
-      updateCommandButtonsUi();
    }
 
    /*
@@ -459,15 +462,5 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
    private void showSavedChanges() {
       pnlContainer.setBorder(ComponentFactory.createTitledBorder("Transformation Rules"));
-   }
-
-   private void updateCommandButtonsUi() {
-      if (hasTransformationRules()) {
-         cmdEdit.setEnabled(true);
-         cmdDelete.setEnabled(true);
-      } else {
-         cmdEdit.setEnabled(false);
-         cmdDelete.setEnabled(false);
-      }
    }
 }
