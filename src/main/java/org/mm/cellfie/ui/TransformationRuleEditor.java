@@ -136,6 +136,8 @@ public class TransformationRuleEditor extends JPanel {
 
       JLabel lblDescription = new JLabel("Description:");
       txtDescription = new JTextArea("", 5, 42);
+      txtDescription.setLineWrap(true);
+      txtDescription.setWrapStyleWord(true);
       JScrollPane scrDescription = new JScrollPane(txtDescription);
 
       JPanel pnlBottom = new JPanel(new BorderLayout(0, 5));
