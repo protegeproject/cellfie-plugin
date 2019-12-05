@@ -22,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -124,25 +123,33 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       JPanel pnlAddEditDelete = new JPanel(new BorderLayout());
       pnlContainer.add(pnlAddEditDelete, BorderLayout.SOUTH);
 
-      JPanel pnlCommandButton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+      JPanel pnlCommandButton = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 5));
       pnlAddEditDelete.add(pnlCommandButton, BorderLayout.WEST);
 
       cmdAdd = new JButton("Add");
-      cmdAdd.setMaximumSize(new Dimension(92, 22));
+      cmdAdd.setMaximumSize(new Dimension(92, 30));
       cmdAdd.addActionListener(new AddRuleButtonAction());
       pnlCommandButton.add(cmdAdd);
 
       cmdEdit = new JButton("Edit");
-      cmdEdit.setMaximumSize(new Dimension(92, 22));
+      cmdEdit.setMaximumSize(new Dimension(92, 30));
       cmdEdit.setEnabled(false);
       cmdEdit.addActionListener(new EditRuleButtonAction());
       pnlCommandButton.add(cmdEdit);
 
       cmdDelete = new JButton("Delete");
-      cmdDelete.setMaximumSize(new Dimension(92, 22));
+      cmdDelete.setMaximumSize(new Dimension(92, 30));
       cmdDelete.setEnabled(false);
       cmdDelete.addActionListener(new DeleteRuleButtonAction());
       pnlCommandButton.add(cmdDelete);
+      
+      JPanel pnlGenerateAxioms = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+      pnlAddEditDelete.add(pnlGenerateAxioms, BorderLayout.EAST);
+
+      JButton cmdGenerateAxioms = new JButton("Generate OWL Axioms");
+      cmdGenerateAxioms.setMaximumSize(new Dimension(142, 30));
+      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(cellfieWorkspace));
+      pnlGenerateAxioms.add(cmdGenerateAxioms);
 
       validate();
    }

@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.mm.cellfie.transformationrule.TransformationRule.ANY_WILDCARD;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -14,7 +13,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -84,13 +82,6 @@ public class CellfieWorkspace extends JPanel {
        */
       ruleBrowserView = new TransformationRuleBrowserView(this);
       splitPane.setRightComponent(ruleBrowserView);
-
-      JPanel pnlGenerateAxioms = new JPanel(new BorderLayout());
-      add(pnlGenerateAxioms, BorderLayout.SOUTH);
-
-      JButton cmdGenerateAxioms = new JButton("Generate OWL Axioms");
-      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(this));
-      pnlGenerateAxioms.add(cmdGenerateAxioms, BorderLayout.CENTER);
 
       validate();
    }
