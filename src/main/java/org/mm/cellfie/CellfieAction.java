@@ -3,10 +3,11 @@ package org.mm.cellfie;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.JDialog;
+import org.mm.cellfie.transformationrule.TransformationExecutor;
 import org.mm.cellfie.ui.CellfieWorkspace;
 import org.mm.cellfie.ui.DialogUtils;
+import org.mm.renderer.owl.OwlRenderer;
 import org.protege.editor.core.ui.error.ErrorLogPanel;
-import org.protege.editor.owl.model.OWLWorkspace;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +22,16 @@ public class CellfieAction extends ProtegeOWLAction {
 
    private static final Logger logger = LoggerFactory.getLogger(CellfieAction.class);
 
-   private OWLWorkspace protegeWorkspace;
+   private OwlRenderer renderer;
 
    @Override
    public void initialise() throws Exception {
-      protegeWorkspace = getOWLWorkspace();
+      renderer = new OwlRenderer(new ProtegeEntityResolver(getOWLModelManager()));
    }
 
    @Override
    public void actionPerformed(ActionEvent event) {
-      File workbookFile = DialogUtils.showOpenFileChooser(protegeWorkspace,
+      File workbookFile = DialogUtils.showOpenFileChooser(getOWLWorkspace(),
             "Open Excel Workbook",
             "Excel Workbook (.xlsx, .xls)",
             "xlsx", "xls");
@@ -46,7 +47,12 @@ public class CellfieAction extends ProtegeOWLAction {
    }
 
    private void showCellfieDialog(File workbookFile) throws Exception {
-      JDialog cellfieDialog = CellfieWorkspace.createDialog(protegeWorkspace, workbookFile, getOWLEditorKit());
+      
+      JDialog cellfieDialog = CellfieWorkspace.createDialog(
+            getOWLWorkspace(),
+            workbookFile,
+            getOWLEditorKit(),
+            new TransformationExecutor(renderer));
       cellfieDialog.setLocationRelativeTo(null);
       cellfieDialog.setVisible(true);
    }

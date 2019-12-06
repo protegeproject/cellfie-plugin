@@ -1,8 +1,8 @@
 package org.mm.cellfie.ui;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 import java.util.Vector;
 import javax.annotation.Nonnull;
 import org.protege.editor.core.ui.list.MList;
@@ -27,13 +27,13 @@ public class PreviewAxiomList extends MList {
    }
 
    @SuppressWarnings("unchecked")
-   public void addAxioms(@Nonnull Set<OWLAxiom> axioms) {
+   public void addAxioms(@Nonnull Collection<OWLAxiom> axioms) {
       checkNotNull(axioms);
       final Vector<PreviewAxiomList.Item> items = copyAndSort(axioms);
       setListData(items);
    }
 
-   private Vector<PreviewAxiomList.Item> copyAndSort(Set<OWLAxiom> axioms) {
+   private Vector<PreviewAxiomList.Item> copyAndSort(Collection<OWLAxiom> axioms) {
       Vector<PreviewAxiomList.Item> listItems = new Vector<>();
       for (OWLAxiom axiom : axioms) {
          listItems.add(new PreviewAxiomList.Item(axiom));

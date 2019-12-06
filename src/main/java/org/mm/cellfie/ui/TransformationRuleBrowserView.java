@@ -81,8 +81,8 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       tblTransformationRules.addMouseListener(new RuleEditMouseListener());
       tblTransformationRules.addMouseListener(new RuleSelectionMouseListener());
 
-      tblTransformationRules.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-            .put(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), "ADD_RULE");
+      tblTransformationRules.getInputMap(JTable.WHEN_FOCUSED)
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "ADD_RULE");
       tblTransformationRules.getActionMap().put("ADD_RULE", new AddRuleKeyAction());
 
       tblTransformationRules.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
@@ -148,7 +148,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
 
       JButton cmdGenerateAxioms = new JButton("Generate OWL Axioms");
       cmdGenerateAxioms.setMaximumSize(new Dimension(142, 30));
-      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction(cellfieWorkspace));
+      cmdGenerateAxioms.addActionListener(new GenerateAxiomsAction());
       pnlGenerateAxioms.add(cmdGenerateAxioms);
 
       validate();
@@ -166,7 +166,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       return tblTransformationRules.getAllRules();
    }
 
-   public TransformationRuleList getPickedRules() {
+   public TransformationRuleList getSelectedRules() {
       return tblTransformationRules.getPickedRules();
    }
 
@@ -456,6 +456,20 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
          saveAsFile();
       } else {
          saveFile(ruleFile);
+      }
+   }
+
+   /*
+    * Action listeners for generating the OWL axioms
+    */
+   private class GenerateAxiomsAction implements ActionListener {
+      @Override
+      public void actionPerformed(ActionEvent event) {
+         try {
+            ResultDialog.showDialog(cellfieWorkspace, cellfieWorkspace.generateAxioms());
+         } catch (Exception e) {
+            ErrorLogPanel.showErrorDialog(e);
+         }
       }
    }
 

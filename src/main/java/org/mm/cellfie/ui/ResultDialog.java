@@ -1,18 +1,14 @@
 package org.mm.cellfie.ui;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.mm.cellfie.exception.CellfieException;
-import org.protege.editor.core.ui.error.ErrorLogPanel;
 import org.protege.editor.core.ui.util.JOptionPaneEx;
+import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.ontology.OntologyPreferences;
 import org.semanticweb.owlapi.model.AddAxiom;
@@ -31,45 +27,26 @@ import org.semanticweb.owlapi.model.OWLOntologyID;
  * @author Josef Hardi <josef.hardi@stanford.edu> <br>
  *         Stanford Center for Biomedical Informatics Research
  */
-public class GenerateAxiomsAction implements ActionListener {
+public class ResultDialog {
 
    private static final int CANCEL_IMPORT = 0;
    private static final int ADD_TO_NEW_ONTOLOGY = 1;
    private static final int ADD_TO_CURRENT_ONTOLOGY = 2;
 
-   private final CellfieWorkspace cellfieWorkspace;
+   private final static ImportOption[] options = {
+         new ImportOption(CANCEL_IMPORT, "Cancel"),
+         new ImportOption(ADD_TO_NEW_ONTOLOGY, "Add to a new ontology"),
+         new ImportOption(ADD_TO_CURRENT_ONTOLOGY, "Add to current ontology") };
 
-   public GenerateAxiomsAction(@Nonnull CellfieWorkspace cellfieWorkspace) {
-      this.cellfieWorkspace = checkNotNull(cellfieWorkspace);
-   }
-
-   @Override
-   public void actionPerformed(ActionEvent event) {
-      try {
-         Set<OWLAxiom> results = cellfieWorkspace.doTransformation();
-         showAxiomPreviewDialog(results);
-      } catch (Exception e) {
-         ErrorLogPanel.showErrorDialog(e);
-      } 
-   }
-
-   public String getOntologyFileLocation() {
-      OWLOntology ontology = cellfieWorkspace.getOntology();
-      String iriString = ontology.getOWLOntologyManager().getOntologyDocumentIRI(ontology).toString();
-      return iriString.substring(iriString.indexOf(":") + 1, iriString.length());
-   }
-
-   private void showAxiomPreviewDialog(Set<OWLAxiom> axioms)
+   public static void showDialog(CellfieWorkspace cellfieWorkspace, Collection<OWLAxiom> axioms)
          throws CellfieException {
-      final OWLModelManager modelManager = cellfieWorkspace.getEditorKit().getModelManager();
-      final ImportOption[] options = {
-            new ImportOption(CANCEL_IMPORT, "Cancel"),
-            new ImportOption(ADD_TO_NEW_ONTOLOGY, "Add to a new ontology"),
-            new ImportOption(ADD_TO_CURRENT_ONTOLOGY, "Add to current ontology") };
+      final OWLEditorKit editorKit = cellfieWorkspace.getEditorKit();
+      final OWLModelManager modelManager = editorKit.getModelManager();
+      
       try {
          OWLOntology currentOntology = cellfieWorkspace.getOntology();
          int answer = JOptionPaneEx.showConfirmDialog(cellfieWorkspace, "Generated Axioms",
-               createPreviewAxiomsPanel(axioms), JOptionPane.PLAIN_MESSAGE,
+               createPreviewAxiomsPanel(editorKit, axioms), JOptionPane.PLAIN_MESSAGE,
                JOptionPane.DEFAULT_OPTION, null, options, options[1]);
          switch (answer) {
             case ADD_TO_CURRENT_ONTOLOGY:
@@ -92,18 +69,18 @@ public class GenerateAxiomsAction implements ActionListener {
       }
    }
 
-   private OWLOntologyChange addImport(OWLOntology newOntology, OWLImportsDeclaration importDeclaration) {
+   private static OWLOntologyChange addImport(OWLOntology newOntology, OWLImportsDeclaration importDeclaration) {
       return new AddImport(newOntology, importDeclaration);
    }
 
-   private OWLOntologyID createOntologyID() {
+   private static OWLOntologyID createOntologyID() {
       OntologyPreferences ontologyPreferences = OntologyPreferences.getInstance();
       IRI freshIRI = IRI.create(ontologyPreferences.generateNextURI());
       return new OWLOntologyID(com.google.common.base.Optional.of(freshIRI),
             com.google.common.base.Optional.absent());
    }
 
-   private List<OWLOntologyChange> addAxioms(OWLOntology ontology, Set<OWLAxiom> axioms) {
+   private static List<OWLOntologyChange> addAxioms(OWLOntology ontology, Collection<OWLAxiom> axioms) {
       List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
       for (OWLAxiom ax : axioms) {
          changes.add(new AddAxiom(ontology, ax));
@@ -111,8 +88,8 @@ public class GenerateAxiomsAction implements ActionListener {
       return changes;
    }
 
-   private JPanel createPreviewAxiomsPanel(Set<OWLAxiom> generatedAxioms) {
-      PreviewAxiomsPanel previewPanel = new PreviewAxiomsPanel(cellfieWorkspace);
+   private static JPanel createPreviewAxiomsPanel(OWLEditorKit editorKit, Collection<OWLAxiom> generatedAxioms) {
+      PreviewAxiomsPanel previewPanel = new PreviewAxiomsPanel(editorKit);
       previewPanel.setContent(generatedAxioms);
       return previewPanel;
    }
@@ -120,7 +97,7 @@ public class GenerateAxiomsAction implements ActionListener {
    /**
     * A helper class for creating import axioms command buttons.
     */
-   class ImportOption implements Comparable<ImportOption> {
+   static class ImportOption implements Comparable<ImportOption> {
       private int option;
       private String title;
 

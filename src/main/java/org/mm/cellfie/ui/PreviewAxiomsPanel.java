@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.text.DecimalFormat;
-import java.util.Set;
+import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,9 +26,8 @@ public class PreviewAxiomsPanel extends JPanel {
    private final JLabel previewSummaryLabel;
    private final PreviewAxiomList previewedList;
 
-   public PreviewAxiomsPanel(@Nonnull CellfieWorkspace cellfieWorkspace) {
-      checkNotNull(cellfieWorkspace);
-      OWLEditorKit editorKit = cellfieWorkspace.getEditorKit();
+   public PreviewAxiomsPanel(@Nonnull OWLEditorKit editorKit) {
+      checkNotNull(editorKit);
 
       setLayout(new BorderLayout());
 
@@ -43,23 +42,23 @@ public class PreviewAxiomsPanel extends JPanel {
       add(pnlViewLog, BorderLayout.SOUTH);
    }
 
-   public void setContent(@Nonnull Set<OWLAxiom> axioms) {
+   public void setContent(@Nonnull Collection<OWLAxiom> axioms) {
       setContent(axioms, null);
    }
 
-   public void setContent(@Nonnull Set<OWLAxiom> axioms, String executionLog) {
+   public void setContent(@Nonnull Collection<OWLAxiom> axioms, String executionLog) {
       checkNotNull(axioms);
       writeSummary(axioms);
       fillList(axioms);
    }
 
-   private void writeSummary(Set<OWLAxiom> axioms) {
+   private void writeSummary(Collection<OWLAxiom> axioms) {
       final DecimalFormat decimalFormatter = new DecimalFormat("#,###");
       String formattedSize = decimalFormatter.format(axioms.size());
       previewSummaryLabel.setText(format("Cellfie generates %s axioms.", formattedSize));
    }
 
-   private void fillList(Set<OWLAxiom> axioms) {
+   private void fillList(Collection<OWLAxiom> axioms) {
       previewedList.addAxioms(axioms);
    }
 }
