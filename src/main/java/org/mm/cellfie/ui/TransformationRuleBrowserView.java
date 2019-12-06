@@ -86,7 +86,7 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
       tblTransformationRules.getActionMap().put("ADD_RULE", new AddRuleKeyAction());
 
       tblTransformationRules.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
-            .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "EDIT_RULE");
+            .put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "EDIT_RULE");
       tblTransformationRules.getActionMap().put("EDIT_RULE", new EditRuleKeyAction());
 
       tblTransformationRules.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
