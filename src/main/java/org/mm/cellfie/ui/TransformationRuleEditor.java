@@ -58,7 +58,7 @@ public class TransformationRuleEditor extends JPanel {
       pnlSheetSelector.add(lblSheetName);
       pnlSheetSelector.add(cbbSheetName);
 
-      JLabel lblUseColumnsFrom = new JLabel("Use columns from: ");
+      JLabel lblUseColumnsFrom = new JLabel("Column range from: ");
       lblUseColumnsFrom.setPreferredSize(new Dimension(140, 22));
 
       JPanel pnlColumnRange = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -73,7 +73,7 @@ public class TransformationRuleEditor extends JPanel {
       cmbStartColumn.setPreferredSize(new Dimension(62, 22));
 
       JLabel lblColumnTo = new JLabel("to", SwingConstants.CENTER);
-      lblColumnTo.setPreferredSize(new Dimension(50, 22));
+      lblColumnTo.setPreferredSize(new Dimension(40, 22));
 
       final DefaultComboBoxModel<String> endColumnModel = new DefaultComboBoxModel<String>(
             new String[] {"+", "A", "B", "C", "D", "E", "F",
@@ -90,7 +90,7 @@ public class TransformationRuleEditor extends JPanel {
       pnlColumnRange.add(lblColumnTo);
       pnlColumnRange.add(cmbEndColumn);
 
-      JLabel lblUseRowsFrom = new JLabel("Use rows from: ");
+      JLabel lblUseRowsFrom = new JLabel("Row range from: ");
       lblUseRowsFrom.setPreferredSize(new Dimension(140, 22));
 
       JPanel pnlRowRange = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -105,7 +105,7 @@ public class TransformationRuleEditor extends JPanel {
       cmbStartRow.setPreferredSize(new Dimension(62, 22));
 
       JLabel lblRowTo = new JLabel("to", SwingConstants.CENTER);
-      lblRowTo.setPreferredSize(new Dimension(50, 22));
+      lblRowTo.setPreferredSize(new Dimension(40, 22));
 
       final DefaultComboBoxModel<String> endRowModel = new DefaultComboBoxModel<String>(
             new String[] {"+", "1", "2", "3", "4", "5", "6",
