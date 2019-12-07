@@ -278,10 +278,12 @@ public class TransformationRuleBrowserView extends JPanel implements TableModelL
    private TransformationRuleEditor createRuleEditor(CellRange cellRange) {
       TransformationRuleEditor editorPanel = new TransformationRuleEditor(cellfieWorkspace);
       editorPanel.setSheetName(cellRange.getSheetName());
-      editorPanel.setStartColumn(cellRange.getStartColumnName());
-      editorPanel.setStartRow(cellRange.getStartRowNumber());
-      editorPanel.setEndColumn(cellRange.getEndColumnName());
-      editorPanel.setEndRow(cellRange.getEndRowNumber());
+      if (cellRange.getColumnRangeSize() > 1 || cellRange.getRowRangeSize() > 1) {
+         editorPanel.setStartColumn(cellRange.getStartColumnName());
+         editorPanel.setStartRow(cellRange.getStartRowNumber());
+         editorPanel.setEndColumn(cellRange.getEndColumnName());
+         editorPanel.setEndRow(cellRange.getEndRowNumber());
+      }
       return editorPanel;
    }
 
