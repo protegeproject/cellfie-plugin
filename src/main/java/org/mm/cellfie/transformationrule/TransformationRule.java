@@ -15,8 +15,6 @@ import com.google.gson.annotations.SerializedName;
  */
 public class TransformationRule {
 
-   public static final String START_COLUMN = "A";
-   public static final String START_ROW = "1";
    public static final String ANY_WILDCARD = "+";
 
    @Expose @SerializedName("sheetName")

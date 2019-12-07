@@ -27,6 +27,9 @@ public class TransformationRuleEditor extends JPanel {
 
    private static final long serialVersionUID = 1L;
 
+   public static final String START_COLUMN = "A";
+   public static final String START_ROW = "2";
+
    private JComboBox<String> cbbSheetName;
 
    private JComboBox<String> cmbStartColumn;
@@ -68,7 +71,7 @@ public class TransformationRuleEditor extends JPanel {
                   "N", "O", "P", "Q", "R", "S", "T",
                   "U", "V", "W", "X", "Y", "Z"});
       cmbStartColumn = new JComboBox<String>(startColumnModel);
-      cmbStartColumn.setSelectedIndex(0);
+      cmbStartColumn.setSelectedItem(START_COLUMN);
       cmbStartColumn.setEditable(true);
       cmbStartColumn.setPreferredSize(new Dimension(62, 22));
 
@@ -81,7 +84,7 @@ public class TransformationRuleEditor extends JPanel {
                   "N", "O", "P", "Q", "R", "S", "T",
                   "U", "V", "W", "X", "Y", "Z"});
       cmbEndColumn = new JComboBox<String>(endColumnModel);
-      cmbEndColumn.setSelectedIndex(1);
+      cmbEndColumn.setSelectedItem(START_COLUMN);
       cmbEndColumn.setEditable(true);
       cmbEndColumn.setPreferredSize(new Dimension(62, 22));
 
@@ -100,7 +103,7 @@ public class TransformationRuleEditor extends JPanel {
                   "15", "16", "17", "18", "19", "20", "30",
                   "40", "50", "100", "200", "500"});
       cmbStartRow = new JComboBox<String>(startRowModel);
-      cmbStartRow.setSelectedIndex(1);
+      cmbStartRow.setSelectedItem(START_ROW);
       cmbStartRow.setEditable(true);
       cmbStartRow.setPreferredSize(new Dimension(62, 22));
 
@@ -113,7 +116,7 @@ public class TransformationRuleEditor extends JPanel {
                   "15", "16", "17", "18", "19", "20", "30",
                   "40", "50", "100", "200", "500"});
       cmbEndRow = new JComboBox<String>(endRowModel);
-      cmbEndRow.setSelectedIndex(0);
+      cmbEndRow.setSelectedItem(TransformationRule.ANY_WILDCARD);
       cmbEndRow.setEditable(true);
       cmbEndRow.setPreferredSize(new Dimension(62, 22));
 
@@ -159,7 +162,7 @@ public class TransformationRuleEditor extends JPanel {
    public void setStartColumn(@Nonnull String columnName) {
       checkNotNull(columnName);
       if (columnName.isEmpty()) {
-         columnName = TransformationRule.START_COLUMN;
+         columnName = START_COLUMN;
       }
       cmbStartColumn.setSelectedItem(columnName);
    }
@@ -167,7 +170,7 @@ public class TransformationRuleEditor extends JPanel {
    public void setStartRow(@Nonnull String rowNumber) {
       checkNotNull(rowNumber);
       if (rowNumber.isEmpty()) {
-         rowNumber = TransformationRule.START_ROW;
+         rowNumber = START_ROW;
       }
       cmbStartRow.setSelectedItem(rowNumber);
    }
