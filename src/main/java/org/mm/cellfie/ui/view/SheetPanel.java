@@ -6,6 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 
 import javax.annotation.Nonnull;
 import javax.swing.JPanel;
@@ -152,9 +153,9 @@ public class SheetPanel extends JPanel {
                case Cell.CELL_TYPE_STRING :
                   return cell.getStringCellValue();
                case Cell.CELL_TYPE_NUMERIC :
-                  // Check if the numeric is double or integer
+                  // Check if the numeric is a decimal or floating-point number
                   if (isInteger(cell.getNumericCellValue())) {
-                     return (int) cell.getNumericCellValue();
+                     return new BigDecimal(cell.getNumericCellValue());
                   } else {
                      return cell.getNumericCellValue();
                   }
