@@ -1,23 +1,21 @@
 package org.mm.cellfie.ui.view;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.annotation.Nonnull;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
-
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.mm.ss.SpreadSheetUtil;
+
+import javax.annotation.Nonnull;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Josef Hardi <johardi@stanford.edu> <br>
@@ -41,6 +39,8 @@ public class SheetPanel extends JPanel {
    private int startRowIndex = START_INDEX;
    private int endColumnIndex = START_INDEX;
    private int endRowIndex = END_INDEX;
+
+   private final DataFormatter dataFormatter = new DataFormatter();
 
    private Point startMousePt;
    private Point endMousePt;
@@ -93,6 +93,11 @@ public class SheetPanel extends JPanel {
       this.startRowIndex = startRowIndex;
       this.endColumnIndex = endColumnIndex;
       this.endRowIndex = endRowIndex;
+   }
+
+   private boolean isDateFormatted(Cell cell)
+   {
+      return DateUtil.isCellDateFormatted(cell);
    }
 
    /**
@@ -151,13 +156,15 @@ public class SheetPanel extends JPanel {
                   return "";
                case Cell.CELL_TYPE_STRING :
                   return cell.getStringCellValue();
-               case Cell.CELL_TYPE_NUMERIC :
-                  // Check if the numeric is double or integer
-                  if (isInteger(cell.getNumericCellValue())) {
-                     return (int) cell.getNumericCellValue();
-                  } else {
-                     return cell.getNumericCellValue();
-                  }
+            case Cell.CELL_TYPE_NUMERIC :
+               // Check if the numeric is an integer or double or a date
+               if (isDateFormatted(cell)) {
+                  return dataFormatter.formatCellValue(cell);
+               } else if (isInteger(cell.getNumericCellValue())) {
+                  return Integer.toString((int)cell.getNumericCellValue());
+               } else {
+                  return Double.toString(cell.getNumericCellValue());
+               }
                case Cell.CELL_TYPE_BOOLEAN :
                   return cell.getBooleanCellValue();
                case Cell.CELL_TYPE_FORMULA :

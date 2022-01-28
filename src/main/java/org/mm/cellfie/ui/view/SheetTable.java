@@ -1,13 +1,6 @@
 package org.mm.cellfie.ui.view;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Insets;
-
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -16,6 +9,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import java.awt.*;
 
 public class SheetTable extends JTable
 {
