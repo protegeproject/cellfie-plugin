@@ -1,6 +1,6 @@
 package org.mm.cellfie.ui.view;
 
-import org.apache.poi.hssf.util.CellReference;
+import org.apache.poi.ss.util.CellReference;
 
 public class Sheet
 {

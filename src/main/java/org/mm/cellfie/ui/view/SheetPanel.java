@@ -152,11 +152,11 @@ public class SheetPanel extends JPanel {
          try {
             Cell cell = sheet.getRow(row).getCell(column);
             switch (cell.getCellType()) {
-               case Cell.CELL_TYPE_BLANK :
+               case BLANK :
                   return "";
-               case Cell.CELL_TYPE_STRING :
+               case STRING :
                   return cell.getStringCellValue();
-            case Cell.CELL_TYPE_NUMERIC :
+            case NUMERIC :
                // Check if the numeric is an integer or double or a date
                if (isDateFormatted(cell)) {
                   return dataFormatter.formatCellValue(cell);
@@ -165,9 +165,9 @@ public class SheetPanel extends JPanel {
                } else {
                   return Double.toString(cell.getNumericCellValue());
                }
-               case Cell.CELL_TYPE_BOOLEAN :
+               case BOOLEAN :
                   return cell.getBooleanCellValue();
-               case Cell.CELL_TYPE_FORMULA :
+               case FORMULA :
                   return cell.getNumericCellValue();
                default :
                   return "";
