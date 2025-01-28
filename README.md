@@ -47,10 +47,10 @@ You have two import options for these new axioms, which are, import them to a ne
 
 To build and install this plugin you must have the following items installed:
 
-+ [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
++ [Java 11](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or later
 + A tool for checking out a [Git](http://git-scm.com/) repository
 + Apache's [Maven](http://maven.apache.org/index.html)
-+ A Protégé 5.0.0 or higher distribution. Download [here](http://protege.stanford.edu/products.php#desktop-protege).
++ A Protégé 5.6.4 or higher distribution. Download [here](http://protege.stanford.edu/products.php#desktop-protege).
 
 Get a copy of the latest code:
 
@@ -68,7 +68,7 @@ On build completion the ```target``` directory will contain a cellfie-${version}
 The JAR is generated in the OSGi bundle format required by Protégé's plugin-in mechanism.
 
 To install in your local Protégé, copy this JAR file to the ```plugins``` subdirectory of your Protégé installation (e.g.,
-/Applications/Protege-5.5.0/plugins/).  
+/Applications/Protege-5.6.4/plugins/).  
 
 ### Questions
 
