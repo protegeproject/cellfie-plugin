@@ -247,7 +247,7 @@ public class GenerateAxiomsAction implements ActionListener
    private List<? extends OWLOntologyChange> addImport(OWLOntology newOntology, OWLOntology currentOntology)
    {
       List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-      com.google.common.base.Optional<IRI> ontologyIri = currentOntology.getOntologyID().getOntologyIRI();
+      Optional<IRI> ontologyIri = currentOntology.getOntologyID().getOntologyIRI();
       if (ontologyIri.isPresent()) {
          OWLImportsDeclaration importDeclaration = modelManager.getOWLDataFactory().getOWLImportsDeclaration(ontologyIri.get());
          changes.add(new AddImport(newOntology, importDeclaration));
@@ -259,7 +259,7 @@ public class GenerateAxiomsAction implements ActionListener
    {
       OntologyPreferences ontologyPreferences = OntologyPreferences.getInstance();
       IRI freshIRI = IRI.create(ontologyPreferences.generateNextURI());
-      return new OWLOntologyID(com.google.common.base.Optional.of(freshIRI), com.google.common.base.Optional.absent());
+      return new OWLOntologyID(Optional.of(freshIRI), Optional.empty());
    }
 
    private List<OWLOntologyChange> addAxioms(OWLOntology ontology, Set<OWLAxiom> axioms)

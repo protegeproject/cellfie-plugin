@@ -25,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.vocab.Namespaces;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
@@ -61,7 +62,7 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
    public <T extends OWLEntity> T resolve(String entityName, final Class<T> entityType)
          throws EntityNotFoundException {
       T entity = null;
-      OWLEntity foundEntity = entityFinder.getOWLEntity(entityName);
+      OWLEntity foundEntity = findEntity(entityName, entityType);
       if (foundEntity == null) {
          entity = createNewForBuiltInEntity(entityName, entityType);
       } else {
@@ -73,6 +74,22 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
                      entityName));
       }
       return entity;
+   }
+
+   private <T extends OWLEntity> OWLEntity findEntity(String entityName, Class<T> entityType) {
+      OWLEntity entity = entityFinder.getOWLEntity(entityName);
+      if (entity != null || !isPrefixedName(entityName)) {
+         return entity;
+      }
+      // The finder follows the current Protégé renderer, which may use labels.
+      // Resolve explicit prefixes independently, including imported entities.
+      Optional<IRI> prefix = getPrefix(entityName);
+      if (!prefix.isPresent()) {
+         return null;
+      }
+      IRI iri = IRI.create(prefix.get().toString() + getLocalName(entityName));
+      return modelManager.getActiveOntology().getEntitiesInSignature(iri, Imports.INCLUDED)
+            .stream().filter(entityType::isInstance).findFirst().orElse(null);
    }
 
    private <T extends OWLEntity> T createNewForBuiltInEntity(String entityName, final Class<T> entityType) {
@@ -136,7 +153,7 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
    @Override
    public <T extends OWLEntity> T create(String entityName, final Class<T> entityType)
          throws EntityCreationException {
-      OWLEntity entity = entityFinder.getOWLEntity(entityName);
+      OWLEntity entity = findEntity(entityName, entityType);
       if (entity == null) {
          try {
             return createNew(entityName, entityType);
@@ -192,8 +209,8 @@ public class OWLProtegeEntityResolver implements OWLEntityResolver {
           }
       }
       int colonIndex = prefixedName.indexOf(':');
-      if (colonIndex > 0 && format != null && format.isPrefixOWLOntologyFormat()) {
-          PrefixDocumentFormat prefixes = format.asPrefixOWLOntologyFormat();
+      if (colonIndex > 0 && format != null && format.isPrefixOWLDocumentFormat()) {
+          PrefixDocumentFormat prefixes = format.asPrefixOWLDocumentFormat();
           String prefixLabel = prefixedName.substring(0, colonIndex + 1);
           String prefix = prefixes.getPrefix(prefixLabel);
           if (prefix != null) {

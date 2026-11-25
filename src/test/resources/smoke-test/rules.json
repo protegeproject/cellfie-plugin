@@ -1,0 +1,14 @@
+{
+  "Collections": [
+    {
+      "sheetName": "Classes",
+      "startColumn": "A",
+      "endColumn": "A",
+      "startRow": "2",
+      "endRow": "3",
+      "comment": "Prot\u00e9g\u00e9 6 smoke test",
+      "rule": "Class: @A* SubClassOf: ex:Fruit Annotations: rdfs:label @B*",
+      "active": true
+    }
+  ]
+}

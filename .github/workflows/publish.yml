@@ -1,0 +1,72 @@
+name: Publish packages to Maven Central
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag to publish (leave empty for snapshots)'
+        required: false
+        type: string
+
+concurrency:
+  group: publish-${{ inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: temurin
+          server-id: ossrh
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_TOKEN
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: GPG_PASSPHRASE
+      - name: Check publishing credentials
+        shell: bash
+        run: |
+          for name in GPG_PASSPHRASE OSSRH_USERNAME OSSRH_TOKEN; do
+            if [[ -z "${!name}" ]]; then
+              echo "Missing publishing credential: ${name}"
+              exit 1
+            fi
+          done
+      - name: Validate project version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || (github.event_name == 'push' && github.ref_name) || '' }}
+        run: |
+          set -euo pipefail
+          project_version="$(python3 -c 'import xml.etree.ElementTree as E; print(E.parse("pom.xml").getroot().findtext("{http://maven.apache.org/POM/4.0.0}version"))')"
+          if [[ -n "${RELEASE_TAG}" ]]; then
+            if [[ ! "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Invalid release tag: ${RELEASE_TAG}"
+              exit 1
+            fi
+            if [[ "${project_version}" != "${RELEASE_TAG}" ]]; then
+              echo "Release tag ${RELEASE_TAG} does not match project version ${project_version}"
+              exit 1
+            fi
+            git show-ref --verify --quiet "refs/tags/${RELEASE_TAG}"
+          elif [[ "${project_version}" != *-SNAPSHOT ]]; then
+            echo "A release version requires an explicit release tag"
+            exit 1
+          fi
+      - name: Publish packages
+        run: mvn --batch-mode --activate-profiles release clean deploy
+
+env:
+  GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
