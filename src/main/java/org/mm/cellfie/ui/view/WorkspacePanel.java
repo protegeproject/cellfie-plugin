@@ -125,11 +125,11 @@ public class WorkspacePanel extends JPanel
       if (ontology.getOntologyID().isAnonymous()) {
          return ontology.getOntologyID().toString();
       }
-      final com.google.common.base.Optional<IRI> iri = ontology.getOntologyID().getDefaultDocumentIRI();
+      final Optional<IRI> iri = ontology.getOntologyID().getDefaultDocumentIRI();
       return getOntologyLabelText(iri);
    }
 
-   private String getOntologyLabelText(com.google.common.base.Optional<IRI> iri)
+   private String getOntologyLabelText(Optional<IRI> iri)
    {
       StringBuilder sb = new StringBuilder();
       if (iri.isPresent()) {
